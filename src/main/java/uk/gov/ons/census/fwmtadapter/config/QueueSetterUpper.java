@@ -4,9 +4,7 @@ import static org.springframework.amqp.core.Binding.DestinationType.QUEUE;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +37,6 @@ public class QueueSetterUpper {
 
   @Bean
   public Binding bindingActionOutboundQueue() {
-    return new Binding(
-        actionOutboundQueue, QUEUE, outboundExchange, "", null);
+    return new Binding(actionOutboundQueue, QUEUE, outboundExchange, "", null);
   }
 }

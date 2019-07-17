@@ -1,6 +1,5 @@
 package uk.gov.ons.census.fwmtadapter.messaging;
 
-import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.annotation.MessageEndpoint;
@@ -13,7 +12,8 @@ public class ActionFieldReceiver {
   private final String outboundExchange;
   private final RabbitTemplate rabbitTemplate;
 
-  public ActionFieldReceiver(RabbitTemplate rabbitTemplate,
+  public ActionFieldReceiver(
+      RabbitTemplate rabbitTemplate,
       @Value("${queueconfig.outbound-exchange}") String outboundExchange) {
     this.rabbitTemplate = rabbitTemplate;
     this.outboundExchange = outboundExchange;
