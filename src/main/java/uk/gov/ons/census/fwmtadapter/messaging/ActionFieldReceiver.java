@@ -67,7 +67,6 @@ public class ActionFieldReceiver {
     ActionInstruction actionInstruction = new ActionInstruction();
     actionInstruction.setActionRequest(actionRequest);
 
-
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }
 }

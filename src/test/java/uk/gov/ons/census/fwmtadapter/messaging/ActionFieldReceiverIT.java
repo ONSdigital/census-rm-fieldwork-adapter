@@ -2,7 +2,6 @@ package uk.gov.ons.census.fwmtadapter.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.concurrent.BlockingQueue;
@@ -63,15 +62,14 @@ public class ActionFieldReceiverIT {
     StringReader reader = new StringReader(actualMessage);
     ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
 
-    assertThat(fieldworkFollowup.getAddressLine1()).isEqualTo(
-        actionInstruction.getActionRequest().getAddress().getLine1());
-    assertThat(fieldworkFollowup.getPostcode()).isEqualTo(
-        actionInstruction.getActionRequest().getAddress().getPostcode());
-    assertThat(new BigDecimal("-179.99999")).isEqualTo(
-        actionInstruction.getActionRequest().getAddress().getLatitude());
-    assertThat(new BigDecimal("179.99999")).isEqualTo(
-        actionInstruction.getActionRequest().getAddress().getLongitude());
-    assertThat(999).isEqualTo(
-        actionInstruction.getActionRequest().getCeExpectedResponses());
+    assertThat(fieldworkFollowup.getAddressLine1())
+        .isEqualTo(actionInstruction.getActionRequest().getAddress().getLine1());
+    assertThat(fieldworkFollowup.getPostcode())
+        .isEqualTo(actionInstruction.getActionRequest().getAddress().getPostcode());
+    assertThat(new BigDecimal("-179.99999"))
+        .isEqualTo(actionInstruction.getActionRequest().getAddress().getLatitude());
+    assertThat(new BigDecimal("179.99999"))
+        .isEqualTo(actionInstruction.getActionRequest().getAddress().getLongitude());
+    assertThat(999).isEqualTo(actionInstruction.getActionRequest().getCeExpectedResponses());
   }
 }

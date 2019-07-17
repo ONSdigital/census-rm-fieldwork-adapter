@@ -31,19 +31,17 @@ public class ActionFieldReceiverTest {
 
     // Then
     ArgumentCaptor<ActionInstruction> argCaptor = ArgumentCaptor.forClass(ActionInstruction.class);
-    verify(rabbitTemplate).convertAndSend(eq("TEST EXCHANGE"), eq(""),
-        argCaptor.capture());
+    verify(rabbitTemplate).convertAndSend(eq("TEST EXCHANGE"), eq(""), argCaptor.capture());
 
     ActionInstruction actionInstruction = argCaptor.getValue();
-    assertThat(fieldworkFollowup.getAddressLine1()).isEqualTo(
-        actionInstruction.getActionRequest().getAddress().getLine1());
-    assertThat(fieldworkFollowup.getPostcode()).isEqualTo(
-        actionInstruction.getActionRequest().getAddress().getPostcode());
-    assertThat(new BigDecimal("-179.99999")).isEqualTo(
-        actionInstruction.getActionRequest().getAddress().getLatitude());
-    assertThat(new BigDecimal("179.99999")).isEqualTo(
-        actionInstruction.getActionRequest().getAddress().getLongitude());
-    assertThat(999).isEqualTo(
-        actionInstruction.getActionRequest().getCeExpectedResponses());
+    assertThat(fieldworkFollowup.getAddressLine1())
+        .isEqualTo(actionInstruction.getActionRequest().getAddress().getLine1());
+    assertThat(fieldworkFollowup.getPostcode())
+        .isEqualTo(actionInstruction.getActionRequest().getAddress().getPostcode());
+    assertThat(new BigDecimal("-179.99999"))
+        .isEqualTo(actionInstruction.getActionRequest().getAddress().getLatitude());
+    assertThat(new BigDecimal("179.99999"))
+        .isEqualTo(actionInstruction.getActionRequest().getAddress().getLongitude());
+    assertThat(999).isEqualTo(actionInstruction.getActionRequest().getCeExpectedResponses());
   }
 }
