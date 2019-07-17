@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.math.BigDecimal;
 import java.util.concurrent.BlockingQueue;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -20,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 
@@ -49,15 +51,27 @@ public class ActionFieldReceiverIT {
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
 
     EasyRandom easyRandom = new EasyRandom();
-    ActionInstruction actionInstruction = easyRandom.nextObject(ActionInstruction.class);
-    rabbitQueueHelper.sendMessage(actionFieldQueue, actionInstruction);
+    FieldworkFollowup fieldworkFollowup = easyRandom.nextObject(FieldworkFollowup.class);
+    fieldworkFollowup.setLatitude("-179.99999");
+    fieldworkFollowup.setLongitude("179.99999");
+    fieldworkFollowup.setCeExpectedCapacity("999");
+    rabbitQueueHelper.sendMessage(actionFieldQueue, fieldworkFollowup);
 
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
     JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
     StringReader reader = new StringReader(actualMessage);
-    ActionInstruction actualObject = (ActionInstruction) unmarshaller.unmarshal(reader);
+    ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
 
-    assertThat(actionInstruction).isEqualTo(actualObject);
+    assertThat(fieldworkFollowup.getAddressLine1()).isEqualTo(
+        actionInstruction.getActionRequest().getAddress().getLine1());
+    assertThat(fieldworkFollowup.getPostcode()).isEqualTo(
+        actionInstruction.getActionRequest().getAddress().getPostcode());
+    assertThat(new BigDecimal("-179.99999")).isEqualTo(
+        actionInstruction.getActionRequest().getAddress().getLatitude());
+    assertThat(new BigDecimal("179.99999")).isEqualTo(
+        actionInstruction.getActionRequest().getAddress().getLongitude());
+    assertThat(999).isEqualTo(
+        actionInstruction.getActionRequest().getCeExpectedResponses());
   }
 }
