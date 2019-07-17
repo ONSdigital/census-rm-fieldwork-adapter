@@ -8,7 +8,7 @@ jdk: openjdk11
 
 env:
   global:
-  - IMAGE_NAME="$DOCKER_GCP_LOCATION/census-rm-case-processor"
+  - IMAGE_NAME="$DOCKER_GCP_LOCATION/census-rm-fieldwork-adapter"
 
 before_install:
   - mvn fmt:check
