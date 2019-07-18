@@ -1,12 +1,5 @@
 version: '2.1'
 services:
- postgres:
-  container_name: postgres-fwmtadapter-it
-  image: sdcplatform/ras-rm-docker-postgres
-  command: ["-c", "shared_buffers=256MB", "-c", "max_connections=200"]
-  ports:
-   - "15432:5432"
-
  rabbitmq:
   container_name: rabbitmq-fwmtadapter-it
   image: rabbitmq:3.6.10-management
