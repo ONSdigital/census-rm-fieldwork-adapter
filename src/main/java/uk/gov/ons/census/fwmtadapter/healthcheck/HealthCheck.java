@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-public class HeathCheck {
+public class HealthCheck {
   @Value("${healthcheck.filename}")
   private String fileName;
 
