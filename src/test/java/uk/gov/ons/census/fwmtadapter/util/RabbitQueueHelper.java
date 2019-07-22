@@ -2,9 +2,6 @@ package uk.gov.ons.census.fwmtadapter.util;
 
 import static org.junit.Assert.assertNotNull;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -24,13 +21,6 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 @EnableRetry
 public class RabbitQueueHelper {
-  private static final ObjectMapper objectMapper = new ObjectMapper();
-
-  static {
-    objectMapper.registerModule(new JavaTimeModule());
-    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-  }
-
   @Autowired private ConnectionFactory connectionFactory;
 
   @Autowired private RabbitTemplate testRabbitTemplate;
@@ -56,6 +46,10 @@ public class RabbitQueueHelper {
 
   public void sendMessage(String queueName, Object message) {
     testRabbitTemplate.convertAndSend(queueName, message);
+  }
+
+  public void sendMessage(String exchangeName, String routingKey, Object message) {
+    testRabbitTemplate.convertAndSend(exchangeName, routingKey, message);
   }
 
   @Retryable(
