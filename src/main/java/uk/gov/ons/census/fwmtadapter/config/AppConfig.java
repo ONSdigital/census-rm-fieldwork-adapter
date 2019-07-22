@@ -10,6 +10,7 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MarshallingMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,8 +28,34 @@ public class AppConfig {
   @Value("${queueconfig.action-field-queue}")
   private String actionFieldQueue;
 
+  @Value("${queueconfig.receipt-queue}")
+  private String receiptQueue;
+
   @Value("${queueconfig.consumers}")
   private int consumers;
+
+  @Bean
+  public MessageChannel receiptedChannel() {
+    return new DirectChannel();
+  }
+
+  @Bean
+  public AmqpInboundChannelAdapter inbound(
+          SimpleMessageListenerContainer receiptContainer,
+          @Qualifier("receiptedChannel") MessageChannel channel) {
+    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(receiptContainer);
+    adapter.setOutputChannel(channel);
+    return adapter;
+  }
+
+  @Bean
+  public SimpleMessageListenerContainer receiptContainer(ConnectionFactory connectionFactory) {
+    SimpleMessageListenerContainer container =
+            new SimpleMessageListenerContainer(connectionFactory);
+    container.setQueueNames(receiptQueue);
+    container.setConcurrentConsumers(consumers);
+    return container;
+  }
 
   @Bean
   public MessageChannel actionFieldInputChannel() {
