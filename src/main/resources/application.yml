@@ -1,0 +1,17 @@
+spring:
+  rabbitmq:
+    username: guest
+    password: guest
+    host: localhost
+    port: 6672
+    virtualhost: /
+
+queueconfig:
+  action-field-queue: Action.Field
+  outbound-exchange: adapter-outbound-exchange
+  adapter-outbound-queue: RM.Field
+  consumers: 50
+
+healthcheck:
+  frequency: 1000 #milliseconds
+  filename: /tmp/fwmt-adapter-healthy

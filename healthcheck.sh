@@ -1,0 +1,1 @@
+find /tmp/fwmt-adapter-healthy -mmin -1 | egrep '.*'
