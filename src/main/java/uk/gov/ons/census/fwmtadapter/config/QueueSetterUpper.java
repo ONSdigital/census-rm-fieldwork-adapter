@@ -20,9 +20,6 @@ public class QueueSetterUpper {
   @Value("${queueconfig.adapter-outbound-queue}")
   private String actionOutboundQueue;
 
-  @Value("${queueconfig.receipt-exchange}")
-  private String receiptExchange;
-
   @Value("${queueconfig.receipt-queue}")
   private String receiptQueue;
 
@@ -47,17 +44,7 @@ public class QueueSetterUpper {
   }
 
   @Bean
-  public DirectExchange receiptExchange() {
-    return new DirectExchange(receiptExchange, true, false);
-  }
-
-  @Bean
   public Queue receiptQueue() {
     return new Queue(receiptQueue, true);
-  }
-
-  @Bean
-  public Binding bindingReceiptQueue() {
-    return new Binding(receiptExchange, QUEUE, receiptExchange, "", null);
   }
 }

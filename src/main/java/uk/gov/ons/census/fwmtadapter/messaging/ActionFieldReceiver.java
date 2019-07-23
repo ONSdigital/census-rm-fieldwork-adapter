@@ -28,6 +28,8 @@ public class ActionFieldReceiver {
   @Transactional
   @ServiceActivator(inputChannel = "actionFieldInputChannel")
   public void receiveMessage(FieldworkFollowup followup) {
+    System.out.println("Got a followup");
+
     ActionAddress actionAddress = new ActionAddress();
     actionAddress.setLine1(followup.getAddressLine1());
     actionAddress.setLine2(followup.getAddressLine2());

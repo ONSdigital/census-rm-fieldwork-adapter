@@ -32,14 +32,19 @@ public class ReceiptService {
     ActionInstruction actionInstruction = new ActionInstruction();
     actionInstruction.setActionCancel(actionCancel);
 
+    System.out.println("Sending action cancelled");
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }
 
   private String getCaseId(Receipt receipt) {
     String caseId = receipt.getCaseId();
 
-    if (caseId == null || caseId.isBlank()) {
+    // Before being sent to us from pubsub, if the caseId is null, it gets set to 0?
+    // So need to check for that? for now checking its length, could see if it's a valid UUID
+    if (caseId == null || caseId.isBlank() || caseId.length() < 5) {
+      System.out.println("Requesting case Id from case API");
       caseId = caseService.getCaseIdFromQid(receipt.getQuestionnaire_Id());
+      System.out.println("Got caseId: " + caseId);
     }
 
     return caseId;
