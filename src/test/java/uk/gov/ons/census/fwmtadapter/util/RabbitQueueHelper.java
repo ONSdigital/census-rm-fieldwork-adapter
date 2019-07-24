@@ -1,6 +1,7 @@
 package uk.gov.ons.census.fwmtadapter.util;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -66,9 +67,18 @@ public class RabbitQueueHelper {
     amqpAdmin.purgeQueue(queueName);
   }
 
+  public void deleteQueue(String queueName) {
+    amqpAdmin.deleteQueue(queueName);
+  }
+
   public String getMessage(BlockingQueue<String> queue) throws InterruptedException {
     String actualMessage = queue.poll(20, TimeUnit.SECONDS);
     assertNotNull("Did not receive message before timeout", actualMessage);
     return actualMessage;
+  }
+
+  public void checkNoMessage(BlockingQueue<String> queue) throws InterruptedException {
+    String actualMessage = queue.poll(5, TimeUnit.SECONDS);
+    assertNull( "Received Message", actualMessage);
   }
 }

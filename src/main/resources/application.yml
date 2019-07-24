@@ -16,3 +16,7 @@ queueconfig:
 healthcheck:
   frequency: 1000 #milliseconds
   filename: /tmp/fwmt-adapter-healthy
+
+case-api:
+  host: "http://caseapi"
+  port: 8161

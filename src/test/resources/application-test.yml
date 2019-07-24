@@ -1,3 +1,7 @@
 spring:
   rabbitmq:
     port: 35672
+
+case-api:
+  host: localhost
+  port: 8089
