@@ -10,6 +10,9 @@ queueconfig:
   action-field-queue: Action.Field
   outbound-exchange: adapter-outbound-exchange
   adapter-outbound-queue: RM.Field
+  case-event-exchange: events
+  refusal-queue: FieldworkAdapter.Refusals
+  refusal-routing-key: event.respondent.refusal
   consumers: 50
 
 healthcheck:
