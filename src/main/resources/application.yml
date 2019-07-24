@@ -10,7 +10,7 @@ queueconfig:
   action-field-queue: Action.Field
   outbound-exchange: adapter-outbound-exchange
   adapter-outbound-queue: RM.Field
-  receipt-queue: Case.Responses.Field
+  receipt-queue: FieldWorkAdapter.Responses
   consumers: 50
 
 healthcheck:
