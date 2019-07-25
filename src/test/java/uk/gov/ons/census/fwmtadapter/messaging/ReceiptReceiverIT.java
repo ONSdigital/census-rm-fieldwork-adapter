@@ -39,7 +39,7 @@ public class ReceiptReceiverIT {
   private static final String TEST_CASE_ID = "test_case_id";
   private static final String TEST_QID = "test_qid";
   private static final String TEST_QID_2 = "test_qid_2";
-
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Value("${queueconfig.receipt-queue}")
   private String receiptQueue;
@@ -53,9 +53,11 @@ public class ReceiptReceiverIT {
   public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8089).httpsPort(8443));
 
   @Before
+  @Transactional
   public void setUp() {
     rabbitQueueHelper.purgeQueue(receiptQueue);
     rabbitQueueHelper.purgeQueue(actionOutboundQueue);
+    //    wireMockRule.start();
   }
 
   @Test
@@ -83,7 +85,6 @@ public class ReceiptReceiverIT {
     String url = "/cases/qid/" + TEST_QID;
     CaseIdDto caseIdDto = new CaseIdDto();
     caseIdDto.setCaseId(TEST_CASE_ID);
-    ObjectMapper objectMapper = new ObjectMapper();
     String returnJson = objectMapper.writeValueAsString(caseIdDto);
 
     stubFor(
@@ -113,39 +114,42 @@ public class ReceiptReceiverIT {
 
   @Test
   public void testGoodReceiptMessageWithoutCaseIdPopulatedCausingTransactionRollback()
-          throws InterruptedException, JsonProcessingException, JAXBException {
+      throws InterruptedException, JsonProcessingException, JAXBException {
     // Given
+
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
     Receipt receipt = new Receipt();
     receipt.setQuestionnaire_Id(TEST_QID_2);
+    String url = "/cases/qid/" + TEST_QID_2;
+
+    stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
 
     // when
     rabbitQueueHelper.sendMessage(receiptQueue, receipt);
 
     // then
     rabbitQueueHelper.checkNoMessage(outboundQueue);
-    
-//    // then again, now add a stub
-//    String url = "/cases/qid/" + TEST_QID_2;
-//    CaseIdDto caseIdDto = new CaseIdDto();
-//    caseIdDto.setCaseId(TEST_CASE_ID);
-//    ObjectMapper objectMapper = new ObjectMapper();
-//    String returnJson = objectMapper.writeValueAsString(caseIdDto);
-//
-//    stubFor(
-//        get(urlEqualTo(url))
-//            .willReturn(
-//                aResponse()
-//                    .withStatus(HttpStatus.OK.value())
-//                    .withHeader("Content-Type", "application/json")
-//                    .withBody(returnJson)));
-//
-//    String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
-//    JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
-//    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-//    StringReader reader = new StringReader(actualMessage);
-//    ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
-//
-//    assertThat(actionInstruction.getActionCancel().getCaseId()).isEqualTo(TEST_CASE_ID);
+
+    // then again, now add a good stub
+    CaseIdDto caseIdDto = new CaseIdDto();
+    caseIdDto.setCaseId(TEST_CASE_ID);
+
+    String returnJson = objectMapper.writeValueAsString(caseIdDto);
+
+    stubFor(
+        get(urlEqualTo(url))
+            .willReturn(
+                aResponse()
+                    .withStatus(HttpStatus.OK.value())
+                    .withHeader("Content-Type", "application/json")
+                    .withBody(returnJson)));
+
+    String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
+    JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
+    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+    StringReader reader = new StringReader(actualMessage);
+    ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
+
+    assertThat(actionInstruction.getActionCancel().getCaseId()).isEqualTo(TEST_CASE_ID);
   }
 }

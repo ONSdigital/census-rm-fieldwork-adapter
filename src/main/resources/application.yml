@@ -18,5 +18,5 @@ healthcheck:
   filename: /tmp/fwmt-adapter-healthy
 
 case-api:
-  host: "http://caseapi"
+  host: "caseapi"
   port: 8161
