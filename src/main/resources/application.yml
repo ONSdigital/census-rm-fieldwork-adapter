@@ -10,13 +10,11 @@ queueconfig:
   action-field-queue: Action.Field
   outbound-exchange: adapter-outbound-exchange
   adapter-outbound-queue: RM.Field
-<<<<<<< HEAD
   receipt-queue: FieldWorkAdapter.Responses
-=======
   case-event-exchange: events
   refusal-queue: FieldworkAdapter.Refusals
   refusal-routing-key: event.respondent.refusal
->>>>>>> master
+
   consumers: 50
 
 healthcheck:

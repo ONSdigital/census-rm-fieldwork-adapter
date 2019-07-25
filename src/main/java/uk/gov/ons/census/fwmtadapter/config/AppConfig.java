@@ -33,7 +33,6 @@ public class AppConfig {
   @Value("${queueconfig.refusal-queue}")
   private String refusalQueue;
 
-
   @Value("${queueconfig.consumers}")
   private int consumers;
 

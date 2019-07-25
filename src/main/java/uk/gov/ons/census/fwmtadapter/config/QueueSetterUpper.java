@@ -45,7 +45,9 @@ public class QueueSetterUpper {
   }
 
   @Bean
-  public Queue receiptQueue() {  return new Queue(receiptQueue, true); }
+  public Queue receiptQueue() {
+    return new Queue(receiptQueue, true);
+  }
 
   @Bean
   public Queue refusalQueue() {
