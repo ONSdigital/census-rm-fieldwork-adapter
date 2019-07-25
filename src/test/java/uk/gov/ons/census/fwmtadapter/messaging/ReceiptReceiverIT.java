@@ -57,7 +57,6 @@ public class ReceiptReceiverIT {
   public void setUp() {
     rabbitQueueHelper.purgeQueue(receiptQueue);
     rabbitQueueHelper.purgeQueue(actionOutboundQueue);
-    //    wireMockRule.start();
   }
 
   @Test

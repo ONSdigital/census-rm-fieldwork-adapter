@@ -30,6 +30,10 @@ public class AppConfig {
   @Value("${queueconfig.receipt-queue}")
   private String receiptQueue;
 
+  @Value("${queueconfig.refusal-queue}")
+  private String refusalQueue;
+
+
   @Value("${queueconfig.consumers}")
   private int consumers;
 
@@ -62,9 +66,23 @@ public class AppConfig {
   }
 
   @Bean
+  public MessageChannel refusalInputChannel() {
+    return new DirectChannel();
+  }
+
+  @Bean
   public AmqpInboundChannelAdapter actionFieldInbound(
       @Qualifier("actionFieldContainer") SimpleMessageListenerContainer listenerContainer,
       @Qualifier("actionFieldInputChannel") MessageChannel channel) {
+    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
+    adapter.setOutputChannel(channel);
+    return adapter;
+  }
+
+  @Bean
+  public AmqpInboundChannelAdapter refusalInbound(
+      @Qualifier("refusalContainer") SimpleMessageListenerContainer listenerContainer,
+      @Qualifier("refusalInputChannel") MessageChannel channel) {
     AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
     adapter.setOutputChannel(channel);
     return adapter;
@@ -75,6 +93,15 @@ public class AppConfig {
     SimpleMessageListenerContainer container =
         new SimpleMessageListenerContainer(connectionFactory);
     container.setQueueNames(actionFieldQueue);
+    container.setConcurrentConsumers(consumers);
+    return container;
+  }
+
+  @Bean
+  public SimpleMessageListenerContainer refusalContainer(ConnectionFactory connectionFactory) {
+    SimpleMessageListenerContainer container =
+        new SimpleMessageListenerContainer(connectionFactory);
+    container.setQueueNames(refusalQueue);
     container.setConcurrentConsumers(consumers);
     return container;
   }
