@@ -63,13 +63,13 @@ public class ActionFieldReceiverIT {
     ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
 
     assertThat(actionInstruction.getActionRequest().getAddress().getLine1())
-            .isEqualTo(fieldworkFollowup.getAddressLine1());
+        .isEqualTo(fieldworkFollowup.getAddressLine1());
     assertThat(actionInstruction.getActionRequest().getAddress().getPostcode())
-            .isEqualTo(fieldworkFollowup.getPostcode());
+        .isEqualTo(fieldworkFollowup.getPostcode());
     assertThat(actionInstruction.getActionRequest().getAddress().getLatitude())
-            .isEqualTo(new BigDecimal("-179.99999"));
+        .isEqualTo(new BigDecimal("-179.99999"));
     assertThat(actionInstruction.getActionRequest().getAddress().getLongitude())
-            .isEqualTo(new BigDecimal("179.99999"));
+        .isEqualTo(new BigDecimal("179.99999"));
     assertThat(actionInstruction.getActionRequest().getCeExpectedResponses()).isEqualTo(999);
     assertThat(actionInstruction.getActionRequest().getUndeliveredAsAddress()).isFalse();
     assertThat(actionInstruction.getActionRequest().getBlankQreReturned()).isFalse();
