@@ -62,14 +62,17 @@ public class ActionFieldReceiverIT {
     StringReader reader = new StringReader(actualMessage);
     ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
 
-    assertThat(fieldworkFollowup.getAddressLine1())
-        .isEqualTo(actionInstruction.getActionRequest().getAddress().getLine1());
-    assertThat(fieldworkFollowup.getPostcode())
-        .isEqualTo(actionInstruction.getActionRequest().getAddress().getPostcode());
-    assertThat(new BigDecimal("-179.99999"))
-        .isEqualTo(actionInstruction.getActionRequest().getAddress().getLatitude());
-    assertThat(new BigDecimal("179.99999"))
-        .isEqualTo(actionInstruction.getActionRequest().getAddress().getLongitude());
-    assertThat(999).isEqualTo(actionInstruction.getActionRequest().getCeExpectedResponses());
+    assertThat(actionInstruction.getActionRequest().getAddress().getLine1())
+            .isEqualTo(fieldworkFollowup.getAddressLine1());
+    assertThat(actionInstruction.getActionRequest().getAddress().getPostcode())
+            .isEqualTo(fieldworkFollowup.getPostcode());
+    assertThat(actionInstruction.getActionRequest().getAddress().getLatitude())
+            .isEqualTo(new BigDecimal("-179.99999"));
+    assertThat(actionInstruction.getActionRequest().getAddress().getLongitude())
+            .isEqualTo(new BigDecimal("179.99999"));
+    assertThat(actionInstruction.getActionRequest().getCeExpectedResponses()).isEqualTo(999);
+    assertThat(actionInstruction.getActionRequest().getUndeliveredAsAddress()).isFalse();
+    assertThat(actionInstruction.getActionRequest().getBlankQreReturned()).isFalse();
+    assertThat(actionInstruction.getActionRequest().getSurveyName()).isEqualTo("CENSUS");
   }
 }
