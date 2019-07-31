@@ -64,6 +64,10 @@ public class ActionFieldReceiver {
       actionRequest.setCeExpectedResponses(Integer.parseInt(followup.getCeExpectedCapacity()));
     }
 
+    actionRequest.setUndeliveredAsAddress(false);
+    actionRequest.setBlankQreReturned(false);
+    actionRequest.setSurveyName("CENSUS");
+
     ActionInstruction actionInstruction = new ActionInstruction();
     actionInstruction.setActionRequest(actionRequest);
 
