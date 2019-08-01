@@ -26,7 +26,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdDto;
-import uk.gov.ons.census.fwmtadapter.model.dto.Receipt;
+import uk.gov.ons.census.fwmtadapter.model.dto.ReceiptDTO;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 
@@ -63,10 +63,10 @@ public class ReceiptReceiverIT {
   public void testGoodReceiptMessageWithCaseIdPopulated()
       throws InterruptedException, JAXBException {
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
-    Receipt receipt = new Receipt();
-    receipt.setCaseId(TEST_CASE_ID);
+    ReceiptDTO receiptDTO = new ReceiptDTO();
+    receiptDTO.setCaseId(TEST_CASE_ID);
 
-    rabbitQueueHelper.sendMessage(receiptQueue, receipt);
+    rabbitQueueHelper.sendMessage(receiptQueue, receiptDTO);
 
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
     JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
@@ -95,11 +95,11 @@ public class ReceiptReceiverIT {
                     .withBody(returnJson)));
 
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
-    Receipt receipt = new Receipt();
-    receipt.setQuestionnaire_Id(TEST_QID);
+    ReceiptDTO receiptDTO = new ReceiptDTO();
+    receiptDTO.setQuestionnaireId(TEST_QID);
 
     // when
-    rabbitQueueHelper.sendMessage(receiptQueue, receipt);
+    rabbitQueueHelper.sendMessage(receiptQueue, receiptDTO);
 
     // then
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
@@ -117,14 +117,14 @@ public class ReceiptReceiverIT {
     // Given
 
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
-    Receipt receipt = new Receipt();
-    receipt.setQuestionnaire_Id(TEST_QID_2);
+    ReceiptDTO receiptDTO = new ReceiptDTO();
+    receiptDTO.setQuestionnaireId(TEST_QID_2);
     String url = "/cases/qid/" + TEST_QID_2;
 
     stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
 
     // when
-    rabbitQueueHelper.sendMessage(receiptQueue, receipt);
+    rabbitQueueHelper.sendMessage(receiptQueue, receiptDTO);
 
     // then
     rabbitQueueHelper.checkNoMessage(outboundQueue);

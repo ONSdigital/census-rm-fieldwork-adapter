@@ -1,5 +1,6 @@
 package uk.gov.ons.census.fwmtadapter.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.OffsetDateTime;
 import lombok.Data;
@@ -7,19 +8,12 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class Receipt {
-  @JsonProperty("case_id")
+public class ReceiptDTO {
   private String caseId;
+  private String questionnaireId;
+  private boolean unreceipt;
 
-  @JsonProperty("tx_id")
-  private String txId;
-
-  @JsonProperty("questionnaire_id")
-  private String questionnaire_Id;
-
-  @JsonProperty("response_dateTime")
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @JsonProperty("dateTime")
   private OffsetDateTime responseDateTime;
-
-  @JsonProperty("inbound_channel")
-  private String inboundChannel;
 }
