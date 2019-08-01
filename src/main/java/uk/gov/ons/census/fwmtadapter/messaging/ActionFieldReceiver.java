@@ -11,7 +11,6 @@ import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionAddress;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionRequest;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.Priority;
 
 @MessageEndpoint
 public class ActionFieldReceiver {
@@ -52,9 +51,7 @@ public class ActionFieldReceiver {
     actionRequest.setActionType(followup.getActionType());
     actionRequest.setAddress(actionAddress);
     actionRequest.setCaseId(followup.getCaseId());
-    actionRequest.setPriority(Priority.MEDIUM);
     actionRequest.setCaseRef(followup.getCaseRef());
-    actionRequest.setIac(followup.getUac());
     actionRequest.setAddressType(followup.getAddressType());
     actionRequest.setAddressLevel(followup.getAddressLevel());
     actionRequest.setTreatmentId(followup.getTreatmentCode());
