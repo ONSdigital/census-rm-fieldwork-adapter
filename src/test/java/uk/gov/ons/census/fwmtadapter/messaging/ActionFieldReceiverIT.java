@@ -54,6 +54,9 @@ public class ActionFieldReceiverIT {
     fieldworkFollowup.setLatitude("-179.99999");
     fieldworkFollowup.setLongitude("179.99999");
     fieldworkFollowup.setCeExpectedCapacity("999");
+    fieldworkFollowup.setSurveyName("CENSUS");
+    fieldworkFollowup.setUndeliveredAsAddress(false);
+    fieldworkFollowup.setBlankQreReturned(false);
     rabbitQueueHelper.sendMessage(actionFieldQueue, fieldworkFollowup);
 
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);

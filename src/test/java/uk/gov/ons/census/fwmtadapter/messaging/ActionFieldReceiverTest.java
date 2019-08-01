@@ -20,13 +20,17 @@ public class ActionFieldReceiverTest {
     // Given
     RabbitTemplate rabbitTemplate = mock(RabbitTemplate.class);
 
-    // When
     ActionFieldReceiver underTest = new ActionFieldReceiver(rabbitTemplate, "TEST EXCHANGE");
     EasyRandom easyRandom = new EasyRandom();
     FieldworkFollowup fieldworkFollowup = easyRandom.nextObject(FieldworkFollowup.class);
     fieldworkFollowup.setLatitude("-179.99999");
     fieldworkFollowup.setLongitude("179.99999");
     fieldworkFollowup.setCeExpectedCapacity("999");
+    fieldworkFollowup.setSurveyName("CENSUS");
+    fieldworkFollowup.setUndeliveredAsAddress(false);
+    fieldworkFollowup.setBlankQreReturned(false);
+
+    // When
     underTest.receiveMessage(fieldworkFollowup);
 
     // Then
