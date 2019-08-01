@@ -33,6 +33,7 @@ public class ActionFieldReceiver {
     actionAddress.setLine3(followup.getAddressLine3());
     actionAddress.setTownName(followup.getTownName());
     actionAddress.setPostcode(followup.getPostcode());
+    actionAddress.setEstabType(followup.getEstabType());
     actionAddress.setOrganisationName(followup.getOrganisationName());
     actionAddress.setArid(followup.getArid());
     actionAddress.setUprn(followup.getUprn());

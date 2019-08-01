@@ -40,7 +40,14 @@ public class ActionFieldReceiverTest {
     ActionInstruction actionInstruction = argCaptor.getValue();
     assertThat(actionInstruction.getActionRequest().getAddress())
         .isEqualToComparingOnlyGivenFields(
-            fieldworkFollowup, "townName", "postcode", "organisationName", "oa", "arid", "uprn");
+            fieldworkFollowup,
+            "townName",
+            "postcode",
+            "organisationName",
+            "oa",
+            "arid",
+            "uprn",
+            "estabType");
     assertThat(actionInstruction.getActionRequest().getAddress().getLatitude())
         .isEqualTo(new BigDecimal(fieldworkFollowup.getLatitude()));
     assertThat(actionInstruction.getActionRequest().getAddress().getLongitude())
