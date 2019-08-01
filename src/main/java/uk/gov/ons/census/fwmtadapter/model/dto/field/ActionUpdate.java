@@ -11,7 +11,6 @@ package uk.gov.ons.census.fwmtadapter.model.dto.field;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import lombok.Data;
 
@@ -25,7 +24,6 @@ import lombok.Data;
  *   &lt;complexContent&gt;
  *     &lt;extension base="{http://ons.gov.uk/ctp/response/action/message/instruction}Action"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="priority" type="{http://ons.gov.uk/ctp/response/action/message/instruction}Priority"/&gt;
  *         &lt;element name="events" type="{http://ons.gov.uk/ctp/response/action/message/instruction}ActionEvent"/&gt;
  *       &lt;/sequence&gt;
  *     &lt;/extension&gt;
@@ -36,13 +34,9 @@ import lombok.Data;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(
     name = "ActionUpdate",
-    propOrder = {"priority", "events"})
+    propOrder = {"events"})
 @Data
 public class ActionUpdate extends Action {
-
-  @XmlElement(required = true)
-  @XmlSchemaType(name = "string")
-  protected Priority priority;
 
   @XmlElement(required = true)
   protected ActionEvent events;
