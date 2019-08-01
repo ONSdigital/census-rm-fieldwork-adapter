@@ -7,14 +7,14 @@ import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdDto;
 
 @Service
 public class CaseService {
-  @Value("${case-api.host}")
+  @Value("${caseapi.host}")
   private String host;
 
-  @Value("${case-api.port}")
+  @Value("${caseapi.port}")
   private String port;
 
   public String getCaseIdFromQid(String questionnaire_id) {
-    String url = "http://case-api:80/cases/qid/" + questionnaire_id;
+    String url = "http://" + host + ":" + port + "/cases/qid/" + questionnaire_id;
     RestTemplate restTemplate = new RestTemplate();
 
     CaseIdDto caseIdDto = restTemplate.getForObject(url, CaseIdDto.class);

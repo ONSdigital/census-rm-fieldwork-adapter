@@ -21,6 +21,6 @@ healthcheck:
   frequency: 1000 #milliseconds
   filename: /tmp/fwmt-adapter-healthy
 
-case-api:
-  host: case-api
-  port: 80
+caseapi:
+  host: caseapi
+  port: 8161
