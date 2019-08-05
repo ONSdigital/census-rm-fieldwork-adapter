@@ -9,8 +9,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class ReceiptDTO {
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @JsonProperty("caseId")
   private String caseId;
+
   private String questionnaireId;
+
   private boolean unreceipt;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)

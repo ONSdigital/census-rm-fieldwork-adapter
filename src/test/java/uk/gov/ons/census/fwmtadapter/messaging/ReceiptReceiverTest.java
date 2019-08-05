@@ -1,11 +1,13 @@
 package uk.gov.ons.census.fwmtadapter.messaging;
 
 import static org.mockito.Mockito.*;
+import static uk.gov.ons.census.fwmtadapter.util.ReceiptHelper.setUpResponseManagementReceiptEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
 import uk.gov.ons.census.fwmtadapter.model.dto.ReceiptDTO;
+import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.services.ReceiptService;
 
 public class ReceiptReceiverTest {
@@ -20,8 +22,10 @@ public class ReceiptReceiverTest {
 
     ReceiptReceiver receiptReceiver = new ReceiptReceiver(receiptProcessor);
     ReceiptDTO receiptDTO = new ReceiptDTO();
-    receiptReceiver.receiveMessage(receiptDTO);
+    ResponseManagementEvent responseManagementEvent =
+        setUpResponseManagementReceiptEvent(receiptDTO);
+    receiptReceiver.receiveMessage(responseManagementEvent);
 
-    verify(receiptProcessor, times(1)).processReceipt(receiptDTO);
+    verify(receiptProcessor, times(1)).processReceipt(responseManagementEvent);
   }
 }

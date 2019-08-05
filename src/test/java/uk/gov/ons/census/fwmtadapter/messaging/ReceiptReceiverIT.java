@@ -3,6 +3,7 @@ package uk.gov.ons.census.fwmtadapter.messaging;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.ons.census.fwmtadapter.util.ReceiptHelper.setUpResponseManagementReceiptEvent;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +28,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.ReceiptDTO;
+import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 
@@ -65,8 +67,10 @@ public class ReceiptReceiverIT {
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
     ReceiptDTO receiptDTO = new ReceiptDTO();
     receiptDTO.setCaseId(TEST_CASE_ID);
+    ResponseManagementEvent responseManagementEvent =
+        setUpResponseManagementReceiptEvent(receiptDTO);
 
-    rabbitQueueHelper.sendMessage(receiptQueue, receiptDTO);
+    rabbitQueueHelper.sendMessage(receiptQueue, responseManagementEvent);
 
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
     JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
@@ -97,9 +101,11 @@ public class ReceiptReceiverIT {
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
     ReceiptDTO receiptDTO = new ReceiptDTO();
     receiptDTO.setQuestionnaireId(TEST_QID);
+    ResponseManagementEvent responseManagementEvent =
+        setUpResponseManagementReceiptEvent(receiptDTO);
 
     // when
-    rabbitQueueHelper.sendMessage(receiptQueue, receiptDTO);
+    rabbitQueueHelper.sendMessage(receiptQueue, responseManagementEvent);
 
     // then
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
@@ -119,12 +125,14 @@ public class ReceiptReceiverIT {
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
     ReceiptDTO receiptDTO = new ReceiptDTO();
     receiptDTO.setQuestionnaireId(TEST_QID_2);
+    ResponseManagementEvent responseManagementEvent =
+        setUpResponseManagementReceiptEvent(receiptDTO);
     String url = "/cases/qid/" + TEST_QID_2;
 
     stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
 
     // when
-    rabbitQueueHelper.sendMessage(receiptQueue, receiptDTO);
+    rabbitQueueHelper.sendMessage(receiptQueue, responseManagementEvent);
 
     // then
     rabbitQueueHelper.checkNoMessage(outboundQueue);
