@@ -11,7 +11,7 @@ queueconfig:
   outbound-exchange: adapter-outbound-exchange
   adapter-outbound-queue: RM.Field
   receipt-queue: FieldWorkAdapter.Responses
-  receipt-routing-key: event.respondent.receipt
+  receipt-routing-key: Receipt.Responses.binding
   case-event-exchange: events
   refusal-queue: FieldworkAdapter.Refusals
   refusal-routing-key: event.respondent.refusal
