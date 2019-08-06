@@ -43,8 +43,14 @@ public class ReceiptReceiverIT {
   private static final String TEST_QID_2 = "test_qid_2";
   private ObjectMapper objectMapper = new ObjectMapper();
 
+  @Value("${queueconfig.case-event-exchange}")
+  private String caseEventExchange;
+
   @Value("${queueconfig.receipt-queue}")
   private String receiptQueue;
+
+  @Value("${queueconfig.receipt-routing-key}")
+  private String receiptRoutingKey;
 
   @Value("${queueconfig.adapter-outbound-queue}")
   private String actionOutboundQueue;
@@ -70,7 +76,7 @@ public class ReceiptReceiverIT {
     ResponseManagementEvent responseManagementEvent =
         setUpResponseManagementReceiptEvent(receiptDTO);
 
-    rabbitQueueHelper.sendMessage(receiptQueue, responseManagementEvent);
+    rabbitQueueHelper.sendMessage(caseEventExchange, receiptRoutingKey, responseManagementEvent);
 
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
     JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
@@ -105,7 +111,7 @@ public class ReceiptReceiverIT {
         setUpResponseManagementReceiptEvent(receiptDTO);
 
     // when
-    rabbitQueueHelper.sendMessage(receiptQueue, responseManagementEvent);
+    rabbitQueueHelper.sendMessage(caseEventExchange, receiptRoutingKey, responseManagementEvent);
 
     // then
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
@@ -132,7 +138,7 @@ public class ReceiptReceiverIT {
     stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
 
     // when
-    rabbitQueueHelper.sendMessage(receiptQueue, responseManagementEvent);
+    rabbitQueueHelper.sendMessage(caseEventExchange, receiptRoutingKey, responseManagementEvent);
 
     // then
     rabbitQueueHelper.checkNoMessage(outboundQueue);

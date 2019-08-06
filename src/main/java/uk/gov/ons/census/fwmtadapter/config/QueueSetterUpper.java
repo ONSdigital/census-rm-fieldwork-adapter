@@ -25,6 +25,9 @@ public class QueueSetterUpper {
   @Value("${queueconfig.receipt-queue}")
   private String receiptQueue;
 
+  @Value("${queueconfig.receipt-routing-key}")
+  private String receiptRoutingKey;
+
   @Value("${queueconfig.case-event-exchange}")
   private String caseEventExchange;
 
@@ -72,5 +75,10 @@ public class QueueSetterUpper {
   @Bean
   public Binding bindingRefusalQueue() {
     return new Binding(refusalQueue, QUEUE, caseEventExchange, refusalRoutingKey, null);
+  }
+
+  @Bean
+  public Binding bindingReceiptQueue() {
+    return new Binding(receiptQueue, QUEUE, caseEventExchange, receiptRoutingKey, null);
   }
 }
