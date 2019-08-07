@@ -55,4 +55,24 @@ public class RefusalReceiverTest {
     // Then
     verifyZeroInteractions(rabbitTemplate);
   }
+
+  @Test(expected = RuntimeException.class)
+  public void shouldThrowRuntimeExceptionWhenInvalidEventTypeExpected() {
+    // Given
+    RabbitTemplate rabbitTemplate = mock(RabbitTemplate.class);
+    RefusalReceiver underTest = new RefusalReceiver(rabbitTemplate, "TEST EXCHANGE");
+    ResponseManagementEvent event = easyRandom.nextObject(ResponseManagementEvent.class);
+    event.getEvent().setType(EventType.CASE_CREATED);
+    String expectedErrorMessage =
+        String.format("Event Type '%s' is invalid!", EventType.CASE_CREATED);
+
+    try {
+      // When
+      underTest.receiveMessage(event);
+    } catch (RuntimeException re) {
+      // Then
+      assertThat(re.getMessage()).isEqualTo(expectedErrorMessage);
+      throw re;
+    }
+  }
 }
