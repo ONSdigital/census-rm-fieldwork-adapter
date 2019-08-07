@@ -26,15 +26,12 @@ public class ReceiptService {
   }
 
   public void processReceipt(ResponseManagementEvent receiptEvent) {
-    System.out.println("Processing Receipt");
-
     ActionCancel actionCancel = new ActionCancel();
     actionCancel.setCaseId(getCaseId(receiptEvent));
     actionCancel.setReason(RECEIPTED);
     ActionInstruction actionInstruction = new ActionInstruction();
     actionInstruction.setActionCancel(actionCancel);
 
-    System.out.println("Sending msg to outboundExhange");
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }
 

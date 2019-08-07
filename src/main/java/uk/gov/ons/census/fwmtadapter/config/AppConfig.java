@@ -19,7 +19,9 @@ import org.springframework.integration.amqp.inbound.AmqpInboundChannelAdapter;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 
 @Configuration
 @EnableScheduling
@@ -75,6 +77,7 @@ public class AppConfig {
       @Qualifier("actionFieldInputChannel") MessageChannel channel) {
     AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
     adapter.setOutputChannel(channel);
+
     return adapter;
   }
 
