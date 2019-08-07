@@ -54,6 +54,9 @@ public class ActionFieldReceiverIT {
     fieldworkFollowup.setLatitude("-179.99999");
     fieldworkFollowup.setLongitude("179.99999");
     fieldworkFollowup.setCeExpectedCapacity("999");
+    fieldworkFollowup.setSurveyName("CENSUS");
+    fieldworkFollowup.setUndeliveredAsAddress(false);
+    fieldworkFollowup.setBlankQreReturned(false);
     rabbitQueueHelper.sendMessage(actionFieldQueue, fieldworkFollowup);
 
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
@@ -62,14 +65,36 @@ public class ActionFieldReceiverIT {
     StringReader reader = new StringReader(actualMessage);
     ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
 
-    assertThat(fieldworkFollowup.getAddressLine1())
-        .isEqualTo(actionInstruction.getActionRequest().getAddress().getLine1());
-    assertThat(fieldworkFollowup.getPostcode())
-        .isEqualTo(actionInstruction.getActionRequest().getAddress().getPostcode());
-    assertThat(new BigDecimal("-179.99999"))
-        .isEqualTo(actionInstruction.getActionRequest().getAddress().getLatitude());
-    assertThat(new BigDecimal("179.99999"))
-        .isEqualTo(actionInstruction.getActionRequest().getAddress().getLongitude());
-    assertThat(999).isEqualTo(actionInstruction.getActionRequest().getCeExpectedResponses());
+    assertThat(actionInstruction.getActionRequest().getAddress())
+        .isEqualToComparingOnlyGivenFields(
+            fieldworkFollowup, "townName", "postcode", "organisationName", "oa", "arid", "uprn");
+    assertThat(actionInstruction.getActionRequest().getAddress().getLatitude())
+        .isEqualTo(new BigDecimal(fieldworkFollowup.getLatitude()));
+    assertThat(actionInstruction.getActionRequest().getAddress().getLongitude())
+        .isEqualTo(new BigDecimal(fieldworkFollowup.getLongitude()));
+    assertThat(actionInstruction.getActionRequest().getAddress().getLine1())
+        .isEqualTo(fieldworkFollowup.getAddressLine1());
+    assertThat(actionInstruction.getActionRequest().getAddress().getLine2())
+        .isEqualTo(fieldworkFollowup.getAddressLine2());
+    assertThat(actionInstruction.getActionRequest().getAddress().getLine3())
+        .isEqualTo(fieldworkFollowup.getAddressLine3());
+
+    assertThat(actionInstruction.getActionRequest())
+        .isEqualToComparingOnlyGivenFields(
+            fieldworkFollowup,
+            "actionPlan",
+            "actionType",
+            "caseId",
+            "caseRef",
+            "surveyName",
+            "addressType",
+            "addressLevel",
+            "fieldOfficerId",
+            "undeliveredAsAddress",
+            "blankQreReturned");
+    assertThat(actionInstruction.getActionRequest().getTreatmentId())
+        .isEqualTo(fieldworkFollowup.getTreatmentCode());
+    assertThat(actionInstruction.getActionRequest().getCeExpectedResponses())
+        .isEqualTo(Integer.parseInt(fieldworkFollowup.getCeExpectedCapacity()));
   }
 }

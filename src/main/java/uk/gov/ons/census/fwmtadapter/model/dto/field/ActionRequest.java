@@ -11,7 +11,6 @@ package uk.gov.ons.census.fwmtadapter.model.dto.field;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import lombok.Data;
 
@@ -36,9 +35,7 @@ import lombok.Data;
  *         &lt;element name="enrolmentStatus" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="caseGroupStatus" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="caseId" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *         &lt;element name="priority" type="{http://ons.gov.uk/ctp/response/action/message/instruction}Priority" minOccurs="0"/&gt;
  *         &lt;element name="caseRef" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *         &lt;element name="iac" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="events" type="{http://ons.gov.uk/ctp/response/action/message/instruction}ActionEvent"/&gt;
  *         &lt;element name="exerciseRef" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
  *         &lt;element name="userDescription" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
@@ -68,9 +65,7 @@ import lombok.Data;
       "enrolmentStatus",
       "caseGroupStatus",
       "caseId",
-      "priority",
       "caseRef",
-      "iac",
       "events",
       "exerciseRef",
       "userDescription",
@@ -109,11 +104,7 @@ public class ActionRequest extends Action {
   protected String caseGroupStatus;
   protected String caseId;
 
-  @XmlSchemaType(name = "string")
-  protected Priority priority;
-
   protected String caseRef;
-  protected String iac;
 
   @XmlElement(required = true)
   protected ActionEvent events;

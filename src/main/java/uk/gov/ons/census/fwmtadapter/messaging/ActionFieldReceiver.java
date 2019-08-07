@@ -11,7 +11,6 @@ import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionAddress;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionRequest;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.Priority;
 
 @MessageEndpoint
 public class ActionFieldReceiver {
@@ -34,6 +33,7 @@ public class ActionFieldReceiver {
     actionAddress.setLine3(followup.getAddressLine3());
     actionAddress.setTownName(followup.getTownName());
     actionAddress.setPostcode(followup.getPostcode());
+    actionAddress.setEstabType(followup.getEstabType());
     actionAddress.setOrganisationName(followup.getOrganisationName());
     actionAddress.setArid(followup.getArid());
     actionAddress.setUprn(followup.getUprn());
@@ -52,9 +52,7 @@ public class ActionFieldReceiver {
     actionRequest.setActionType(followup.getActionType());
     actionRequest.setAddress(actionAddress);
     actionRequest.setCaseId(followup.getCaseId());
-    actionRequest.setPriority(Priority.MEDIUM);
     actionRequest.setCaseRef(followup.getCaseRef());
-    actionRequest.setIac(followup.getUac());
     actionRequest.setAddressType(followup.getAddressType());
     actionRequest.setAddressLevel(followup.getAddressLevel());
     actionRequest.setTreatmentId(followup.getTreatmentCode());
@@ -63,6 +61,10 @@ public class ActionFieldReceiver {
     if (followup.getCeExpectedCapacity() != null && !followup.getCeExpectedCapacity().isEmpty()) {
       actionRequest.setCeExpectedResponses(Integer.parseInt(followup.getCeExpectedCapacity()));
     }
+
+    actionRequest.setUndeliveredAsAddress(followup.getUndeliveredAsAddress());
+    actionRequest.setBlankQreReturned(followup.getBlankQreReturned());
+    actionRequest.setSurveyName(followup.getSurveyName());
 
     ActionInstruction actionInstruction = new ActionInstruction();
     actionInstruction.setActionRequest(actionRequest);
