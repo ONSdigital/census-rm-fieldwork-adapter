@@ -60,6 +60,7 @@ public class ActionFieldReceiverIT {
     rabbitQueueHelper.sendMessage(actionFieldQueue, fieldworkFollowup);
 
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
+    assertThat(actualMessage).isNotNull();
     JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
     StringReader reader = new StringReader(actualMessage);
