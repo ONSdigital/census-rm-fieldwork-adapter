@@ -33,6 +33,7 @@ public class ReceiptService {
     ActionInstruction actionInstruction = new ActionInstruction();
     actionInstruction.setActionCancel(actionCancel);
 
+    System.out.println("Sending msg to outboundExhange");
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }
 
