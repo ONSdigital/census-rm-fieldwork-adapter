@@ -3,6 +3,7 @@ package uk.gov.ons.census.fwmtadapter.services;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionCancel;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
@@ -41,7 +42,7 @@ public class ReceiptService {
     String caseId = receiptEvent.getPayload().getReceipt().getCaseId();
 
     // Before being sent to us from pubsub, if the caseId is null, it gets set to 0
-    if (caseId == null || caseId.isBlank() || caseId.equals("0")) {
+    if (StringUtils.isEmpty(caseId) || caseId.equals("0")) {
       caseId =
           caseService.getCaseIdFromQid(receiptEvent.getPayload().getReceipt().getQuestionnaireId());
     }
