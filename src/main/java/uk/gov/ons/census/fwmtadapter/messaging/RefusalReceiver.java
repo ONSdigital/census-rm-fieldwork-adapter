@@ -28,7 +28,13 @@ public class RefusalReceiver {
   @ServiceActivator(inputChannel = "refusalInputChannel")
   public void receiveMessage(ResponseManagementEvent event) {
     if (event.getEvent().getType() != EventType.REFUSAL_RECEIVED) {
-      throw new RuntimeException(); // Unexpected event type
+      throw new RuntimeException(
+          String.format("Event Type '%s' is invalid!", event.getEvent().getType()));
+    }
+
+    // Do not send refusal back to Field if from Field
+    if ("FIELD".equalsIgnoreCase(event.getEvent().getChannel())) {
+      return;
     }
 
     ActionCancel actionCancel = new ActionCancel();
