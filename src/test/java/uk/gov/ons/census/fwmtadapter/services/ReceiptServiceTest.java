@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmtadapter.messaging;
+package uk.gov.ons.census.fwmtadapter.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -12,8 +12,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import uk.gov.ons.census.fwmtadapter.model.dto.ReceiptDTO;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
-import uk.gov.ons.census.fwmtadapter.services.CaseService;
-import uk.gov.ons.census.fwmtadapter.services.ReceiptService;
 
 public class ReceiptServiceTest {
 

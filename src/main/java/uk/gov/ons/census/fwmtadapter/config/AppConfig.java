@@ -19,9 +19,8 @@ import org.springframework.integration.amqp.inbound.AmqpInboundChannelAdapter;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @EnableScheduling
@@ -144,6 +143,11 @@ public class AppConfig {
     MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
 
     return mapperFactory.getMapperFacade();
+  }
+
+  @Bean
+  public RestTemplate restTemplate() {
+    return new RestTemplate();
   }
 
   @PostConstruct
