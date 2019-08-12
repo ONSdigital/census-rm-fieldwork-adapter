@@ -47,6 +47,8 @@ public class RefusalReceiverIT {
 
   @Autowired private RabbitQueueHelper rabbitQueueHelper;
 
+  EasyRandom easyRandom = new EasyRandom();
+
   @Before
   @Transactional
   public void setUp() {
@@ -55,7 +57,9 @@ public class RefusalReceiverIT {
   }
 
   @Test
-  public void testReceiveMessage() throws InterruptedException, JAXBException {
+  public void testRefusalMessageFromNonFieldChannelEmitsMessageToField()
+      throws InterruptedException, JAXBException {
+    // Given
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
 
     CollectionCase collectionCase = new CollectionCase();
@@ -72,7 +76,9 @@ public class RefusalReceiverIT {
 
     rabbitQueueHelper.sendMessage(caseEventExchange, refusalRoutingKey, responseManagementEvent);
 
+    // Then
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
+    assertThat(actualMessage).isNotNull();
     JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
     StringReader reader = new StringReader(actualMessage);
@@ -80,5 +86,22 @@ public class RefusalReceiverIT {
     assertThat(responseManagementEvent.getPayload().getRefusal().getCollectionCase().getId())
         .isEqualTo(actionInstruction.getActionCancel().getCaseId());
     assertThat("REFUSED").isEqualTo(actionInstruction.getActionCancel().getReason());
+  }
+
+  @Test
+  public void testRefusalMessageFromFieldChannelDoesNotEmitMessageToField()
+      throws InterruptedException {
+    // Given
+    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
+
+    ResponseManagementEvent event = easyRandom.nextObject(ResponseManagementEvent.class);
+    event.getEvent().setType(EventType.REFUSAL_RECEIVED);
+    event.getEvent().setChannel("FIELD");
+
+    // When
+    rabbitQueueHelper.sendMessage(caseEventExchange, refusalRoutingKey, event);
+
+    // Then
+    assertThat(rabbitQueueHelper.getMessage(outboundQueue)).isNull();
   }
 }

@@ -62,9 +62,7 @@ public class RabbitQueueHelper {
   }
 
   public String getMessage(BlockingQueue<String> queue) throws InterruptedException {
-    String actualMessage = queue.poll(20, TimeUnit.SECONDS);
-    assertNotNull("Did not receive message before timeout", actualMessage);
-    return actualMessage;
+    return queue.poll(20, TimeUnit.SECONDS);
   }
 
   public void checkNoMessage(BlockingQueue<String> queue) throws InterruptedException {
