@@ -1,6 +1,5 @@
 package uk.gov.ons.census.fwmtadapter.util;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
