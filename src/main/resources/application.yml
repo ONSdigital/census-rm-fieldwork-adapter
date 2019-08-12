@@ -11,8 +11,8 @@ queueconfig:
   outbound-exchange: adapter-outbound-exchange
   adapter-outbound-queue: RM.Field
   receipt-queue: FieldWorkAdapter.Responses
-  receipt-routing-key: Receipt.Responses.binding
-  case-event-exchange: event.response.receipt
+  receipt-routing-key: event.response.receipt
+  case-event-exchange: events
   refusal-queue: FieldworkAdapter.Refusals
   refusal-routing-key: event.respondent.refusal
 
@@ -23,5 +23,5 @@ healthcheck:
   filename: /tmp/fwmt-adapter-healthy
 
 caseapi:
-  host: caseapi
+  host: localhost
   port: 8161
