@@ -1,0 +1,11 @@
+spring:
+  rabbitmq:
+    port: 35672
+
+caseapi:
+  host: localhost
+  port: 8089
+
+logging:
+  level:
+    ROOT: OFF
