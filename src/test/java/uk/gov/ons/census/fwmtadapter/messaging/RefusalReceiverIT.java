@@ -19,7 +19,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.ons.census.fwmtadapter.model.dto.CollectionCase;
+import uk.gov.ons.census.fwmtadapter.model.dto.Event;
 import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
+import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
+import uk.gov.ons.census.fwmtadapter.model.dto.Refusal;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
@@ -44,7 +48,7 @@ public class RefusalReceiverIT {
 
   @Autowired private RabbitQueueHelper rabbitQueueHelper;
 
-  EasyRandom easyRandom = new EasyRandom();
+  private EasyRandom easyRandom = new EasyRandom();
 
   @Before
   @Transactional
@@ -59,11 +63,19 @@ public class RefusalReceiverIT {
     // Given
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
 
-    ResponseManagementEvent event = easyRandom.nextObject(ResponseManagementEvent.class);
-    event.getEvent().setType(EventType.REFUSAL_RECEIVED);
+    CollectionCase collectionCase = new CollectionCase();
+    collectionCase.setId("123");
+    Refusal refusal = new Refusal();
+    refusal.setCollectionCase(collectionCase);
+    Payload payload = new Payload();
+    payload.setRefusal(refusal);
+    ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
+    responseManagementEvent.setPayload(payload);
+    Event event = new Event();
+    event.setType(EventType.REFUSAL_RECEIVED);
+    responseManagementEvent.setEvent(event);
 
-    // When
-    rabbitQueueHelper.sendMessage(caseEventExchange, refusalRoutingKey, event);
+    rabbitQueueHelper.sendMessage(caseEventExchange, refusalRoutingKey, responseManagementEvent);
 
     // Then
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
@@ -72,7 +84,7 @@ public class RefusalReceiverIT {
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
     StringReader reader = new StringReader(actualMessage);
     ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
-    assertThat(event.getPayload().getRefusal().getCollectionCase().getId())
+    assertThat(responseManagementEvent.getPayload().getRefusal().getCollectionCase().getId())
         .isEqualTo(actionInstruction.getActionCancel().getCaseId());
     assertThat("REFUSED").isEqualTo(actionInstruction.getActionCancel().getReason());
   }

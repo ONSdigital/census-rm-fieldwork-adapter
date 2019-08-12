@@ -10,6 +10,8 @@ queueconfig:
   action-field-queue: Action.Field
   outbound-exchange: adapter-outbound-exchange
   adapter-outbound-queue: RM.Field
+  receipt-queue: FieldWorkAdapter.Responses
+  receipt-routing-key: event.response.receipt
   case-event-exchange: events
   refusal-queue: FieldworkAdapter.Refusals
   refusal-routing-key: event.respondent.refusal
@@ -18,3 +20,7 @@ queueconfig:
 healthcheck:
   frequency: 1000 #milliseconds
   filename: /tmp/fwmt-adapter-healthy
+
+caseapi:
+  host: case-api
+  port: 80
