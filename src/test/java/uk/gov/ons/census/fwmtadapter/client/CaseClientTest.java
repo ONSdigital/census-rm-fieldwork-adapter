@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmtadapter.services;
+package uk.gov.ons.census.fwmtadapter.client;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.Mockito.mock;
@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdDto;
 
-public class CaseServiceTest {
+public class CaseClientTest {
   private static final String QUESTIONAIRE_ID = "123a";
   private static final String CASE_ID = "g5dv3";
 
@@ -29,9 +29,9 @@ public class CaseServiceTest {
     RestTemplate restTemplate = mock(RestTemplate.class);
     when(restTemplate.getForObject(expectedUrl, CaseIdDto.class)).thenReturn(expectedCaseIdDto);
 
-    CaseService caseService = new CaseService(restTemplate);
+    CaseClient caseClient = new CaseClient(restTemplate);
 
-    assertThat(caseService.getCaseIdFromQid(QUESTIONAIRE_ID)).isEqualTo(CASE_ID);
+    assertThat(caseClient.getCaseIdFromQid(QUESTIONAIRE_ID)).isEqualTo(CASE_ID);
   }
 
   @Test(expected = RuntimeException.class)
@@ -43,8 +43,8 @@ public class CaseServiceTest {
     RestTemplate restTemplate = mock(RestTemplate.class);
     when(restTemplate.getForObject(expectedUrl, CaseIdDto.class)).thenReturn(expectedCaseIdDto);
 
-    CaseService caseService = new CaseService(restTemplate);
+    CaseClient caseClient = new CaseClient(restTemplate);
 
-    caseService.getCaseIdFromQid(QUESTIONAIRE_ID);
+    caseClient.getCaseIdFromQid(QUESTIONAIRE_ID);
   }
 }

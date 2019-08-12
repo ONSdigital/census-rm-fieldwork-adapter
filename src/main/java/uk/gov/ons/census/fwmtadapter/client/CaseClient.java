@@ -1,13 +1,13 @@
-package uk.gov.ons.census.fwmtadapter.services;
+package uk.gov.ons.census.fwmtadapter.client;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdDto;
 
-@Service
-public class CaseService {
+@Component
+public class CaseClient {
   private final RestTemplate restTemplate;
 
   @Value("${caseapi.host}")
@@ -16,7 +16,7 @@ public class CaseService {
   @Value("${caseapi.port}")
   private String port;
 
-  public CaseService(RestTemplate restTemplate) {
+  public CaseClient(RestTemplate restTemplate) {
     this.restTemplate = restTemplate;
   }
 

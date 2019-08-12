@@ -15,7 +15,6 @@ queueconfig:
   case-event-exchange: events
   refusal-queue: FieldworkAdapter.Refusals
   refusal-routing-key: event.respondent.refusal
-
   consumers: 50
 
 healthcheck:

@@ -4,6 +4,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import uk.gov.ons.census.fwmtadapter.client.CaseClient;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionCancel;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
@@ -14,15 +15,15 @@ public class ReceiptService {
   public static final String RECEIPTED = "RECEIPTED";
   private final RabbitTemplate rabbitTemplate;
   private final String outboundExchange;
-  private final CaseService caseService;
+  private final CaseClient caseClient;
 
   public ReceiptService(
       RabbitTemplate rabbitTemplate,
       @Value("${queueconfig.outbound-exchange}") String outboundExchange,
-      CaseService caseService) {
+      CaseClient caseClient) {
     this.rabbitTemplate = rabbitTemplate;
     this.outboundExchange = outboundExchange;
-    this.caseService = caseService;
+    this.caseClient = caseClient;
   }
 
   public void processReceipt(ResponseManagementEvent receiptEvent) {
@@ -41,7 +42,7 @@ public class ReceiptService {
     // Before being sent to us from pubsub, if the caseId is null, it gets set to 0
     if (StringUtils.isEmpty(caseId) || caseId.equals("0")) {
       caseId =
-          caseService.getCaseIdFromQid(receiptEvent.getPayload().getReceipt().getQuestionnaireId());
+          caseClient.getCaseIdFromQid(receiptEvent.getPayload().getReceipt().getQuestionnaireId());
     }
 
     return caseId;

@@ -9,6 +9,7 @@ import static uk.gov.ons.census.fwmtadapter.util.ReceiptHelper.setUpResponseMana
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import uk.gov.ons.census.fwmtadapter.client.CaseClient;
 import uk.gov.ons.census.fwmtadapter.model.dto.ReceiptDTO;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
@@ -45,14 +46,13 @@ public class ReceiptServiceTest {
     ReceiptDTO receiptDTO = new ReceiptDTO();
     receiptDTO.setQuestionnaireId(TEST_QID);
     RabbitTemplate rabbitTemplate = mock(RabbitTemplate.class);
-    CaseService caseService = mock(CaseService.class);
-    when(caseService.getCaseIdFromQid(TEST_QID)).thenReturn(TEST_CASE_ID);
+    CaseClient caseClient = mock(CaseClient.class);
+    when(caseClient.getCaseIdFromQid(TEST_QID)).thenReturn(TEST_CASE_ID);
 
     ResponseManagementEvent responseManagementEvent =
         setUpResponseManagementReceiptEvent(receiptDTO);
 
-    ReceiptService receiptService =
-        new ReceiptService(rabbitTemplate, "exchange_name", caseService);
+    ReceiptService receiptService = new ReceiptService(rabbitTemplate, "exchange_name", caseClient);
 
     receiptService.processReceipt(responseManagementEvent);
 
@@ -68,14 +68,13 @@ public class ReceiptServiceTest {
     ReceiptDTO receiptDTO = new ReceiptDTO();
     receiptDTO.setQuestionnaireId(TEST_QID);
     RabbitTemplate rabbitTemplate = mock(RabbitTemplate.class);
-    CaseService caseService = mock(CaseService.class);
-    when(caseService.getCaseIdFromQid(TEST_QID)).thenThrow(new RuntimeException());
+    CaseClient caseClient = mock(CaseClient.class);
+    when(caseClient.getCaseIdFromQid(TEST_QID)).thenThrow(new RuntimeException());
 
     ResponseManagementEvent responseManagementEvent =
         setUpResponseManagementReceiptEvent(receiptDTO);
 
-    ReceiptService receiptService =
-        new ReceiptService(rabbitTemplate, "exchange_name", caseService);
+    ReceiptService receiptService = new ReceiptService(rabbitTemplate, "exchange_name", caseClient);
 
     receiptService.processReceipt(responseManagementEvent);
   }
