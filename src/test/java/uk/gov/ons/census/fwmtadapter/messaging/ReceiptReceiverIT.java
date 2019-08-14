@@ -26,7 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdDto;
+import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdAddressTypeDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.ReceiptDTO;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
@@ -39,8 +39,8 @@ import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ReceiptReceiverIT {
   private static final String TEST_CASE_ID = "test_case_id";
+  private static final String TEST_ADDRESS_TYPE = "test_address_type";
   private static final String TEST_QID = "test_qid";
-  private static final String TEST_QID_2 = "test_qid_2";
   private ObjectMapper objectMapper = new ObjectMapper();
 
   @Value("${queueconfig.case-event-exchange}")
@@ -68,33 +68,14 @@ public class ReceiptReceiverIT {
   }
 
   @Test
-  public void testGoodReceiptMessageWithCaseIdPopulated()
-      throws InterruptedException, JAXBException {
-    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
-    ReceiptDTO receiptDTO = new ReceiptDTO();
-    receiptDTO.setCaseId(TEST_CASE_ID);
-    ResponseManagementEvent responseManagementEvent =
-        setUpResponseManagementReceiptEvent(receiptDTO);
-
-    rabbitQueueHelper.sendMessage(caseEventExchange, receiptRoutingKey, responseManagementEvent);
-
-    String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
-    JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
-    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-    StringReader reader = new StringReader(actualMessage);
-    ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
-
-    assertThat(actionInstruction.getActionCancel().getCaseId()).isEqualTo(TEST_CASE_ID);
-  }
-
-  @Test
-  public void testGoodReceiptMessageWithoutCaseIdPopulated()
+  public void testGoodReceiptMessage()
       throws InterruptedException, JAXBException, JsonProcessingException {
     // Given
     String url = "/cases/qid/" + TEST_QID;
-    CaseIdDto caseIdDto = new CaseIdDto();
-    caseIdDto.setCaseId(TEST_CASE_ID);
-    String returnJson = objectMapper.writeValueAsString(caseIdDto);
+    CaseIdAddressTypeDto caseIdAddressTypeDto = new CaseIdAddressTypeDto();
+    caseIdAddressTypeDto.setCaseId(TEST_CASE_ID);
+    caseIdAddressTypeDto.setAddressType(TEST_ADDRESS_TYPE);
+    String returnJson = objectMapper.writeValueAsString(caseIdAddressTypeDto);
 
     stubFor(
         get(urlEqualTo(url))
@@ -121,19 +102,20 @@ public class ReceiptReceiverIT {
     ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
 
     assertThat(actionInstruction.getActionCancel().getCaseId()).isEqualTo(TEST_CASE_ID);
+    assertThat(actionInstruction.getActionCancel().getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
   }
 
   @Test
-  public void testGoodReceiptMessageWithoutCaseIdPopulatedCausingTransactionRollback()
+  public void testGoodReceiptMessageWhereCaseLookFailsAtFirstCausingTransactionRollback()
       throws InterruptedException, JsonProcessingException, JAXBException {
     // Given
 
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
     ReceiptDTO receiptDTO = new ReceiptDTO();
-    receiptDTO.setQuestionnaireId(TEST_QID_2);
+    receiptDTO.setQuestionnaireId(TEST_QID);
     ResponseManagementEvent responseManagementEvent =
         setUpResponseManagementReceiptEvent(receiptDTO);
-    String url = "/cases/qid/" + TEST_QID_2;
+    String url = "/cases/qid/" + TEST_QID;
 
     stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
 
@@ -144,10 +126,11 @@ public class ReceiptReceiverIT {
     rabbitQueueHelper.checkNoMessage(outboundQueue);
 
     // then again, now add a good stub
-    CaseIdDto caseIdDto = new CaseIdDto();
-    caseIdDto.setCaseId(TEST_CASE_ID);
+    CaseIdAddressTypeDto caseIdAddressTypeDto = new CaseIdAddressTypeDto();
+    caseIdAddressTypeDto.setCaseId(TEST_CASE_ID);
+    caseIdAddressTypeDto.setAddressType(TEST_ADDRESS_TYPE);
 
-    String returnJson = objectMapper.writeValueAsString(caseIdDto);
+    String returnJson = objectMapper.writeValueAsString(caseIdAddressTypeDto);
 
     stubFor(
         get(urlEqualTo(url))
@@ -164,5 +147,6 @@ public class ReceiptReceiverIT {
     ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
 
     assertThat(actionInstruction.getActionCancel().getCaseId()).isEqualTo(TEST_CASE_ID);
+    assertThat(actionInstruction.getActionCancel().getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
   }
 }

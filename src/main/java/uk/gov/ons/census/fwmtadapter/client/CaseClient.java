@@ -2,9 +2,9 @@ package uk.gov.ons.census.fwmtadapter.client;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
-import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdDto;
+import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainer;
+import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdAddressTypeDto;
 
 @Component
 public class CaseClient {
@@ -20,17 +20,13 @@ public class CaseClient {
     this.restTemplate = restTemplate;
   }
 
-  public String getCaseIdFromQid(String questionnaire_id) {
+  public CaseContainer getCaseFromCaseId(String caseId) {
+    String url = "http://" + host + ":" + port + "/" + caseId;
+    return restTemplate.getForObject(url, CaseContainer.class);
+  }
+
+  public CaseIdAddressTypeDto getCaseIdAndAddressTypeFromQid(String questionnaire_id) {
     String url = "http://" + host + ":" + port + "/cases/qid/" + questionnaire_id;
-
-    CaseIdDto caseIdDto = restTemplate.getForObject(url, CaseIdDto.class);
-
-    String caseId = caseIdDto.getCaseId();
-
-    if (StringUtils.isEmpty(caseId)) {
-      throw new RuntimeException("Returned empty caseID from case api");
-    }
-
-    return caseIdDto.getCaseId();
+    return restTemplate.getForObject(url, CaseIdAddressTypeDto.class);
   }
 }
