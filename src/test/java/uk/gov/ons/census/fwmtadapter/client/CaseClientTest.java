@@ -42,7 +42,7 @@ public class CaseClientTest {
 
   @Test
   public void successfullyGetCaseByCaseId() {
-    String expectedUrl = "http://" + host + ":" + port + "/" + CASE_ID;
+    String expectedUrl = "http://" + host + ":" + port + "/cases/" + CASE_ID;
     EasyRandom easyRandom = new EasyRandom();
 
     CaseContainer caseContainer = easyRandom.nextObject(CaseContainer.class);

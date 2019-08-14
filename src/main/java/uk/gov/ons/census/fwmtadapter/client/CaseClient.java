@@ -21,7 +21,8 @@ public class CaseClient {
   }
 
   public CaseContainer getCaseFromCaseId(String caseId) {
-    String url = "http://" + host + ":" + port + "/" + caseId;
+    String url = "http://" + host + ":" + port + "/cases/" + caseId;
+    System.out.println("Attempting to call: " + url);
     return restTemplate.getForObject(url, CaseContainer.class);
   }
 

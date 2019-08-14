@@ -2,6 +2,7 @@ package uk.gov.ons.census.fwmtadapter.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.OffsetDateTime;
+import java.util.List;
 import lombok.Data;
 
 @Data
@@ -56,4 +57,6 @@ public class CaseContainer {
   private String lad;
 
   private String state;
+
+  private List<EventDTO> caseEvents;
 }
