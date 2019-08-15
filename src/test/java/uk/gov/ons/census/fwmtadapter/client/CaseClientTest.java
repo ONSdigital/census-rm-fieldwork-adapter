@@ -61,10 +61,10 @@ public class CaseClientTest {
 
   private UriComponents createUriComponents(String path, String id) {
     return UriComponentsBuilder.newInstance()
-            .scheme("http")
-            .host(host)
-            .port(port)
-            .path(path)
-            .buildAndExpand(id);
+        .scheme("http")
+        .host(host)
+        .port(port)
+        .path(path)
+        .buildAndExpand(id);
   }
 }
