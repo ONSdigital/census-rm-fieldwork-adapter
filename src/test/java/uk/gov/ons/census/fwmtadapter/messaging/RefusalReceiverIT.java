@@ -43,8 +43,8 @@ import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class RefusalReceiverIT {
-  public static final String TEST_CASE_ID = "test_case_id";
-  public static final String TEST_ADDRESS_TYPE = "test_address_type";
+  private static final String TEST_CASE_ID = "test_case_id";
+  private static final String TEST_ADDRESS_TYPE = "test_address_type";
 
   @Value("${queueconfig.case-event-exchange}")
   private String caseEventExchange;
@@ -60,8 +60,8 @@ public class RefusalReceiverIT {
 
   @Autowired private RabbitQueueHelper rabbitQueueHelper;
 
-  private EasyRandom easyRandom = new EasyRandom();
-  private ObjectMapper objectMapper = new ObjectMapper();
+  private final EasyRandom easyRandom = new EasyRandom();
+  private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Rule
   public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8089).httpsPort(8443));

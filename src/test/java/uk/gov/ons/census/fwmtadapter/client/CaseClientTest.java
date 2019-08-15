@@ -16,7 +16,7 @@ import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdAddressTypeDto;
 public class CaseClientTest {
   private static final String QUESTIONAIRE_ID = "123a";
   private static final String CASE_ID = "g5dv3";
-  public static final String ADDRESS_TYPE_TEST = "address_type_test";
+  private static final String ADDRESS_TYPE_TEST = "address_type_test";
 
   @Value("${caseapi.host}")
   private String host;
