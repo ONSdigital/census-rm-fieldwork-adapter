@@ -23,23 +23,21 @@ public class CaseClient {
   }
 
   public CaseContainer getCaseFromCaseId(String caseId) {
-    UriComponents uriComponents = createUriComponents("/cases/", "caseId", caseId);
+    UriComponents uriComponents = createUriComponents("/cases/{caseId}", caseId);
     return restTemplate.getForObject(uriComponents.toUri().toString(), CaseContainer.class);
   }
 
   public CaseIdAddressTypeDto getCaseIdAndAddressTypeFromQid(String questionnaire_id) {
-    UriComponents uriComponents = createUriComponents("/cases/qid/", "qid", questionnaire_id);
+    UriComponents uriComponents = createUriComponents("/cases/qid/{qid}", questionnaire_id);
     return restTemplate.getForObject(uriComponents.toUri().toString(), CaseIdAddressTypeDto.class);
   }
 
-  private UriComponents createUriComponents(String path, String param_name, String param) {
+  private UriComponents createUriComponents(String path, String id) {
     return UriComponentsBuilder.newInstance()
         .scheme("http")
         .host(host)
         .port(port)
         .path(path)
-        .queryParam(param_name, param)
-        .build()
-        .encode();
+        .buildAndExpand(id);
   }
 }

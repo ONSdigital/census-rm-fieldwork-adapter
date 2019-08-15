@@ -91,7 +91,7 @@ public class RefusalReceiverIT {
     event.setType(EventType.REFUSAL_RECEIVED);
     responseManagementEvent.setEvent(event);
 
-    String url = "/cases/?caseId=" + TEST_CASE_ID;
+    String url = "/cases/" + TEST_CASE_ID;
     CaseContainer caseContainer = new CaseContainer();
     caseContainer.setAddressType(TEST_ADDRESS_TYPE);
     String returnJson = objectMapper.writeValueAsString(caseContainer);

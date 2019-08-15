@@ -26,7 +26,7 @@ public class CaseClientTest {
 
   @Test
   public void successfulyGetCaseIdFromQid() {
-    UriComponents expectedUri = createUriComponents("/cases/qid/", "qid", QUESTIONAIRE_ID);
+    UriComponents expectedUri = createUriComponents("/cases/qid/{qid}", QUESTIONAIRE_ID);
 
     CaseIdAddressTypeDto expectedCaseIdAddressTypeDto = new CaseIdAddressTypeDto();
     expectedCaseIdAddressTypeDto.setCaseId(CASE_ID);
@@ -44,7 +44,7 @@ public class CaseClientTest {
 
   @Test
   public void successfullyGetCaseByCaseId() {
-    UriComponents expectedUri = createUriComponents("/cases/", "caseId", CASE_ID);
+    UriComponents expectedUri = createUriComponents("/cases/{caseId}", CASE_ID);
     EasyRandom easyRandom = new EasyRandom();
 
     CaseContainer caseContainer = easyRandom.nextObject(CaseContainer.class);
@@ -59,14 +59,12 @@ public class CaseClientTest {
     assertThat(caseClient.getCaseFromCaseId(CASE_ID)).isEqualTo(caseContainer);
   }
 
-  private UriComponents createUriComponents(String path, String param_name, String param) {
+  private UriComponents createUriComponents(String path, String id) {
     return UriComponentsBuilder.newInstance()
-        .scheme("http")
-        .host(host)
-        .port(port)
-        .path(path)
-        .queryParam(param_name, param)
-        .build()
-        .encode();
+            .scheme("http")
+            .host(host)
+            .port(port)
+            .path(path)
+            .buildAndExpand(id);
   }
 }
