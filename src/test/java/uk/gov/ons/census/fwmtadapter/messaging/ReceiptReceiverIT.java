@@ -71,7 +71,7 @@ public class ReceiptReceiverIT {
   public void testGoodReceiptMessage()
       throws InterruptedException, JAXBException, JsonProcessingException {
     // Given
-    String url = "/cases/qid/" + TEST_QID;
+    String url = "/cases/qid/?qid=" + TEST_QID;
     CaseIdAddressTypeDto caseIdAddressTypeDto = new CaseIdAddressTypeDto();
     caseIdAddressTypeDto.setCaseId(TEST_CASE_ID);
     caseIdAddressTypeDto.setAddressType(TEST_ADDRESS_TYPE);
@@ -115,7 +115,7 @@ public class ReceiptReceiverIT {
     receiptDTO.setQuestionnaireId(TEST_QID);
     ResponseManagementEvent responseManagementEvent =
         setUpResponseManagementReceiptEvent(receiptDTO);
-    String url = "/cases/qid/" + TEST_QID;
+    String url = "/cases/qid/?qid=" + TEST_QID;
 
     stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
 

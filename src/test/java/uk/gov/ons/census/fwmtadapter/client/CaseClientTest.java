@@ -8,6 +8,8 @@ import org.jeasy.random.EasyRandom;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainer;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdAddressTypeDto;
 
@@ -24,14 +26,14 @@ public class CaseClientTest {
 
   @Test
   public void successfulyGetCaseIdFromQid() {
-    String expectedUrl = "http://" + host + ":" + port + "/cases/qid/" + QUESTIONAIRE_ID;
+    UriComponents expectedUri = createUriComponents("/cases/qid/", "qid", QUESTIONAIRE_ID);
 
     CaseIdAddressTypeDto expectedCaseIdAddressTypeDto = new CaseIdAddressTypeDto();
     expectedCaseIdAddressTypeDto.setCaseId(CASE_ID);
     expectedCaseIdAddressTypeDto.setAddressType(ADDRESS_TYPE_TEST);
 
     RestTemplate restTemplate = mock(RestTemplate.class);
-    when(restTemplate.getForObject(expectedUrl, CaseIdAddressTypeDto.class))
+    when(restTemplate.getForObject(expectedUri.toUri().toString(), CaseIdAddressTypeDto.class))
         .thenReturn(expectedCaseIdAddressTypeDto);
 
     CaseClient caseClient = new CaseClient(restTemplate);
@@ -42,17 +44,29 @@ public class CaseClientTest {
 
   @Test
   public void successfullyGetCaseByCaseId() {
-    String expectedUrl = "http://" + host + ":" + port + "/cases/" + CASE_ID;
+    UriComponents expectedUri = createUriComponents("/cases/", "caseId", CASE_ID);
     EasyRandom easyRandom = new EasyRandom();
 
     CaseContainer caseContainer = easyRandom.nextObject(CaseContainer.class);
     caseContainer.setCaseId(CASE_ID);
 
     RestTemplate restTemplate = mock(RestTemplate.class);
-    when(restTemplate.getForObject(expectedUrl, CaseContainer.class)).thenReturn(caseContainer);
+    when(restTemplate.getForObject(expectedUri.toUri().toString(), CaseContainer.class))
+        .thenReturn(caseContainer);
 
     CaseClient caseClient = new CaseClient(restTemplate);
 
     assertThat(caseClient.getCaseFromCaseId(CASE_ID)).isEqualTo(caseContainer);
+  }
+
+  private UriComponents createUriComponents(String path, String param_name, String param) {
+    return UriComponentsBuilder.newInstance()
+        .scheme("http")
+        .host(host)
+        .port(port)
+        .path(path)
+        .queryParam(param_name, param)
+        .build()
+        .encode();
   }
 }

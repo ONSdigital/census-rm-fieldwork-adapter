@@ -29,8 +29,6 @@ public class ReceiptService {
   public void processReceipt(ResponseManagementEvent receiptEvent) {
     ActionCancel actionCancel = new ActionCancel();
 
-    String a = receiptEvent.getPayload().getReceipt().getQuestionnaireId();
-
     CaseIdAddressTypeDto caseIdAddressType =
         caseClient.getCaseIdAndAddressTypeFromQid(
             receiptEvent.getPayload().getReceipt().getQuestionnaireId());
