@@ -35,7 +35,6 @@ public class ReceiptService {
 
     actionCancel.setCaseId(caseIdAddressType.getCaseId());
     actionCancel.setAddressType(caseIdAddressType.getAddressType());
-
     ActionInstruction actionInstruction = new ActionInstruction();
     actionInstruction.setActionCancel(actionCancel);
 
