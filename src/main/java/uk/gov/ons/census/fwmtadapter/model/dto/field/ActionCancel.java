@@ -10,39 +10,15 @@ package uk.gov.ons.census.fwmtadapter.model.dto.field;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import lombok.Data;
 
-/**
- * Java class for ActionCancel complex type.
- *
- * <p>The following schema fragment specifies the expected content contained within this class.
- *
- * <pre>
- * &lt;complexType name="ActionCancel"&gt;
- *   &lt;complexContent&gt;
- *     &lt;extension base="{http://ons.gov.uk/ctp/response/action/message/instruction}Action"&gt;
- *       &lt;sequence&gt;
- *         &lt;element name="reason" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
- *         &lt;element name="caseId" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *         &lt;element name="caseRef" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/&gt;
- *       &lt;/sequence&gt;
- *     &lt;/extension&gt;
- *   &lt;/complexContent&gt;
- * &lt;/complexType&gt;
- * </pre>
- */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(
     name = "ActionCancel",
-    propOrder = {"reason", "caseId", "caseRef"})
+    propOrder = {"caseId", "addressType"})
 @Data
 public class ActionCancel extends Action {
-
-  @XmlElement(required = true)
-  protected String reason;
-
   protected String caseId;
-  protected String caseRef;
+  protected String addressType;
 }

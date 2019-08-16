@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.ons.census.fwmtadapter.client.CaseClient;
+import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainer;
 import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionCancel;
@@ -15,13 +17,16 @@ public class RefusalReceiver {
   public static final String REFUSED = "REFUSED";
 
   private final String outboundExchange;
+  private final CaseClient caseClient;
   private final RabbitTemplate rabbitTemplate;
 
   public RefusalReceiver(
       RabbitTemplate rabbitTemplate,
-      @Value("${queueconfig.outbound-exchange}") String outboundExchange) {
+      @Value("${queueconfig.outbound-exchange}") String outboundExchange,
+      CaseClient caseClient) {
     this.rabbitTemplate = rabbitTemplate;
     this.outboundExchange = outboundExchange;
+    this.caseClient = caseClient;
   }
 
   @Transactional
@@ -37,10 +42,13 @@ public class RefusalReceiver {
       return;
     }
 
-    ActionCancel actionCancel = new ActionCancel();
-    actionCancel.setCaseId(event.getPayload().getRefusal().getCollectionCase().getId());
-    actionCancel.setReason(REFUSED);
+    String caseId = event.getPayload().getRefusal().getCollectionCase().getId();
 
+    CaseContainer caseContainer = caseClient.getCaseFromCaseId(caseId);
+
+    ActionCancel actionCancel = new ActionCancel();
+    actionCancel.setCaseId(caseId);
+    actionCancel.setAddressType(caseContainer.getAddressType());
     ActionInstruction actionInstruction = new ActionInstruction();
     actionInstruction.setActionCancel(actionCancel);
 
