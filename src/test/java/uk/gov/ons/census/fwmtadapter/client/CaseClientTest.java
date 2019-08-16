@@ -10,8 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainer;
-import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdAddressTypeDto;
+import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 
 public class CaseClientTest {
   private static final String QUESTIONAIRE_ID = "123a";
@@ -28,18 +27,17 @@ public class CaseClientTest {
   public void successfulyGetCaseIdFromQid() {
     UriComponents expectedUri = createUriComponents("/cases/qid/{qid}", QUESTIONAIRE_ID);
 
-    CaseIdAddressTypeDto expectedCaseIdAddressTypeDto = new CaseIdAddressTypeDto();
+    CaseContainerDto expectedCaseIdAddressTypeDto = new CaseContainerDto();
     expectedCaseIdAddressTypeDto.setCaseId(CASE_ID);
     expectedCaseIdAddressTypeDto.setAddressType(ADDRESS_TYPE_TEST);
 
     RestTemplate restTemplate = mock(RestTemplate.class);
-    when(restTemplate.getForObject(expectedUri.toUri().toString(), CaseIdAddressTypeDto.class))
+    when(restTemplate.getForObject(expectedUri.toUri().toString(), CaseContainerDto.class))
         .thenReturn(expectedCaseIdAddressTypeDto);
 
     CaseClient caseClient = new CaseClient(restTemplate);
 
-    assertThat(caseClient.getCaseIdAndAddressTypeFromQid(QUESTIONAIRE_ID))
-        .isEqualTo(expectedCaseIdAddressTypeDto);
+    assertThat(caseClient.getCaseFromQid(QUESTIONAIRE_ID)).isEqualTo(expectedCaseIdAddressTypeDto);
   }
 
   @Test
@@ -47,16 +45,16 @@ public class CaseClientTest {
     UriComponents expectedUri = createUriComponents("/cases/{caseId}", CASE_ID);
     EasyRandom easyRandom = new EasyRandom();
 
-    CaseContainer caseContainer = easyRandom.nextObject(CaseContainer.class);
-    caseContainer.setCaseId(CASE_ID);
+    CaseContainerDto caseContainerDto = easyRandom.nextObject(CaseContainerDto.class);
+    caseContainerDto.setCaseId(CASE_ID);
 
     RestTemplate restTemplate = mock(RestTemplate.class);
-    when(restTemplate.getForObject(expectedUri.toUri().toString(), CaseContainer.class))
-        .thenReturn(caseContainer);
+    when(restTemplate.getForObject(expectedUri.toUri().toString(), CaseContainerDto.class))
+        .thenReturn(caseContainerDto);
 
     CaseClient caseClient = new CaseClient(restTemplate);
 
-    assertThat(caseClient.getCaseFromCaseId(CASE_ID)).isEqualTo(caseContainer);
+    assertThat(caseClient.getCaseFromCaseId(CASE_ID)).isEqualTo(caseContainerDto);
   }
 
   private UriComponents createUriComponents(String path, String id) {

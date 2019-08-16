@@ -5,8 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
-import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainer;
-import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdAddressTypeDto;
+import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 
 @Component
 public class CaseClient {
@@ -22,14 +21,14 @@ public class CaseClient {
     this.restTemplate = restTemplate;
   }
 
-  public CaseContainer getCaseFromCaseId(String caseId) {
+  public CaseContainerDto getCaseFromCaseId(String caseId) {
     UriComponents uriComponents = createUriComponents("/cases/{caseId}", caseId);
-    return restTemplate.getForObject(uriComponents.toUri().toString(), CaseContainer.class);
+    return restTemplate.getForObject(uriComponents.toUri().toString(), CaseContainerDto.class);
   }
 
-  public CaseIdAddressTypeDto getCaseIdAndAddressTypeFromQid(String questionnaire_id) {
+  public CaseContainerDto getCaseFromQid(String questionnaire_id) {
     UriComponents uriComponents = createUriComponents("/cases/qid/{qid}", questionnaire_id);
-    return restTemplate.getForObject(uriComponents.toUri().toString(), CaseIdAddressTypeDto.class);
+    return restTemplate.getForObject(uriComponents.toUri().toString(), CaseContainerDto.class);
   }
 
   private UriComponents createUriComponents(String path, String id) {

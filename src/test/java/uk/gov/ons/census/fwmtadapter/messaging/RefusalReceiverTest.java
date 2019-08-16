@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import uk.gov.ons.census.fwmtadapter.client.CaseClient;
-import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainer;
+import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
@@ -31,10 +31,10 @@ public class RefusalReceiverTest {
 
     // When
     CaseClient caseClient = mock(CaseClient.class);
-    CaseContainer caseContainer = new CaseContainer();
-    caseContainer.setCaseId(TEST_CASE_ID);
-    caseContainer.setAddressType(TEST_ADDRESS_TYPE);
-    when(caseClient.getCaseFromCaseId(TEST_CASE_ID)).thenReturn(caseContainer);
+    CaseContainerDto caseContainerDto = new CaseContainerDto();
+    caseContainerDto.setCaseId(TEST_CASE_ID);
+    caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
+    when(caseClient.getCaseFromCaseId(TEST_CASE_ID)).thenReturn(caseContainerDto);
 
     RefusalReceiver underTest = new RefusalReceiver(rabbitTemplate, "TEST EXCHANGE", caseClient);
 

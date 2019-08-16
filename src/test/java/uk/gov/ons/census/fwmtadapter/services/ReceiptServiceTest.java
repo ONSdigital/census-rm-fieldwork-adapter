@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import uk.gov.ons.census.fwmtadapter.client.CaseClient;
-import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdAddressTypeDto;
+import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.ReceiptDTO;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
@@ -27,11 +27,11 @@ public class ReceiptServiceTest {
     RabbitTemplate rabbitTemplate = mock(RabbitTemplate.class);
     CaseClient caseClient = mock(CaseClient.class);
 
-    CaseIdAddressTypeDto caseIdAddressTypeDto = new CaseIdAddressTypeDto();
-    caseIdAddressTypeDto.setCaseId(TEST_CASE_ID);
-    caseIdAddressTypeDto.setAddressType(TEST_ADDRESS_TYPE);
+    CaseContainerDto caseContainerDto = new CaseContainerDto();
+    caseContainerDto.setCaseId(TEST_CASE_ID);
+    caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
 
-    when(caseClient.getCaseIdAndAddressTypeFromQid(TEST_QID)).thenReturn(caseIdAddressTypeDto);
+    when(caseClient.getCaseFromQid(TEST_QID)).thenReturn(caseContainerDto);
 
     ResponseManagementEvent responseManagementEvent =
         setUpResponseManagementReceiptEvent(receiptDTO);
@@ -53,7 +53,7 @@ public class ReceiptServiceTest {
     receiptDTO.setQuestionnaireId(TEST_QID);
     RabbitTemplate rabbitTemplate = mock(RabbitTemplate.class);
     CaseClient caseClient = mock(CaseClient.class);
-    when(caseClient.getCaseIdAndAddressTypeFromQid(TEST_QID)).thenThrow(new RuntimeException());
+    when(caseClient.getCaseFromQid(TEST_QID)).thenThrow(new RuntimeException());
 
     ResponseManagementEvent responseManagementEvent =
         setUpResponseManagementReceiptEvent(receiptDTO);
