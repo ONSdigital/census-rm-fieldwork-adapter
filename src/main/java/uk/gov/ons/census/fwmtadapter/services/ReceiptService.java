@@ -4,7 +4,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.census.fwmtadapter.client.CaseClient;
-import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdAddressTypeDto;
+import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionCancel;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
@@ -29,13 +29,11 @@ public class ReceiptService {
   public void processReceipt(ResponseManagementEvent receiptEvent) {
     ActionCancel actionCancel = new ActionCancel();
 
-    CaseIdAddressTypeDto caseIdAddressType =
-        caseClient.getCaseIdAndAddressTypeFromQid(
-            receiptEvent.getPayload().getReceipt().getQuestionnaireId());
+    CaseContainerDto caseContainerDto =
+        caseClient.getCaseFromQid(receiptEvent.getPayload().getReceipt().getQuestionnaireId());
 
-    actionCancel.setCaseId(caseIdAddressType.getCaseId());
-    actionCancel.setAddressType(caseIdAddressType.getAddressType());
-
+    actionCancel.setCaseId(caseContainerDto.getCaseId());
+    actionCancel.setAddressType(caseContainerDto.getAddressType());
     ActionInstruction actionInstruction = new ActionInstruction();
     actionInstruction.setActionCancel(actionCancel);
 

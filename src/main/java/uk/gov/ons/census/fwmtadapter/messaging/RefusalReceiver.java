@@ -6,7 +6,7 @@ import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.census.fwmtadapter.client.CaseClient;
-import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainer;
+import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionCancel;
@@ -44,11 +44,11 @@ public class RefusalReceiver {
 
     String caseId = event.getPayload().getRefusal().getCollectionCase().getId();
 
-    CaseContainer caseContainer = caseClient.getCaseFromCaseId(caseId);
+    CaseContainerDto caseContainerDto = caseClient.getCaseFromCaseId(caseId);
 
     ActionCancel actionCancel = new ActionCancel();
     actionCancel.setCaseId(caseId);
-    actionCancel.setAddressType(caseContainer.getAddressType());
+    actionCancel.setAddressType(caseContainerDto.getAddressType());
     ActionInstruction actionInstruction = new ActionInstruction();
     actionInstruction.setActionCancel(actionCancel);
 

@@ -27,7 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainer;
+import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.CollectionCase;
 import uk.gov.ons.census.fwmtadapter.model.dto.Event;
 import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
@@ -92,9 +92,9 @@ public class RefusalReceiverIT {
     responseManagementEvent.setEvent(event);
 
     String url = "/cases/" + TEST_CASE_ID;
-    CaseContainer caseContainer = new CaseContainer();
-    caseContainer.setAddressType(TEST_ADDRESS_TYPE);
-    String returnJson = objectMapper.writeValueAsString(caseContainer);
+    CaseContainerDto caseContainerDto = new CaseContainerDto();
+    caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
+    String returnJson = objectMapper.writeValueAsString(caseContainerDto);
 
     stubFor(
         get(urlEqualTo(url))

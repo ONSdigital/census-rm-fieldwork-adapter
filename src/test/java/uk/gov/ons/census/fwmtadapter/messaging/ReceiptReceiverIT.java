@@ -26,7 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.ons.census.fwmtadapter.model.dto.CaseIdAddressTypeDto;
+import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.ReceiptDTO;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
@@ -72,10 +72,10 @@ public class ReceiptReceiverIT {
       throws InterruptedException, JAXBException, JsonProcessingException {
     // Given
     String url = "/cases/qid/" + TEST_QID;
-    CaseIdAddressTypeDto caseIdAddressTypeDto = new CaseIdAddressTypeDto();
-    caseIdAddressTypeDto.setCaseId(TEST_CASE_ID);
-    caseIdAddressTypeDto.setAddressType(TEST_ADDRESS_TYPE);
-    String returnJson = objectMapper.writeValueAsString(caseIdAddressTypeDto);
+    CaseContainerDto caseContainerDto = new CaseContainerDto();
+    caseContainerDto.setCaseId(TEST_CASE_ID);
+    caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
+    String returnJson = objectMapper.writeValueAsString(caseContainerDto);
 
     stubFor(
         get(urlEqualTo(url))
@@ -126,11 +126,11 @@ public class ReceiptReceiverIT {
     rabbitQueueHelper.checkNoMessage(outboundQueue);
 
     // then again, now add a good stub
-    CaseIdAddressTypeDto caseIdAddressTypeDto = new CaseIdAddressTypeDto();
-    caseIdAddressTypeDto.setCaseId(TEST_CASE_ID);
-    caseIdAddressTypeDto.setAddressType(TEST_ADDRESS_TYPE);
+    CaseContainerDto caseContainerDto = new CaseContainerDto();
+    caseContainerDto.setCaseId(TEST_CASE_ID);
+    caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
 
-    String returnJson = objectMapper.writeValueAsString(caseIdAddressTypeDto);
+    String returnJson = objectMapper.writeValueAsString(caseContainerDto);
 
     stubFor(
         get(urlEqualTo(url))

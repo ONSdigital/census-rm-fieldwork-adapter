@@ -18,7 +18,7 @@ import lombok.Data;
     name = "ActionCancel",
     propOrder = {"caseId", "addressType"})
 @Data
-public class ActionCancel extends Action {
+public class ActionCancel {
   protected String caseId;
   protected String addressType;
 }
