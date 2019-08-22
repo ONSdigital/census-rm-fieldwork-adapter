@@ -13,4 +13,7 @@ public class Payload {
   @JsonInclude(Include.NON_NULL)
   @JsonProperty("response")
   private ReceiptDTO receipt;
+
+  @JsonInclude(Include.NON_NULL)
+  private InvalidAddress invalidAddress;
 }

@@ -1,7 +1,9 @@
 package uk.gov.ons.census.fwmtadapter.messaging;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +15,6 @@ import java.util.concurrent.BlockingQueue;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import org.jeasy.random.EasyRandom;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,8 +32,8 @@ import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.CollectionCase;
 import uk.gov.ons.census.fwmtadapter.model.dto.Event;
 import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
+import uk.gov.ons.census.fwmtadapter.model.dto.InvalidAddress;
 import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
-import uk.gov.ons.census.fwmtadapter.model.dto.Refusal;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
@@ -42,25 +43,24 @@ import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @RunWith(SpringJUnit4ClassRunner.class)
-public class RefusalReceiverIT {
+public class InvalidAddressReceiverIT {
   private static final String TEST_CASE_ID = "test_case_id";
   private static final String TEST_ADDRESS_TYPE = "test_address_type";
 
   @Value("${queueconfig.case-event-exchange}")
   private String caseEventExchange;
 
-  @Value("${queueconfig.refusal-queue}")
-  private String refusalQueue;
+  @Value("${queueconfig.invalid-address-routing-key}")
+  private String invalidAddressRoutingKey;
 
-  @Value("${queueconfig.refusal-routing-key}")
-  private String refusalRoutingKey;
+  @Value("${queueconfig.invalid-address-inbound-queue}")
+  private String invalidAddressInboundQueue;
 
   @Value("${queueconfig.adapter-outbound-queue}")
   private String actionOutboundQueue;
 
   @Autowired private RabbitQueueHelper rabbitQueueHelper;
 
-  private final EasyRandom easyRandom = new EasyRandom();
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Rule public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8089));
@@ -68,26 +68,26 @@ public class RefusalReceiverIT {
   @Before
   @Transactional
   public void setUp() {
-    rabbitQueueHelper.purgeQueue(refusalQueue);
+    rabbitQueueHelper.purgeQueue(invalidAddressInboundQueue);
     rabbitQueueHelper.purgeQueue(actionOutboundQueue);
   }
 
   @Test
-  public void testRefusalMessageFromNonFieldChannelEmitsMessageToField()
+  public void testInvalidAddressMessageFromNonFieldChannelEmitsMessageToField()
       throws InterruptedException, JAXBException, JsonProcessingException {
     // Given
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
 
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId(TEST_CASE_ID);
-    Refusal refusal = new Refusal();
-    refusal.setCollectionCase(collectionCase);
+    InvalidAddress invalidAddress = new InvalidAddress();
+    invalidAddress.setCollectionCase(collectionCase);
     Payload payload = new Payload();
-    payload.setRefusal(refusal);
+    payload.setInvalidAddress(invalidAddress);
     ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
     responseManagementEvent.setPayload(payload);
     Event event = new Event();
-    event.setType(EventType.REFUSAL_RECEIVED);
+    event.setType(EventType.ADDRESS_NOT_VALID);
     event.setChannel("CC");
     responseManagementEvent.setEvent(event);
 
@@ -104,7 +104,8 @@ public class RefusalReceiverIT {
                     .withHeader("Content-Type", "application/json")
                     .withBody(returnJson)));
 
-    rabbitQueueHelper.sendMessage(caseEventExchange, refusalRoutingKey, responseManagementEvent);
+    rabbitQueueHelper.sendMessage(
+        caseEventExchange, invalidAddressRoutingKey, responseManagementEvent);
 
     // Then
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
@@ -113,27 +114,26 @@ public class RefusalReceiverIT {
     Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
     StringReader reader = new StringReader(actualMessage);
     ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
-    assertThat(responseManagementEvent.getPayload().getRefusal().getCollectionCase().getId())
-        .isEqualTo(actionInstruction.getActionCancel().getCaseId());
+    assertThat(TEST_CASE_ID).isEqualTo(actionInstruction.getActionCancel().getCaseId());
     assertThat(actionInstruction.getActionCancel().getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
   }
 
   @Test
-  public void testRefusalMessageFromFieldChannelDoesNotEmitMessageToField()
+  public void testInvalidAddressMessageFromFieldChannelDoesNotEmitMessageToField()
       throws InterruptedException, JsonProcessingException {
     // Given
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
 
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId(TEST_CASE_ID);
-    Refusal refusal = new Refusal();
-    refusal.setCollectionCase(collectionCase);
+    InvalidAddress invalidAddress = new InvalidAddress();
+    invalidAddress.setCollectionCase(collectionCase);
     Payload payload = new Payload();
-    payload.setRefusal(refusal);
+    payload.setInvalidAddress(invalidAddress);
     ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
     responseManagementEvent.setPayload(payload);
     Event event = new Event();
-    event.setType(EventType.REFUSAL_RECEIVED);
+    event.setType(EventType.ADDRESS_NOT_VALID);
     event.setChannel("FIELD");
     responseManagementEvent.setEvent(event);
 
@@ -151,7 +151,8 @@ public class RefusalReceiverIT {
                     .withBody(returnJson)));
 
     // When
-    rabbitQueueHelper.sendMessage(caseEventExchange, refusalRoutingKey, responseManagementEvent);
+    rabbitQueueHelper.sendMessage(
+        caseEventExchange, invalidAddressRoutingKey, responseManagementEvent);
 
     // Then
     assertThat(rabbitQueueHelper.getMessage(outboundQueue)).isNull();

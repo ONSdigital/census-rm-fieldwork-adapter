@@ -37,6 +37,12 @@ public class QueueSetterUpper {
   @Value("${queueconfig.refusal-routing-key}")
   private String refusalRoutingKey;
 
+  @Value("${queueconfig.invalid-address-routing-key}")
+  private String invalidAddressRoutingKey;
+
+  @Value("${queueconfig.invalid-address-inbound-queue}")
+  private String invalidAddressInboundQueue;
+
   @Bean
   public Queue actionFieldQueue() {
     return new Queue(actionFieldQueue, true);
@@ -55,6 +61,11 @@ public class QueueSetterUpper {
   @Bean
   public Queue refusalQueue() {
     return new Queue(refusalQueue, true);
+  }
+
+  @Bean
+  public Queue invalidAddressQueue() {
+    return new Queue(invalidAddressInboundQueue, true);
   }
 
   @Bean
@@ -80,5 +91,11 @@ public class QueueSetterUpper {
   @Bean
   public Binding bindingReceiptQueue() {
     return new Binding(receiptQueue, QUEUE, caseEventExchange, receiptRoutingKey, null);
+  }
+
+  @Bean
+  public Binding bindingInvalidAddressQueue() {
+    return new Binding(
+        invalidAddressInboundQueue, QUEUE, caseEventExchange, invalidAddressRoutingKey, null);
   }
 }
