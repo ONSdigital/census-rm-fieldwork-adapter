@@ -120,7 +120,7 @@ public class RefusalReceiverIT {
 
   @Test
   public void testRefusalMessageFromFieldChannelDoesNotEmitMessageToField()
-      throws InterruptedException, JsonProcessingException {
+      throws InterruptedException {
     // Given
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
 
@@ -136,19 +136,6 @@ public class RefusalReceiverIT {
     event.setType(EventType.REFUSAL_RECEIVED);
     event.setChannel("FIELD");
     responseManagementEvent.setEvent(event);
-
-    String url = "/cases/" + TEST_CASE_ID;
-    CaseContainerDto caseContainerDto = new CaseContainerDto();
-    caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
-    String returnJson = objectMapper.writeValueAsString(caseContainerDto);
-
-    stubFor(
-        get(urlEqualTo(url))
-            .willReturn(
-                aResponse()
-                    .withStatus(HttpStatus.OK.value())
-                    .withHeader("Content-Type", "application/json")
-                    .withBody(returnJson)));
 
     // When
     rabbitQueueHelper.sendMessage(caseEventExchange, refusalRoutingKey, responseManagementEvent);
