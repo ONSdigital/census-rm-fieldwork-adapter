@@ -13,12 +13,12 @@ import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionCancel;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
 
 @MessageEndpoint
-public class RefusalReceiver {
+public class InvalidAddressReceiver {
   private final String outboundExchange;
   private final CaseClient caseClient;
   private final RabbitTemplate rabbitTemplate;
 
-  public RefusalReceiver(
+  public InvalidAddressReceiver(
       RabbitTemplate rabbitTemplate,
       @Value("${queueconfig.outbound-exchange}") String outboundExchange,
       CaseClient caseClient) {
@@ -28,19 +28,22 @@ public class RefusalReceiver {
   }
 
   @Transactional
-  @ServiceActivator(inputChannel = "refusalInputChannel")
+  @ServiceActivator(inputChannel = "invalidAddressInputChannel")
   public void receiveMessage(ResponseManagementEvent event) {
-    if (event.getEvent().getType() != EventType.REFUSAL_RECEIVED) {
+    // This check shouldn't be needed, but because several different shape messages are getting
+    // published to the same topic according to the event dictionary, let's keep this check in
+    // place so that we know we need to do something about it
+    if (event.getEvent().getType() != EventType.ADDRESS_NOT_VALID) {
       throw new RuntimeException(
           String.format("Event Type '%s' is invalid!", event.getEvent().getType()));
     }
 
-    // Do not send refusal back to Field if from Field
+    // Do not send back to Field if from Field
     if ("FIELD".equalsIgnoreCase(event.getEvent().getChannel())) {
       return;
     }
 
-    String caseId = event.getPayload().getRefusal().getCollectionCase().getId();
+    String caseId = event.getPayload().getInvalidAddress().getCollectionCase().getId();
 
     CaseContainerDto caseContainerDto = caseClient.getCaseFromCaseId(caseId);
 

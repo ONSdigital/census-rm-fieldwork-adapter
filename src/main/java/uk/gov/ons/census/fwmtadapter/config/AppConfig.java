@@ -34,11 +34,19 @@ public class AppConfig {
   @Value("${queueconfig.refusal-queue}")
   private String refusalQueue;
 
+  @Value("${queueconfig.invalid-address-inbound-queue}")
+  private String invalidAddressInboundQueue;
+
   @Value("${queueconfig.consumers}")
   private int consumers;
 
   @Bean
   public MessageChannel receiptedChannel() {
+    return new DirectChannel();
+  }
+
+  @Bean
+  public MessageChannel invalidAddressInputChannel() {
     return new DirectChannel();
   }
 
@@ -52,10 +60,29 @@ public class AppConfig {
   }
 
   @Bean
+  AmqpInboundChannelAdapter invalidAddressInbound(
+      @Qualifier("invalidAddressContainer") SimpleMessageListenerContainer listenerContainer,
+      @Qualifier("invalidAddressInputChannel") MessageChannel channel) {
+    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
+    adapter.setOutputChannel(channel);
+    return adapter;
+  }
+
+  @Bean
   public SimpleMessageListenerContainer receiptContainer(ConnectionFactory connectionFactory) {
     SimpleMessageListenerContainer container =
         new SimpleMessageListenerContainer(connectionFactory);
     container.setQueueNames(receiptQueue);
+    container.setConcurrentConsumers(consumers);
+    return container;
+  }
+
+  @Bean
+  public SimpleMessageListenerContainer invalidAddressContainer(
+      ConnectionFactory connectionFactory) {
+    SimpleMessageListenerContainer container =
+        new SimpleMessageListenerContainer(connectionFactory);
+    container.setQueueNames(invalidAddressInboundQueue);
     container.setConcurrentConsumers(consumers);
     return container;
   }
