@@ -1,0 +1,119 @@
+{
+  "rabbit_version": "3.6.10",
+  "users": [
+    {
+      "name": "guest",
+      "password_hash": "AldElI2NwJNg9A1YZbcOU2IH3EAbc1QMTLugjUXXcs/zikqh",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "parameters": [],
+  "global_parameters": [],
+  "policies": [],
+  "queues": [
+    {
+      "name": "Action.Field",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "FieldworkAdapter.Refusals",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "FieldWorkAdapter.Responses",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "RM.Field",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "FieldworkAdapter.invalidAddress",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "events",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "adapter-outbound-exchange",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "adapter-outbound-exchange",
+      "vhost": "/",
+      "destination": "RM.Field",
+      "destination_type": "queue",
+      "routing_key": "",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "FieldworkAdapter.invalidAddress",
+      "destination_type": "queue",
+      "routing_key": "event.case.address.update",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "FieldworkAdapter.Refusals",
+      "destination_type": "queue",
+      "routing_key": "event.respondent.refusal",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "FieldWorkAdapter.Responses",
+      "destination_type": "queue",
+      "routing_key": "event.response.receipt",
+      "arguments": {}
+    }
+  ]
+}
