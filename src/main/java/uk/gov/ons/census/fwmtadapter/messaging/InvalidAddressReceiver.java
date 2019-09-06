@@ -7,7 +7,6 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.census.fwmtadapter.client.CaseClient;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
-import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionCancel;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
@@ -30,12 +29,16 @@ public class InvalidAddressReceiver {
   @Transactional
   @ServiceActivator(inputChannel = "invalidAddressInputChannel")
   public void receiveMessage(ResponseManagementEvent event) {
-    // This check shouldn't be needed, but because several different shape messages are getting
-    // published to the same topic according to the event dictionary, let's keep this check in
-    // place so that we know we need to do something about it
-    if (event.getEvent().getType() != EventType.ADDRESS_NOT_VALID) {
-      throw new RuntimeException(
-          String.format("Event Type '%s' is invalid!", event.getEvent().getType()));
+    switch (event.getEvent().getType()) {
+      case ADDRESS_MODIFIED:
+      case ADDRESS_TYPE_CHANGED:
+      case NEW_ADDRESS_REPORTED:
+        return; // We don't do anything with these
+      case ADDRESS_NOT_VALID:
+        break; // We DO WANT to process this one
+      default:
+        throw new RuntimeException(
+            String.format("Event Type '%s' is invalid on this topic", event.getEvent().getType()));
     }
 
     // Do not send back to Field if from Field

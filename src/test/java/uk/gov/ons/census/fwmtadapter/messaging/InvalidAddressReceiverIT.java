@@ -46,18 +46,14 @@ import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 public class InvalidAddressReceiverIT {
   private static final String TEST_CASE_ID = "test_case_id";
   private static final String TEST_ADDRESS_TYPE = "test_address_type";
+  private static final String INVALID_ADDRESS_ROUTING_KEY = "event.case.address.update";
+  private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
 
   @Value("${queueconfig.case-event-exchange}")
   private String caseEventExchange;
 
-  @Value("${queueconfig.invalid-address-routing-key}")
-  private String invalidAddressRoutingKey;
-
   @Value("${queueconfig.invalid-address-inbound-queue}")
   private String invalidAddressInboundQueue;
-
-  @Value("${queueconfig.adapter-outbound-queue}")
-  private String actionOutboundQueue;
 
   @Autowired private RabbitQueueHelper rabbitQueueHelper;
 
@@ -69,14 +65,14 @@ public class InvalidAddressReceiverIT {
   @Transactional
   public void setUp() {
     rabbitQueueHelper.purgeQueue(invalidAddressInboundQueue);
-    rabbitQueueHelper.purgeQueue(actionOutboundQueue);
+    rabbitQueueHelper.purgeQueue(ADAPTER_OUTBOUND_QUEUE);
   }
 
   @Test
   public void testInvalidAddressMessageFromNonFieldChannelEmitsMessageToField()
       throws InterruptedException, JAXBException, JsonProcessingException {
     // Given
-    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
+    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
 
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId(TEST_CASE_ID);
@@ -105,7 +101,7 @@ public class InvalidAddressReceiverIT {
                     .withBody(returnJson)));
 
     rabbitQueueHelper.sendMessage(
-        caseEventExchange, invalidAddressRoutingKey, responseManagementEvent);
+        caseEventExchange, INVALID_ADDRESS_ROUTING_KEY, responseManagementEvent);
 
     // Then
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
@@ -122,7 +118,7 @@ public class InvalidAddressReceiverIT {
   public void testInvalidAddressMessageFromFieldChannelDoesNotEmitMessageToField()
       throws InterruptedException {
     // Given
-    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
+    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
 
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId(TEST_CASE_ID);
@@ -139,7 +135,7 @@ public class InvalidAddressReceiverIT {
 
     // When
     rabbitQueueHelper.sendMessage(
-        caseEventExchange, invalidAddressRoutingKey, responseManagementEvent);
+        caseEventExchange, INVALID_ADDRESS_ROUTING_KEY, responseManagementEvent);
 
     // Then
     assertThat(rabbitQueueHelper.getMessage(outboundQueue)).isNull();

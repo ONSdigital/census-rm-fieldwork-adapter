@@ -80,7 +80,7 @@ public class InvalidAddressReceiverTest {
     ResponseManagementEvent event = easyRandom.nextObject(ResponseManagementEvent.class);
     event.getEvent().setType(EventType.CASE_CREATED);
     String expectedErrorMessage =
-        String.format("Event Type '%s' is invalid!", EventType.CASE_CREATED);
+        String.format("Event Type '%s' is invalid on this topic", EventType.CASE_CREATED);
 
     try {
       // When
@@ -90,5 +90,56 @@ public class InvalidAddressReceiverTest {
       assertThat(re.getMessage()).isEqualTo(expectedErrorMessage);
       throw re;
     }
+  }
+
+  @Test
+  public void testAddressModifiedIsIgnored() {
+    // Given
+    RabbitTemplate rabbitTemplate = mock(RabbitTemplate.class);
+
+    // When
+    InvalidAddressReceiver underTest =
+        new InvalidAddressReceiver(rabbitTemplate, "TEST EXCHANGE", null);
+    ResponseManagementEvent event = easyRandom.nextObject(ResponseManagementEvent.class);
+    event.getEvent().setType(EventType.ADDRESS_MODIFIED);
+    event.getEvent().setChannel("CC");
+    underTest.receiveMessage(event);
+
+    // Then
+    verifyZeroInteractions(rabbitTemplate);
+  }
+
+  @Test
+  public void testAddressTypeChangedIsIgnored() {
+    // Given
+    RabbitTemplate rabbitTemplate = mock(RabbitTemplate.class);
+
+    // When
+    InvalidAddressReceiver underTest =
+        new InvalidAddressReceiver(rabbitTemplate, "TEST EXCHANGE", null);
+    ResponseManagementEvent event = easyRandom.nextObject(ResponseManagementEvent.class);
+    event.getEvent().setType(EventType.ADDRESS_TYPE_CHANGED);
+    event.getEvent().setChannel("CC");
+    underTest.receiveMessage(event);
+
+    // Then
+    verifyZeroInteractions(rabbitTemplate);
+  }
+
+  @Test
+  public void testNewAddressIgnored() {
+    // Given
+    RabbitTemplate rabbitTemplate = mock(RabbitTemplate.class);
+
+    // When
+    InvalidAddressReceiver underTest =
+        new InvalidAddressReceiver(rabbitTemplate, "TEST EXCHANGE", null);
+    ResponseManagementEvent event = easyRandom.nextObject(ResponseManagementEvent.class);
+    event.getEvent().setType(EventType.NEW_ADDRESS_REPORTED);
+    event.getEvent().setChannel("CC");
+    underTest.receiveMessage(event);
+
+    // Then
+    verifyZeroInteractions(rabbitTemplate);
   }
 }

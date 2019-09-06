@@ -9,13 +9,9 @@ spring:
 queueconfig:
   action-field-queue: Action.Field
   outbound-exchange: adapter-outbound-exchange
-  adapter-outbound-queue: RM.Field
   receipt-queue: FieldWorkAdapter.Responses
-  receipt-routing-key: event.response.receipt
   case-event-exchange: events
   refusal-queue: FieldworkAdapter.Refusals
-  refusal-routing-key: event.respondent.refusal
-  invalid-address-routing-key: event.case.address.update
   invalid-address-inbound-queue: FieldworkAdapter.invalidAddress
   consumers: 50
 

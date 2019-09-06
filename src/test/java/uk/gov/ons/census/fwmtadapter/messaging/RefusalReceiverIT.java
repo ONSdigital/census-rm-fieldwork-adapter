@@ -45,18 +45,14 @@ import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 public class RefusalReceiverIT {
   private static final String TEST_CASE_ID = "test_case_id";
   private static final String TEST_ADDRESS_TYPE = "test_address_type";
+  private static final String REFUSAL_ROUTING_KEY = "event.respondent.refusal";
+  private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
 
   @Value("${queueconfig.case-event-exchange}")
   private String caseEventExchange;
 
   @Value("${queueconfig.refusal-queue}")
   private String refusalQueue;
-
-  @Value("${queueconfig.refusal-routing-key}")
-  private String refusalRoutingKey;
-
-  @Value("${queueconfig.adapter-outbound-queue}")
-  private String actionOutboundQueue;
 
   @Autowired private RabbitQueueHelper rabbitQueueHelper;
 
@@ -69,14 +65,14 @@ public class RefusalReceiverIT {
   @Transactional
   public void setUp() {
     rabbitQueueHelper.purgeQueue(refusalQueue);
-    rabbitQueueHelper.purgeQueue(actionOutboundQueue);
+    rabbitQueueHelper.purgeQueue(ADAPTER_OUTBOUND_QUEUE);
   }
 
   @Test
   public void testRefusalMessageFromNonFieldChannelEmitsMessageToField()
       throws InterruptedException, JAXBException, JsonProcessingException {
     // Given
-    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
+    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
 
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId(TEST_CASE_ID);
@@ -104,7 +100,7 @@ public class RefusalReceiverIT {
                     .withHeader("Content-Type", "application/json")
                     .withBody(returnJson)));
 
-    rabbitQueueHelper.sendMessage(caseEventExchange, refusalRoutingKey, responseManagementEvent);
+    rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
 
     // Then
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
@@ -122,7 +118,7 @@ public class RefusalReceiverIT {
   public void testRefusalMessageFromFieldChannelDoesNotEmitMessageToField()
       throws InterruptedException {
     // Given
-    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
+    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
 
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId(TEST_CASE_ID);
@@ -138,7 +134,7 @@ public class RefusalReceiverIT {
     responseManagementEvent.setEvent(event);
 
     // When
-    rabbitQueueHelper.sendMessage(caseEventExchange, refusalRoutingKey, responseManagementEvent);
+    rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
 
     // Then
     assertThat(rabbitQueueHelper.getMessage(outboundQueue)).isNull();
