@@ -30,11 +30,10 @@ import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @RunWith(SpringJUnit4ClassRunner.class)
 public class ActionFieldReceiverIT {
+  private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
+
   @Value("${queueconfig.action-field-queue}")
   private String actionFieldQueue;
-
-  @Value("${queueconfig.adapter-outbound-queue}")
-  private String actionOutboundQueue;
 
   @Autowired private RabbitQueueHelper rabbitQueueHelper;
 
@@ -42,12 +41,12 @@ public class ActionFieldReceiverIT {
   @Transactional
   public void setUp() {
     rabbitQueueHelper.purgeQueue(actionFieldQueue);
-    rabbitQueueHelper.purgeQueue(actionOutboundQueue);
+    rabbitQueueHelper.purgeQueue(ADAPTER_OUTBOUND_QUEUE);
   }
 
   @Test
   public void testReceiveMessage() throws InterruptedException, JAXBException {
-    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
+    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
 
     EasyRandom easyRandom = new EasyRandom();
     FieldworkFollowup fieldworkFollowup = easyRandom.nextObject(FieldworkFollowup.class);

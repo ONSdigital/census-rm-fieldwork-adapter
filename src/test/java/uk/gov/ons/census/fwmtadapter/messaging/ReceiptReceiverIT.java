@@ -41,6 +41,8 @@ public class ReceiptReceiverIT {
   private static final String TEST_CASE_ID = "test_case_id";
   private static final String TEST_ADDRESS_TYPE = "test_address_type";
   private static final String TEST_QID = "test_qid";
+  private static final String RECEIPT_ROUTING_KEY = "event.response.receipt";
+  private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
   private ObjectMapper objectMapper = new ObjectMapper();
 
   @Value("${queueconfig.case-event-exchange}")
@@ -48,12 +50,6 @@ public class ReceiptReceiverIT {
 
   @Value("${queueconfig.receipt-queue}")
   private String receiptQueue;
-
-  @Value("${queueconfig.receipt-routing-key}")
-  private String receiptRoutingKey;
-
-  @Value("${queueconfig.adapter-outbound-queue}")
-  private String actionOutboundQueue;
 
   @Autowired private RabbitQueueHelper rabbitQueueHelper;
 
@@ -64,7 +60,7 @@ public class ReceiptReceiverIT {
   @Transactional
   public void setUp() {
     rabbitQueueHelper.purgeQueue(receiptQueue);
-    rabbitQueueHelper.purgeQueue(actionOutboundQueue);
+    rabbitQueueHelper.purgeQueue(ADAPTER_OUTBOUND_QUEUE);
   }
 
   @Test
@@ -85,14 +81,14 @@ public class ReceiptReceiverIT {
                     .withHeader("Content-Type", "application/json")
                     .withBody(returnJson)));
 
-    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
+    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
     ReceiptDTO receiptDTO = new ReceiptDTO();
     receiptDTO.setQuestionnaireId(TEST_QID);
     ResponseManagementEvent responseManagementEvent =
         setUpResponseManagementReceiptEvent(receiptDTO);
 
     // when
-    rabbitQueueHelper.sendMessage(caseEventExchange, receiptRoutingKey, responseManagementEvent);
+    rabbitQueueHelper.sendMessage(caseEventExchange, RECEIPT_ROUTING_KEY, responseManagementEvent);
 
     // then
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
@@ -110,7 +106,7 @@ public class ReceiptReceiverIT {
       throws InterruptedException, JsonProcessingException, JAXBException {
     // Given
 
-    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(actionOutboundQueue);
+    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
     ReceiptDTO receiptDTO = new ReceiptDTO();
     receiptDTO.setQuestionnaireId(TEST_QID);
     ResponseManagementEvent responseManagementEvent =
@@ -120,7 +116,7 @@ public class ReceiptReceiverIT {
     stubFor(get(urlEqualTo(url)).willReturn(aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
 
     // when
-    rabbitQueueHelper.sendMessage(caseEventExchange, receiptRoutingKey, responseManagementEvent);
+    rabbitQueueHelper.sendMessage(caseEventExchange, RECEIPT_ROUTING_KEY, responseManagementEvent);
 
     // then
     rabbitQueueHelper.checkNoMessage(outboundQueue);
