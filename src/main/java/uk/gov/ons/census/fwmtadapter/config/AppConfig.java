@@ -21,6 +21,8 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
+import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 
 @Configuration
 @EnableScheduling
@@ -51,6 +53,16 @@ public class AppConfig {
   }
 
   @Bean
+  public MessageChannel actionFieldInputChannel() {
+    return new DirectChannel();
+  }
+
+  @Bean
+  public MessageChannel refusalInputChannel() {
+    return new DirectChannel();
+  }
+
+  @Bean
   public AmqpInboundChannelAdapter inbound(
       SimpleMessageListenerContainer receiptContainer,
       @Qualifier("receiptedChannel") MessageChannel channel) {
@@ -66,35 +78,6 @@ public class AppConfig {
     AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
     adapter.setOutputChannel(channel);
     return adapter;
-  }
-
-  @Bean
-  public SimpleMessageListenerContainer receiptContainer(ConnectionFactory connectionFactory) {
-    SimpleMessageListenerContainer container =
-        new SimpleMessageListenerContainer(connectionFactory);
-    container.setQueueNames(receiptQueue);
-    container.setConcurrentConsumers(consumers);
-    return container;
-  }
-
-  @Bean
-  public SimpleMessageListenerContainer invalidAddressContainer(
-      ConnectionFactory connectionFactory) {
-    SimpleMessageListenerContainer container =
-        new SimpleMessageListenerContainer(connectionFactory);
-    container.setQueueNames(invalidAddressInboundQueue);
-    container.setConcurrentConsumers(consumers);
-    return container;
-  }
-
-  @Bean
-  public MessageChannel actionFieldInputChannel() {
-    return new DirectChannel();
-  }
-
-  @Bean
-  public MessageChannel refusalInputChannel() {
-    return new DirectChannel();
   }
 
   @Bean
@@ -117,21 +100,34 @@ public class AppConfig {
   }
 
   @Bean
-  public SimpleMessageListenerContainer actionFieldContainer(ConnectionFactory connectionFactory) {
-    SimpleMessageListenerContainer container =
-        new SimpleMessageListenerContainer(connectionFactory);
-    container.setQueueNames(actionFieldQueue);
-    container.setConcurrentConsumers(consumers);
-    return container;
+  public SimpleMessageListenerContainer actionFieldContainer(
+      ConnectionFactory connectionFactory, MessageErrorHandler messageErrorHandler) {
+    return setupListenerContainer(
+        connectionFactory, actionFieldQueue, messageErrorHandler, FieldworkFollowup.class);
   }
 
   @Bean
-  public SimpleMessageListenerContainer refusalContainer(ConnectionFactory connectionFactory) {
-    SimpleMessageListenerContainer container =
-        new SimpleMessageListenerContainer(connectionFactory);
-    container.setQueueNames(refusalQueue);
-    container.setConcurrentConsumers(consumers);
-    return container;
+  public SimpleMessageListenerContainer refusalContainer(
+      ConnectionFactory connectionFactory, MessageErrorHandler messageErrorHandler) {
+    return setupListenerContainer(
+        connectionFactory, refusalQueue, messageErrorHandler, ResponseManagementEvent.class);
+  }
+
+  @Bean
+  public SimpleMessageListenerContainer receiptContainer(
+      ConnectionFactory connectionFactory, MessageErrorHandler messageErrorHandler) {
+    return setupListenerContainer(
+        connectionFactory, receiptQueue, messageErrorHandler, ResponseManagementEvent.class);
+  }
+
+  @Bean
+  public SimpleMessageListenerContainer invalidAddressContainer(
+      ConnectionFactory connectionFactory, MessageErrorHandler messageErrorHandler) {
+    return setupListenerContainer(
+        connectionFactory,
+        invalidAddressInboundQueue,
+        messageErrorHandler,
+        ResponseManagementEvent.class);
   }
 
   @Bean
@@ -180,5 +176,19 @@ public class AppConfig {
   @PostConstruct
   public void init() {
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+  }
+
+  private SimpleMessageListenerContainer setupListenerContainer(
+      ConnectionFactory connectionFactory,
+      String queueName,
+      MessageErrorHandler messageErrorHandler,
+      Class expectedClass) {
+    SimpleMessageListenerContainer container =
+        new SimpleMessageListenerContainer(connectionFactory);
+    container.setQueueNames(queueName);
+    container.setConcurrentConsumers(consumers);
+    messageErrorHandler.setExpectedType(expectedClass);
+    container.setErrorHandler(messageErrorHandler);
+    return container;
   }
 }
