@@ -1,4 +1,4 @@
-FROM openjdk:11-slim
+FROM openjdk:11-jdk-slim
 
 ARG JAR_FILE=census-rm-fieldwork-adapter*.jar
 COPY target/$JAR_FILE /opt/census-rm-fieldwork-adapter.jar
