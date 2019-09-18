@@ -22,3 +22,6 @@ healthcheck:
 caseapi:
   host: case-api
   port: 80
+
+messagelogging:
+  logstacktraces: false
