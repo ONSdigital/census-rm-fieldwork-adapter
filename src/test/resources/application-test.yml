@@ -5,3 +5,6 @@ spring:
 caseapi:
   host: localhost
   port: 8089
+
+queueconfig:
+  case-event-exchange: events

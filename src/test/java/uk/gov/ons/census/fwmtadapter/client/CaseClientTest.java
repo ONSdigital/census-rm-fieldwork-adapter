@@ -24,23 +24,6 @@ public class CaseClientTest {
   private String port;
 
   @Test
-  public void successfulyGetCaseIdFromQid() {
-    UriComponents expectedUri = createUriComponents("/cases/qid/{qid}", QUESTIONAIRE_ID);
-
-    CaseContainerDto expectedCaseIdAddressTypeDto = new CaseContainerDto();
-    expectedCaseIdAddressTypeDto.setCaseId(CASE_ID);
-    expectedCaseIdAddressTypeDto.setAddressType(ADDRESS_TYPE_TEST);
-
-    RestTemplate restTemplate = mock(RestTemplate.class);
-    when(restTemplate.getForObject(expectedUri.toUri().toString(), CaseContainerDto.class))
-        .thenReturn(expectedCaseIdAddressTypeDto);
-
-    CaseClient caseClient = new CaseClient(restTemplate);
-
-    assertThat(caseClient.getCaseFromQid(QUESTIONAIRE_ID)).isEqualTo(expectedCaseIdAddressTypeDto);
-  }
-
-  @Test
   public void successfullyGetCaseByCaseId() {
     UriComponents expectedUri = createUriComponents("/cases/{caseId}", CASE_ID);
     EasyRandom easyRandom = new EasyRandom();

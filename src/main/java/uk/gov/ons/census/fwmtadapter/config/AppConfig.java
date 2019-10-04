@@ -30,22 +30,17 @@ public class AppConfig {
   @Value("${queueconfig.action-field-queue}")
   private String actionFieldQueue;
 
-  @Value("${queueconfig.receipt-queue}")
-  private String receiptQueue;
-
   @Value("${queueconfig.refusal-queue}")
   private String refusalQueue;
 
   @Value("${queueconfig.invalid-address-inbound-queue}")
   private String invalidAddressInboundQueue;
 
+  @Value("${queueconfig.uac-updated-queue}")
+  private String uacUpdatedQueue;
+
   @Value("${queueconfig.consumers}")
   private int consumers;
-
-  @Bean
-  public MessageChannel receiptedChannel() {
-    return new DirectChannel();
-  }
 
   @Bean
   public MessageChannel invalidAddressInputChannel() {
@@ -63,12 +58,8 @@ public class AppConfig {
   }
 
   @Bean
-  public AmqpInboundChannelAdapter inbound(
-      SimpleMessageListenerContainer receiptContainer,
-      @Qualifier("receiptedChannel") MessageChannel channel) {
-    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(receiptContainer);
-    adapter.setOutputChannel(channel);
-    return adapter;
+  public MessageChannel uacUpdatedInputChannel() {
+    return new DirectChannel();
   }
 
   @Bean
@@ -100,6 +91,15 @@ public class AppConfig {
   }
 
   @Bean
+  public AmqpInboundChannelAdapter uacUpdatedInbound(
+      @Qualifier("uacUpdatedContainer") SimpleMessageListenerContainer listenerContainer,
+      @Qualifier("uacUpdatedInputChannel") MessageChannel channel) {
+    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
+    adapter.setOutputChannel(channel);
+    return adapter;
+  }
+
+  @Bean
   public SimpleMessageListenerContainer actionFieldContainer(
       ConnectionFactory connectionFactory, MessageErrorHandler messageErrorHandler) {
     return setupListenerContainer(
@@ -114,13 +114,6 @@ public class AppConfig {
   }
 
   @Bean
-  public SimpleMessageListenerContainer receiptContainer(
-      ConnectionFactory connectionFactory, MessageErrorHandler messageErrorHandler) {
-    return setupListenerContainer(
-        connectionFactory, receiptQueue, messageErrorHandler, ResponseManagementEvent.class);
-  }
-
-  @Bean
   public SimpleMessageListenerContainer invalidAddressContainer(
       ConnectionFactory connectionFactory, MessageErrorHandler messageErrorHandler) {
     return setupListenerContainer(
@@ -128,6 +121,13 @@ public class AppConfig {
         invalidAddressInboundQueue,
         messageErrorHandler,
         ResponseManagementEvent.class);
+  }
+
+  @Bean
+  public SimpleMessageListenerContainer uacUpdatedContainer(
+      ConnectionFactory connectionFactory, MessageErrorHandler messageErrorHandler) {
+    return setupListenerContainer(
+        connectionFactory, uacUpdatedQueue, messageErrorHandler, ResponseManagementEvent.class);
   }
 
   @Bean
