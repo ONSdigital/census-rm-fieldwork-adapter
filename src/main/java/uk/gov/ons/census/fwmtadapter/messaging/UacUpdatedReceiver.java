@@ -38,8 +38,6 @@ public class UacUpdatedReceiver {
       return;
     } else if (StringUtils.isEmpty(event.getPayload().getUac().getCaseId())) {
       log.with("qid", event.getPayload().getUac().getQuestionnaireId())
-          .with("tx_id", event.getEvent().getTransactionId())
-          .with("channel", event.getEvent().getChannel())
           .warn("We would like to cancel the associated case but it's not been linked yet");
       return;
     }
