@@ -26,11 +26,6 @@ public class CaseClient {
     return restTemplate.getForObject(uriComponents.toUri().toString(), CaseContainerDto.class);
   }
 
-  public CaseContainerDto getCaseFromQid(String questionnaire_id) {
-    UriComponents uriComponents = createUriComponents("/cases/qid/{qid}", questionnaire_id);
-    return restTemplate.getForObject(uriComponents.toUri().toString(), CaseContainerDto.class);
-  }
-
   private UriComponents createUriComponents(String path, String id) {
     return UriComponentsBuilder.newInstance()
         .scheme("http")

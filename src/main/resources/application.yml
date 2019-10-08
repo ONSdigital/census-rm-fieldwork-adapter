@@ -9,10 +9,9 @@ spring:
 queueconfig:
   action-field-queue: Action.Field
   outbound-exchange: adapter-outbound-exchange
-  receipt-queue: FieldWorkAdapter.Responses
-  case-event-exchange: events
   refusal-queue: FieldworkAdapter.Refusals
   invalid-address-inbound-queue: FieldworkAdapter.invalidAddress
+  uac-updated-queue: FieldworkAdapter.uacUpdated
   consumers: 50
 
 healthcheck:

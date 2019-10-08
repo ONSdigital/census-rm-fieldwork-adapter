@@ -41,7 +41,7 @@
       "arguments": {}
     },
     {
-      "name": "FieldWorkAdapter.Responses",
+      "name": "FieldworkAdapter.uacUpdated",
       "vhost": "/",
       "durable": true,
       "auto_delete": false,
@@ -110,9 +110,9 @@
     {
       "source": "events",
       "vhost": "/",
-      "destination": "FieldWorkAdapter.Responses",
+      "destination": "FieldworkAdapter.uacUpdated",
       "destination_type": "queue",
-      "routing_key": "event.response.receipt",
+      "routing_key": "event.uac.update",
       "arguments": {}
     }
   ]
