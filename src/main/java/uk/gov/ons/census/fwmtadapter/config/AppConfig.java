@@ -21,12 +21,17 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.ons.census.fwmtadapter.client.ExceptionManagerClient;
+import uk.gov.ons.census.fwmtadapter.messaging.MessageErrorHandler;
 import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 
 @Configuration
 @EnableScheduling
 public class AppConfig {
+  @Value("${messagelogging.logstacktraces}")
+  private boolean logStackTraces;
+
   @Value("${queueconfig.action-field-queue}")
   private String actionFieldQueue;
 
@@ -101,33 +106,33 @@ public class AppConfig {
 
   @Bean
   public SimpleMessageListenerContainer actionFieldContainer(
-      ConnectionFactory connectionFactory, MessageErrorHandler messageErrorHandler) {
+      ConnectionFactory connectionFactory, ExceptionManagerClient exceptionManagerClient) {
     return setupListenerContainer(
-        connectionFactory, actionFieldQueue, messageErrorHandler, FieldworkFollowup.class);
+        connectionFactory, actionFieldQueue, exceptionManagerClient, FieldworkFollowup.class);
   }
 
   @Bean
   public SimpleMessageListenerContainer refusalContainer(
-      ConnectionFactory connectionFactory, MessageErrorHandler messageErrorHandler) {
+      ConnectionFactory connectionFactory, ExceptionManagerClient exceptionManagerClient) {
     return setupListenerContainer(
-        connectionFactory, refusalQueue, messageErrorHandler, ResponseManagementEvent.class);
+        connectionFactory, refusalQueue, exceptionManagerClient, ResponseManagementEvent.class);
   }
 
   @Bean
   public SimpleMessageListenerContainer invalidAddressContainer(
-      ConnectionFactory connectionFactory, MessageErrorHandler messageErrorHandler) {
+      ConnectionFactory connectionFactory, ExceptionManagerClient exceptionManagerClient) {
     return setupListenerContainer(
         connectionFactory,
         invalidAddressInboundQueue,
-        messageErrorHandler,
+        exceptionManagerClient,
         ResponseManagementEvent.class);
   }
 
   @Bean
   public SimpleMessageListenerContainer uacUpdatedContainer(
-      ConnectionFactory connectionFactory, MessageErrorHandler messageErrorHandler) {
+      ConnectionFactory connectionFactory, ExceptionManagerClient exceptionManagerClient) {
     return setupListenerContainer(
-        connectionFactory, uacUpdatedQueue, messageErrorHandler, ResponseManagementEvent.class);
+        connectionFactory, uacUpdatedQueue, exceptionManagerClient, ResponseManagementEvent.class);
   }
 
   @Bean
@@ -181,13 +186,19 @@ public class AppConfig {
   private SimpleMessageListenerContainer setupListenerContainer(
       ConnectionFactory connectionFactory,
       String queueName,
-      MessageErrorHandler messageErrorHandler,
-      Class expectedClass) {
+      ExceptionManagerClient exceptionManagerClient,
+      Class expectedMessageType) {
     SimpleMessageListenerContainer container =
         new SimpleMessageListenerContainer(connectionFactory);
     container.setQueueNames(queueName);
     container.setConcurrentConsumers(consumers);
-    messageErrorHandler.setExpectedType(expectedClass);
+    MessageErrorHandler messageErrorHandler =
+        new MessageErrorHandler(
+            exceptionManagerClient,
+            expectedMessageType,
+            logStackTraces,
+            "Fieldwork Adapter",
+            queueName);
     container.setErrorHandler(messageErrorHandler);
     container.setChannelTransacted(true);
     return container;

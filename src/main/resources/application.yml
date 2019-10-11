@@ -22,5 +22,11 @@ caseapi:
   host: case-api
   port: 80
 
+exceptionmanager:
+  connection:
+    scheme: http
+    host: localhost
+    port: 8666
+
 messagelogging:
   logstacktraces: false
