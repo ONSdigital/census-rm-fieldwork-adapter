@@ -3,7 +3,7 @@ Adapter service to convert from JSON events to the XML format required by Fieldw
 
 # Queues
 
-The adapter service connects to the following queues and exhanges.
+The adapter service connects to the following queues via the exhanges listed.
 
  Queue | Exchange | Direction 
 -------|----------|----------
