@@ -11,7 +11,7 @@ The adapter service connects to the following queues and exhanges.
 |FieldworkAdapter.invalidAddress| events | Input |
 |FieldworkAdapter.Refusals | events | Input |
 |FieldworkAdapter.uacUpdated | events | Input|
-|RM.Field                           | adapter-outbound-exchange | Output|
+|RM.Field | adapter-outbound-exchange | Output|
 
 # Overview
 
