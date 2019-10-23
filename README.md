@@ -21,5 +21,33 @@ It is a simple service listening to various input events and translating them fo
 
 # How to configure
 
+The default configuration is set for running the service locally. Essentially the HTTP connections to case-api and Exception manager should be:
+
+```yaml
+caseapi:
+  host: localhost
+  port: 8161
+
+exceptionmanager:
+  connection:
+    scheme: http
+    host: localhost
+    port: 8666
+```
+# To debug census-rm-fieldwork-adapter locally
+
+Start docker-dev
+
+Stop census-rm-fieldwork-adapter running in Docker
+
+```yaml
+docker stop fwmt-adapter
+```
+
+Open the census-rm-fieldwork-adapter repository in IntelliJ.
+Create a SpringBoot Run configuration called Application.
+Run in debug mode.
 
 # How to test
+
+Use the [census-rm-acceptance-tests](https://github.com/ONSdigital/census-rm-acceptance-tests)
