@@ -23,8 +23,8 @@ healthcheck:
   filename: /tmp/fwmt-adapter-healthy
 
 caseapi:
-  host: case-api
-  port: 80
+  host: localhost
+  port: 8161
 
 exceptionmanager:
   connection:
