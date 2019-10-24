@@ -5,8 +5,8 @@ Adapter service to convert from JSON events to the XML format required by Fieldw
 
 The adapter service connects to the following queues via the exhanges listed.
 
- Queue | Exchange | Direction 
--------|----------|----------
+|Queue | Exchange | Direction |
+|------|----------|-----------|
 |Action.Field | action-outbound-exchange | Input |
 |FieldworkAdapter.invalidAddress| events | Input |
 |FieldworkAdapter.Refusals | events | Input |
@@ -18,6 +18,13 @@ The adapter service connects to the following queues via the exhanges listed.
 This service adapts internal JSON format messages into the FWMT XML format.
 It is a simple service listening to various input events and translating them for the FWMT.
 
+## Messages received
+
+* Fieldwork FollowUp message is converted into ActionRequest.
+
+* Invalid Address message is converted into ActionCancel, unless the source of the message is FWMT.
+
+* Refusal message is converted into ActionCancel, unless source of message is FWMT.
 
 # How to configure
 
