@@ -11,6 +11,7 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.retry.annotation.Retryable;
@@ -21,7 +22,8 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles("test")
 @EnableRetry
 public class RabbitQueueHelper {
-  @Autowired private ConnectionFactory connectionFactory;
+  @Autowired
+  @Qualifier("rmConnectionFactory") private ConnectionFactory connectionFactory;
 
   @Autowired private RabbitTemplate testRabbitTemplate;
 

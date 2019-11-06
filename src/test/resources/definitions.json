@@ -6,17 +6,33 @@
       "password_hash": "AldElI2NwJNg9A1YZbcOU2IH3EAbc1QMTLugjUXXcs/zikqh",
       "hashing_algorithm": "rabbit_password_hashing_sha256",
       "tags": "administrator"
+    },
+    {
+      "name": "field",
+      "password_hash": "oBiWIBAMeUBQRIzKW5zO4B5Mdr038gvLDHTcVPRfMqBshMG+",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": "administrator"
     }
   ],
   "vhosts": [
     {
       "name": "/"
+    },
+    {
+      "name": "field_vhost"
     }
   ],
   "permissions": [
     {
       "user": "guest",
       "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "field",
+      "vhost": "field_vhost",
       "configure": ".*",
       "write": ".*",
       "read": ".*"
@@ -60,6 +76,13 @@
       "durable": true,
       "auto_delete": false,
       "arguments": {}
+    },
+    {
+      "name": "FIELD.queue",
+      "vhost": "field_vhost",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
     }
   ],
   "exchanges": [
@@ -75,6 +98,15 @@
     {
       "name": "adapter-outbound-exchange",
       "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    },
+    {
+      "name": "exchange-in-field-vhost",
+      "vhost": "field_vhost",
       "type": "direct",
       "durable": true,
       "auto_delete": false,
@@ -113,6 +145,14 @@
       "destination": "FieldworkAdapter.uacUpdated",
       "destination_type": "queue",
       "routing_key": "event.uac.update",
+      "arguments": {}
+    },
+    {
+      "source": "exchange-in-field-vhost",
+      "vhost": "field_vhost",
+      "destination": "FIELD.queue",
+      "destination_type": "queue",
+      "routing_key": "",
       "arguments": {}
     }
   ]

@@ -3,6 +3,7 @@ package uk.gov.ons.census.fwmtadapter.util;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
@@ -12,7 +13,7 @@ import org.springframework.test.context.ActiveProfiles;
 public class TestConfig {
   @Bean
   public RabbitTemplate testRabbitTemplate(
-      ConnectionFactory connectionFactory, Jackson2JsonMessageConverter messageConverter) {
+          @Qualifier("rmConnectionFactory") ConnectionFactory connectionFactory, Jackson2JsonMessageConverter messageConverter) {
     RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
     rabbitTemplate.setMessageConverter(messageConverter);
     rabbitTemplate.setChannelTransacted(true);

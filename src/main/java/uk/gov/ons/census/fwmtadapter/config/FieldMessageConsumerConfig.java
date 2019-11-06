@@ -19,7 +19,7 @@ import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 
 @Configuration
-public class MessageConsumerConfig {
+public class FieldMessageConsumerConfig {
   private final ExceptionManagerClient exceptionManagerClient;
   private final RabbitTemplate rabbitTemplate;
   private final ConnectionFactory connectionFactory;
@@ -42,102 +42,32 @@ public class MessageConsumerConfig {
   @Value("${queueconfig.quarantine-exchange}")
   private String quarantineExchange;
 
-  @Value("${queueconfig.action-field-queue}")
-  private String actionFieldQueue;
-
-  @Value("${queueconfig.refusal-queue}")
-  private String refusalQueue;
-
-  @Value("${queueconfig.invalid-address-inbound-queue}")
-  private String invalidAddressInboundQueue;
-
-  @Value("${queueconfig.uac-updated-queue}")
-  private String uacUpdatedQueue;
-
-  public MessageConsumerConfig(
+  public FieldMessageConsumerConfig(
       ExceptionManagerClient exceptionManagerClient,
       RabbitTemplate rabbitTemplate,
-      @Qualifier("rmConnectionFactory") ConnectionFactory connectionFactory) {
+      @Qualifier("fieldConnectionFactory") ConnectionFactory connectionFactory) {
     this.exceptionManagerClient = exceptionManagerClient;
     this.rabbitTemplate = rabbitTemplate;
     this.connectionFactory = connectionFactory;
   }
 
   @Bean
-  public MessageChannel invalidAddressInputChannel() {
+  public MessageChannel fieldInputChannel() {
     return new DirectChannel();
   }
 
   @Bean
-  public MessageChannel actionFieldInputChannel() {
-    return new DirectChannel();
-  }
-
-  @Bean
-  public MessageChannel refusalInputChannel() {
-    return new DirectChannel();
-  }
-
-  @Bean
-  public MessageChannel uacUpdatedInputChannel() {
-    return new DirectChannel();
-  }
-
-  @Bean
-  AmqpInboundChannelAdapter invalidAddressInbound(
-      @Qualifier("invalidAddressContainer") SimpleMessageListenerContainer listenerContainer,
-      @Qualifier("invalidAddressInputChannel") MessageChannel channel) {
+  AmqpInboundChannelAdapter fieldInbound(
+      @Qualifier("fieldContainer") SimpleMessageListenerContainer listenerContainer,
+      @Qualifier("fieldInputChannel") MessageChannel channel) {
     AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
     adapter.setOutputChannel(channel);
     return adapter;
   }
 
   @Bean
-  public AmqpInboundChannelAdapter actionFieldInbound(
-      @Qualifier("actionFieldContainer") SimpleMessageListenerContainer listenerContainer,
-      @Qualifier("actionFieldInputChannel") MessageChannel channel) {
-    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
-    adapter.setOutputChannel(channel);
-
-    return adapter;
-  }
-
-  @Bean
-  public AmqpInboundChannelAdapter refusalInbound(
-      @Qualifier("refusalContainer") SimpleMessageListenerContainer listenerContainer,
-      @Qualifier("refusalInputChannel") MessageChannel channel) {
-    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
-    adapter.setOutputChannel(channel);
-    return adapter;
-  }
-
-  @Bean
-  public AmqpInboundChannelAdapter uacUpdatedInbound(
-      @Qualifier("uacUpdatedContainer") SimpleMessageListenerContainer listenerContainer,
-      @Qualifier("uacUpdatedInputChannel") MessageChannel channel) {
-    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
-    adapter.setOutputChannel(channel);
-    return adapter;
-  }
-
-  @Bean
-  public SimpleMessageListenerContainer actionFieldContainer() {
-    return setupListenerContainer(actionFieldQueue, FieldworkFollowup.class);
-  }
-
-  @Bean
-  public SimpleMessageListenerContainer refusalContainer() {
-    return setupListenerContainer(refusalQueue, ResponseManagementEvent.class);
-  }
-
-  @Bean
-  public SimpleMessageListenerContainer invalidAddressContainer() {
-    return setupListenerContainer(invalidAddressInboundQueue, ResponseManagementEvent.class);
-  }
-
-  @Bean
-  public SimpleMessageListenerContainer uacUpdatedContainer() {
-    return setupListenerContainer(uacUpdatedQueue, ResponseManagementEvent.class);
+  public SimpleMessageListenerContainer fieldContainer() {
+    return setupListenerContainer("RM.Field", FieldworkFollowup.class);
   }
 
   private SimpleMessageListenerContainer setupListenerContainer(

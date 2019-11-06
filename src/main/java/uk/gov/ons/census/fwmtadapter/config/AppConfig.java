@@ -11,9 +11,11 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.MarshallingMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
@@ -27,7 +29,8 @@ public class AppConfig {
   private String password = "guest";
 
   @Bean
-  public ConnectionFactory fieldConnectionFactory() {
+  @Primary
+  public ConnectionFactory rmConnectionFactory() {
     CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host, port);
     connectionFactory.setUsername(username);
     connectionFactory.setPassword(password);
@@ -35,18 +38,17 @@ public class AppConfig {
     return connectionFactory;
   }
 
-//  @Bean
-//  public ConnectionFactory rmVhostConnectionFactory() {
-//    CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host, port);
-//    connectionFactory.setUsername(username);
-//    connectionFactory.setPassword(password);
-//    connectionFactory.setVirtualHost("/");
-//
-//    return connectionFactory;
-//  }
+  @Bean
+  public ConnectionFactory fieldConnectionFactory() {
+    CachingConnectionFactory connectionFactory = new CachingConnectionFactory(host, port);
+    connectionFactory.setUsername("field");
+    connectionFactory.setPassword("field");
+    connectionFactory.setVirtualHost("field_vhost");
+    return connectionFactory;
+  }
 
   @Bean
-  public AmqpAdmin amqpAdmin(@Qualifier("fieldConnectionFactory")ConnectionFactory connectionFactory) {
+  public AmqpAdmin amqpAdmin(@Qualifier("rmConnectionFactory")ConnectionFactory connectionFactory) {
     return new RabbitAdmin(connectionFactory);
   }
 
@@ -68,7 +70,7 @@ public class AppConfig {
 
   @Bean
   public RabbitTemplate rabbitTemplate(
-          @Qualifier("fieldConnectionFactory")ConnectionFactory connectionFactory,
+          @Qualifier("rmConnectionFactory") ConnectionFactory connectionFactory,
       MarshallingMessageConverter actionInstructionFieldMarshallingMessageConverter) {
     RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
     rabbitTemplate.setMessageConverter(actionInstructionFieldMarshallingMessageConverter);
