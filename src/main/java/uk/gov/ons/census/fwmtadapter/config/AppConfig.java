@@ -48,7 +48,6 @@ public class AppConfig {
   }
 
   @Bean
-  @Primary
   public AmqpAdmin amqpAdmin(
       @Qualifier("rmConnectionFactory") ConnectionFactory connectionFactory) {
     return new RabbitAdmin(connectionFactory);
