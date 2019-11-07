@@ -21,17 +21,17 @@ import org.springframework.test.context.ActiveProfiles;
 @Component
 @ActiveProfiles("test")
 @EnableRetry
-public class RabbitQueueHelper {
+public class FieldRabbitQueueHelper {
   @Autowired
-  @Qualifier("rmConnectionFactory")
+  @Qualifier("fieldConnectionFactory")
   private ConnectionFactory connectionFactory;
 
   @Autowired
-  @Qualifier("rabbitTemplate")
+  @Qualifier("fieldRabbitTemplate")
   private RabbitTemplate testRabbitTemplate;
 
   @Autowired
-  @Qualifier("amqpAdmin")
+  @Qualifier("fieldAmqpAdmin")
   private AmqpAdmin amqpAdmin;
 
   public BlockingQueue<String> listen(String queueName) {

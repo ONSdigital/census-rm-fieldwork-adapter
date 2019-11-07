@@ -10,8 +10,8 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MarshallingMessageConverter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -48,7 +48,15 @@ public class AppConfig {
   }
 
   @Bean
-  public AmqpAdmin amqpAdmin(@Qualifier("rmConnectionFactory")ConnectionFactory connectionFactory) {
+  @Primary
+  public AmqpAdmin amqpAdmin(
+      @Qualifier("rmConnectionFactory") ConnectionFactory connectionFactory) {
+    return new RabbitAdmin(connectionFactory);
+  }
+
+  @Bean
+  public AmqpAdmin fieldAmqpAdmin(
+      @Qualifier("fieldConnectionFactory") ConnectionFactory connectionFactory) {
     return new RabbitAdmin(connectionFactory);
   }
 
@@ -70,10 +78,20 @@ public class AppConfig {
 
   @Bean
   public RabbitTemplate rabbitTemplate(
-          @Qualifier("rmConnectionFactory") ConnectionFactory connectionFactory,
+      @Qualifier("rmConnectionFactory") ConnectionFactory connectionFactory,
       MarshallingMessageConverter actionInstructionFieldMarshallingMessageConverter) {
     RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
     rabbitTemplate.setMessageConverter(actionInstructionFieldMarshallingMessageConverter);
+    rabbitTemplate.setChannelTransacted(true);
+    return rabbitTemplate;
+  }
+
+  @Bean
+  public RabbitTemplate fieldRabbitTemplate(
+      @Qualifier("fieldConnectionFactory") ConnectionFactory connectionFactory,
+      Jackson2JsonMessageConverter messageConverter) {
+    RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+    rabbitTemplate.setMessageConverter(messageConverter);
     rabbitTemplate.setChannelTransacted(true);
     return rabbitTemplate;
   }

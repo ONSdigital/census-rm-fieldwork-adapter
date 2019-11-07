@@ -13,7 +13,8 @@ import org.springframework.test.context.ActiveProfiles;
 public class TestConfig {
   @Bean
   public RabbitTemplate testRabbitTemplate(
-          @Qualifier("rmConnectionFactory") ConnectionFactory connectionFactory, Jackson2JsonMessageConverter messageConverter) {
+      @Qualifier("rmConnectionFactory") ConnectionFactory connectionFactory,
+      Jackson2JsonMessageConverter messageConverter) {
     RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
     rabbitTemplate.setMessageConverter(messageConverter);
     rabbitTemplate.setChannelTransacted(true);
