@@ -85,6 +85,24 @@ public class UacUpdatedReceiverTest {
   }
 
   @Test
+  public void testReceiveMessageUnReceipted() {
+    // Given
+    Uac uac = new Uac();
+    uac.setUnreceipted(true);
+    Payload payload = new Payload();
+    payload.setUac(uac);
+    ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
+    responseManagementEvent.setPayload(payload);
+
+    // When
+    underTest.receiveMessage(responseManagementEvent);
+
+    // Then
+    verify(caseClient, never()).getCaseFromCaseId(any());
+    verify(rabbitTemplate, never()).convertAndSend(anyString(), anyString(), any(Object.class));
+  }
+
+  @Test
   public void testReceiveMessageUnlinkedUacQid() {
     // Given
     Uac uac = new Uac();
