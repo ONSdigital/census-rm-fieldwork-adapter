@@ -34,7 +34,7 @@ public class UacUpdatedReceiver {
   @Transactional
   @ServiceActivator(inputChannel = "uacUpdatedInputChannel")
   public void receiveMessage(ResponseManagementEvent event) {
-    if (event.getPayload().getUac().isActive()) {
+    if (event.getPayload().getUac().isActive() || event.getPayload().getUac().isUnreceipted()) {
       return;
     } else if (StringUtils.isEmpty(event.getPayload().getUac().getCaseId())) {
       log.with("qid", event.getPayload().getUac().getQuestionnaireId())

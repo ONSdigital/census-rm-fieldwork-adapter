@@ -12,4 +12,5 @@ public class Uac {
   private String region;
   private String caseId;
   private String collectionExerciseId;
+  private boolean unreceipted;
 }
