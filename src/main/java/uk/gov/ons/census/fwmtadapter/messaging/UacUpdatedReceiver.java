@@ -34,9 +34,13 @@ public class UacUpdatedReceiver {
   @Transactional
   @ServiceActivator(inputChannel = "uacUpdatedInputChannel")
   public void receiveMessage(ResponseManagementEvent event) {
+    // If the UacQid is still active don't send a Cancel msg to field.
+    // If the UacQid is Unreceipted (BlankQuestionnaire) then don't send a Cancel msg out
     if (event.getPayload().getUac().isActive() || event.getPayload().getUac().isUnreceipted()) {
       return;
-    } else if (StringUtils.isEmpty(event.getPayload().getUac().getCaseId())) {
+    }
+
+    if (StringUtils.isEmpty(event.getPayload().getUac().getCaseId())) {
       log.with("qid", event.getPayload().getUac().getQuestionnaireId())
           .warn("We would like to cancel the associated case but it's not been linked yet");
       return;
