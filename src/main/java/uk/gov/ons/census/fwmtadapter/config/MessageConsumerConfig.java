@@ -164,6 +164,7 @@ public class MessageConsumerConfig {
     container.setQueueNames(queueName);
     container.setConcurrentConsumers(consumers);
     container.setChannelTransacted(true);
+
     container.setAdviceChain(retryOperationsInterceptor);
     return container;
   }
