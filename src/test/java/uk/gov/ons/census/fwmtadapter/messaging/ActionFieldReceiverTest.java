@@ -12,23 +12,24 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
 import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionRequest;
 
 public class ActionFieldReceiverTest {
+  private static final EasyRandom easyRandom = new EasyRandom();
+  private RabbitTemplate rabbitTemplate = mock(RabbitTemplate.class);
 
   @Test
   public void testReceiveMessage() {
     // Given
-    RabbitTemplate rabbitTemplate = mock(RabbitTemplate.class);
-
     ActionFieldReceiver underTest = new ActionFieldReceiver(rabbitTemplate, "TEST EXCHANGE");
-    EasyRandom easyRandom = new EasyRandom();
+
     FieldworkFollowup fieldworkFollowup = easyRandom.nextObject(FieldworkFollowup.class);
     fieldworkFollowup.setLatitude("-179.99999");
     fieldworkFollowup.setLongitude("179.99999");
-    fieldworkFollowup.setCeExpectedCapacity("999");
     fieldworkFollowup.setSurveyName("CENSUS");
     fieldworkFollowup.setUndeliveredAsAddress(false);
     fieldworkFollowup.setBlankQreReturned(false);
+    fieldworkFollowup.setAddressType("HH");
 
     // When
     underTest.receiveMessage(fieldworkFollowup);
@@ -75,6 +76,55 @@ public class ActionFieldReceiverTest {
     assertThat(actionInstruction.getActionRequest().getTreatmentId())
         .isEqualTo(fieldworkFollowup.getTreatmentCode());
     assertThat(actionInstruction.getActionRequest().getCeExpectedResponses())
-        .isEqualTo(Integer.parseInt(fieldworkFollowup.getCeExpectedCapacity()));
+        .isEqualTo(fieldworkFollowup.getCeExpectedCapacity());
+
+    assertThat(actionInstruction.getActionRequest().getCeCE1Complete()).isNull();
+  }
+
+  @Test
+  public void testCommunityEstabCE1CompleteFalse() {
+    ActionFieldReceiver underTest = new ActionFieldReceiver(rabbitTemplate, "TEST EXCHANGE");
+
+    FieldworkFollowup fieldworkFollowup = easyRandom.nextObject(FieldworkFollowup.class);
+    fieldworkFollowup.setLatitude("-179.99999");
+    fieldworkFollowup.setLongitude("179.99999");
+    fieldworkFollowup.setAddressType("CE");
+    fieldworkFollowup.setAddressLevel("E");
+    fieldworkFollowup.setReceipted(false);
+
+    // When
+    underTest.receiveMessage(fieldworkFollowup);
+
+    // Then
+    ArgumentCaptor<ActionInstruction> actionInstructionArgumentCaptor =
+        ArgumentCaptor.forClass(ActionInstruction.class);
+    verify(rabbitTemplate)
+        .convertAndSend(eq("TEST EXCHANGE"), eq(""), actionInstructionArgumentCaptor.capture());
+    ActionRequest actionRequest = actionInstructionArgumentCaptor.getValue().getActionRequest();
+
+    assertThat(actionRequest.getCeCE1Complete()).isFalse();
+  }
+
+  @Test
+  public void testCommunityEstabCE1CompleteTrue() {
+    ActionFieldReceiver underTest = new ActionFieldReceiver(rabbitTemplate, "TEST EXCHANGE");
+    FieldworkFollowup fieldworkFollowup = easyRandom.nextObject(FieldworkFollowup.class);
+    fieldworkFollowup.setLatitude("-179.99999");
+    fieldworkFollowup.setLongitude("179.99999");
+    fieldworkFollowup.setAddressType("CE");
+    fieldworkFollowup.setAddressLevel("E");
+    fieldworkFollowup.setReceipted(true);
+
+    // When
+    underTest.receiveMessage(fieldworkFollowup);
+
+    // Then
+    ArgumentCaptor<ActionInstruction> actionInstructionArgumentCaptor =
+        ArgumentCaptor.forClass(ActionInstruction.class);
+    verify(rabbitTemplate)
+        .convertAndSend(eq("TEST EXCHANGE"), eq(""), actionInstructionArgumentCaptor.capture());
+    ActionRequest actionRequest = actionInstructionArgumentCaptor.getValue().getActionRequest();
+
+    assertThat(actionRequest.getCeCE1Complete()).isTrue();
   }
 }
