@@ -58,8 +58,13 @@ public class ActionFieldReceiver {
     actionRequest.setTreatmentId(followup.getTreatmentCode());
     actionRequest.setFieldOfficerId(followup.getFieldOfficerId());
     actionRequest.setCoordinatorId(followup.getFieldCoordinatorId());
-    if (followup.getCeExpectedCapacity() != null && !followup.getCeExpectedCapacity().isEmpty()) {
-      actionRequest.setCeExpectedResponses(Integer.parseInt(followup.getCeExpectedCapacity()));
+
+    if (followup.getCeExpectedCapacity() != null) {
+      actionRequest.setCeExpectedResponses(followup.getCeExpectedCapacity());
+    }
+
+    if (isCommunityEstablishmentCase(followup)) {
+      actionRequest.setCeCE1Complete(followup.getReceipted());
     }
 
     actionRequest.setUndeliveredAsAddress(followup.getUndeliveredAsAddress());
@@ -70,5 +75,9 @@ public class ActionFieldReceiver {
     actionInstruction.setActionRequest(actionRequest);
 
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
+  }
+
+  private boolean isCommunityEstablishmentCase(FieldworkFollowup followup) {
+    return followup.getAddressType().equals("CE") && followup.getAddressLevel().equals("E");
   }
 }

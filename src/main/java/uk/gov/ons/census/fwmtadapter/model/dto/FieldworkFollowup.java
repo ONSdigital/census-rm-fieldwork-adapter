@@ -25,8 +25,10 @@ public class FieldworkFollowup {
   private String treatmentCode;
   private String fieldOfficerId;
   private String fieldCoordinatorId;
-  private String ceExpectedCapacity;
+  private Integer ceExpectedCapacity;
+  private Integer ceActualResponses;
   private String surveyName;
   private Boolean undeliveredAsAddress;
   private Boolean blankQreReturned;
+  private Boolean receipted;
 }

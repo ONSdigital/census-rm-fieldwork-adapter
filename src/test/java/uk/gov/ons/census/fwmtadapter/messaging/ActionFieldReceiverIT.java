@@ -52,7 +52,6 @@ public class ActionFieldReceiverIT {
     FieldworkFollowup fieldworkFollowup = easyRandom.nextObject(FieldworkFollowup.class);
     fieldworkFollowup.setLatitude("-179.99999");
     fieldworkFollowup.setLongitude("179.99999");
-    fieldworkFollowup.setCeExpectedCapacity("999");
     fieldworkFollowup.setSurveyName("CENSUS");
     fieldworkFollowup.setUndeliveredAsAddress(false);
     fieldworkFollowup.setBlankQreReturned(false);
@@ -95,6 +94,6 @@ public class ActionFieldReceiverIT {
     assertThat(actionInstruction.getActionRequest().getTreatmentId())
         .isEqualTo(fieldworkFollowup.getTreatmentCode());
     assertThat(actionInstruction.getActionRequest().getCeExpectedResponses())
-        .isEqualTo(Integer.parseInt(fieldworkFollowup.getCeExpectedCapacity()));
+        .isEqualTo(fieldworkFollowup.getCeExpectedCapacity());
   }
 }
