@@ -60,7 +60,7 @@ public class ActionFieldReceiver {
     actionRequest.setCoordinatorId(followup.getFieldCoordinatorId());
 
     actionRequest.setCeExpectedResponses(getIntegerValueOrZero(followup.getCeExpectedCapacity()));
-    actionRequest.setCeActualResponses(getIntegerValueOrZero(actionRequest.getCeActualResponses()));
+    actionRequest.setCeActualResponses(getIntegerValueOrZero(followup.getCeActualResponses()));
     actionRequest.setCeCE1Complete(getCEComplete(followup));
 
     actionRequest.setUndeliveredAsAddress(followup.getUndeliveredAsAddress());

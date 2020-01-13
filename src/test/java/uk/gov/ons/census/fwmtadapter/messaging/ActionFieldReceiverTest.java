@@ -135,8 +135,6 @@ public class ActionFieldReceiverTest {
 
     assertThat(actionRequest.getCeCE1Complete()).isTrue();
     assertThat(actionRequest.getCeExpectedResponses()).isEqualTo(5);
-
-    //This is effectively hardcoded to 0 at present
-    assertThat(actionRequest.getCeActualResponses()).isEqualTo(0);
+    assertThat(actionRequest.getCeActualResponses()).isEqualTo(5);
   }
 }
