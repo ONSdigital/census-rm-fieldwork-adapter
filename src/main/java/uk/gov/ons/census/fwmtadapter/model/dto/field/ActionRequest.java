@@ -129,6 +129,7 @@ public class ActionRequest extends Action {
 
   protected String ccsQuestionnaireUrl;
   protected Boolean ceDeliveryReqd;
+
   protected Boolean ceCE1Complete;
   protected Integer ceExpectedResponses;
   protected Integer ceActualResponses;

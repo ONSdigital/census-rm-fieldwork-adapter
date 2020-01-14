@@ -59,13 +59,9 @@ public class ActionFieldReceiver {
     actionRequest.setFieldOfficerId(followup.getFieldOfficerId());
     actionRequest.setCoordinatorId(followup.getFieldCoordinatorId());
 
-    if (followup.getCeExpectedCapacity() != null) {
-      actionRequest.setCeExpectedResponses(followup.getCeExpectedCapacity());
-    }
-
-    if (isCommunityEstablishmentCase(followup)) {
-      actionRequest.setCeCE1Complete(followup.getReceipted());
-    }
+    actionRequest.setCeExpectedResponses(getIntegerValueOrZero(followup.getCeExpectedCapacity()));
+    actionRequest.setCeActualResponses(getIntegerValueOrZero(followup.getCeActualResponses()));
+    actionRequest.setCeCE1Complete(getCEComplete(followup));
 
     actionRequest.setUndeliveredAsAddress(followup.getUndeliveredAsAddress());
     actionRequest.setBlankQreReturned(followup.getBlankQreReturned());
@@ -77,7 +73,21 @@ public class ActionFieldReceiver {
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }
 
-  private boolean isCommunityEstablishmentCase(FieldworkFollowup followup) {
-    return followup.getAddressType().equals("CE") && followup.getAddressLevel().equals("E");
+  private Boolean getCEComplete(FieldworkFollowup followup) {
+    if (followup.getAddressType().equals("CE") && followup.getAddressLevel().equals("E")) {
+      if (followup.getReceipted() != null) {
+        return followup.getReceipted();
+      }
+    }
+
+    return false;
+  }
+
+  private int getIntegerValueOrZero(Integer value) {
+    if (value == null) {
+      return 0;
+    }
+
+    return value;
   }
 }

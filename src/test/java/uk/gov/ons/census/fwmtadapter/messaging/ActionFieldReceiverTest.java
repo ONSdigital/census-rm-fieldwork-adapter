@@ -30,6 +30,8 @@ public class ActionFieldReceiverTest {
     fieldworkFollowup.setUndeliveredAsAddress(false);
     fieldworkFollowup.setBlankQreReturned(false);
     fieldworkFollowup.setAddressType("HH");
+    fieldworkFollowup.setCeActualResponses(null);
+    fieldworkFollowup.setCeExpectedCapacity(null);
 
     // When
     underTest.receiveMessage(fieldworkFollowup);
@@ -75,10 +77,10 @@ public class ActionFieldReceiverTest {
             "blankQreReturned");
     assertThat(actionInstruction.getActionRequest().getTreatmentId())
         .isEqualTo(fieldworkFollowup.getTreatmentCode());
-    assertThat(actionInstruction.getActionRequest().getCeExpectedResponses())
-        .isEqualTo(fieldworkFollowup.getCeExpectedCapacity());
 
-    assertThat(actionInstruction.getActionRequest().getCeCE1Complete()).isNull();
+    assertThat(actionInstruction.getActionRequest().getCeCE1Complete()).isFalse();
+    assertThat(actionInstruction.getActionRequest().getCeExpectedResponses()).isEqualTo(0);
+    assertThat(actionInstruction.getActionRequest().getCeActualResponses()).isEqualTo(0);
   }
 
   @Test
@@ -91,6 +93,8 @@ public class ActionFieldReceiverTest {
     fieldworkFollowup.setAddressType("CE");
     fieldworkFollowup.setAddressLevel("E");
     fieldworkFollowup.setReceipted(false);
+    fieldworkFollowup.setCeExpectedCapacity(5);
+    fieldworkFollowup.setCeActualResponses(0);
 
     // When
     underTest.receiveMessage(fieldworkFollowup);
@@ -103,6 +107,8 @@ public class ActionFieldReceiverTest {
     ActionRequest actionRequest = actionInstructionArgumentCaptor.getValue().getActionRequest();
 
     assertThat(actionRequest.getCeCE1Complete()).isFalse();
+    assertThat(actionRequest.getCeExpectedResponses()).isEqualTo(5);
+    assertThat(actionRequest.getCeActualResponses()).isEqualTo(0);
   }
 
   @Test
@@ -114,6 +120,8 @@ public class ActionFieldReceiverTest {
     fieldworkFollowup.setAddressType("CE");
     fieldworkFollowup.setAddressLevel("E");
     fieldworkFollowup.setReceipted(true);
+    fieldworkFollowup.setCeExpectedCapacity(5);
+    fieldworkFollowup.setCeActualResponses(5);
 
     // When
     underTest.receiveMessage(fieldworkFollowup);
@@ -126,5 +134,7 @@ public class ActionFieldReceiverTest {
     ActionRequest actionRequest = actionInstructionArgumentCaptor.getValue().getActionRequest();
 
     assertThat(actionRequest.getCeCE1Complete()).isTrue();
+    assertThat(actionRequest.getCeExpectedResponses()).isEqualTo(5);
+    assertThat(actionRequest.getCeActualResponses()).isEqualTo(5);
   }
 }
