@@ -41,6 +41,7 @@ public class UacUpdatedReceiverTest {
     Uac uac = new Uac();
     uac.setActive(false);
     uac.setCaseId("test case ID");
+    uac.setQuestionnaireId("0120000000000100");
     Payload payload = new Payload();
     payload.setUac(uac);
     ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
@@ -91,6 +92,32 @@ public class UacUpdatedReceiverTest {
     uac.setActive(false);
     uac.setCaseId(null);
     uac.setQuestionnaireId("test questionnaire id");
+    Payload payload = new Payload();
+    payload.setUac(uac);
+    Event event = new Event();
+    event.setTransactionId("test transaction id");
+    event.setChannel("test channel");
+    ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
+    responseManagementEvent.setPayload(payload);
+    responseManagementEvent.setEvent(event);
+
+    // When
+    underTest.receiveMessage(responseManagementEvent);
+
+    // Then
+    verify(caseClient, never()).getCaseFromCaseId(any());
+    verify(rabbitTemplate, never()).convertAndSend(anyString(), anyString(), any(Object.class));
+  }
+
+  @Test
+  public void testReceivedMessageContinuationQuestionnaireQid() {
+    // Given
+    Uac uac = new Uac();
+    uac.setActive(false);
+    uac.setCaseId(null);
+    String englandHouseholdContinuationQid = "1120000000000100";
+    uac.setQuestionnaireId(englandHouseholdContinuationQid);
+
     Payload payload = new Payload();
     payload.setUac(uac);
     Event event = new Event();
