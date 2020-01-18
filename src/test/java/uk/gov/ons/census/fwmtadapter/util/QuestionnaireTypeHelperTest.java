@@ -9,8 +9,6 @@ public class QuestionnaireTypeHelperTest {
 
   @Test
   public void testValidQuestionnaireTypeEnglandHouseholdContinuation() {
-    // Given
-
     // When
     boolean actual = QuestionnaireTypeHelper.isContinuationQuestionnaireType("11");
 
@@ -20,8 +18,6 @@ public class QuestionnaireTypeHelperTest {
 
   @Test
   public void testValidQuestionnaireTypeWalesEnglishHouseholdContinuation() {
-    // Given
-
     // When
     boolean actual = QuestionnaireTypeHelper.isContinuationQuestionnaireType("12");
 
@@ -31,8 +27,6 @@ public class QuestionnaireTypeHelperTest {
 
   @Test
   public void testValidQuestionnaireTypeWalesWelshHouseholdContinuation() {
-    // Given
-
     // When
     boolean actual = QuestionnaireTypeHelper.isContinuationQuestionnaireType("13");
 
@@ -42,8 +36,6 @@ public class QuestionnaireTypeHelperTest {
 
   @Test
   public void testValidQuestionnaireTypeNorthernIrelandHouseholdContinuation() {
-    // Given
-
     // When
     boolean actual = QuestionnaireTypeHelper.isContinuationQuestionnaireType("14");
 
@@ -53,8 +45,6 @@ public class QuestionnaireTypeHelperTest {
 
   @Test
   public void testValidQuestionnaireTypeCCSPostbackEnglandAndWalesContinuation() {
-    // Given
-
     // When
     boolean actual = QuestionnaireTypeHelper.isContinuationQuestionnaireType("61");
 
@@ -64,8 +54,6 @@ public class QuestionnaireTypeHelperTest {
 
   @Test
   public void testValidQuestionnaireTypeCCSPostbackWalesWelshContinuation() {
-    // Given
-
     // When
     boolean actual = QuestionnaireTypeHelper.isContinuationQuestionnaireType("63");
 
@@ -75,8 +63,6 @@ public class QuestionnaireTypeHelperTest {
 
   @Test
   public void testIsNotContinuationQuestionnaireType() {
-    // Given
-
     // When
     boolean actual = QuestionnaireTypeHelper.isContinuationQuestionnaireType("99");
 
