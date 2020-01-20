@@ -41,7 +41,7 @@ import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 public class UacUpdatedReceiverIT {
   private static final String TEST_CASE_ID = "test_case_id";
   private static final String TEST_ADDRESS_TYPE = "test_address_type";
-  private static final String TEST_QID = "test_qid";
+  private static final String TEST_QID = "0120000000000100";
   private static final String UAC_UPDATE_ROUTING_KEY = "event.uac.update";
   private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
   private ObjectMapper objectMapper = new ObjectMapper();
