@@ -1,5 +1,9 @@
 package uk.gov.ons.census.fwmtadapter.config;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.TimeZone;
 import javax.annotation.PostConstruct;
 import ma.glasnost.orika.MapperFacade;
@@ -9,7 +13,9 @@ import org.springframework.amqp.core.AmqpAdmin;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MarshallingMessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
@@ -41,11 +47,31 @@ public class AppConfig {
   }
 
   @Bean
+  public Jackson2JsonMessageConverter jsonMessageConverter() {
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    return new Jackson2JsonMessageConverter(objectMapper);
+  }
+
+  @Bean
   public RabbitTemplate rabbitTemplate(
       ConnectionFactory connectionFactory,
       MarshallingMessageConverter actionInstructionFieldMarshallingMessageConverter) {
     RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
     rabbitTemplate.setMessageConverter(actionInstructionFieldMarshallingMessageConverter);
+    rabbitTemplate.setChannelTransacted(true);
+    return rabbitTemplate;
+  }
+
+  @Bean
+  @Qualifier("specialMagicalRabbitTemplate")
+  public RabbitTemplate specialMagicalRabbitTemplate(
+      ConnectionFactory connectionFactory,
+      Jackson2JsonMessageConverter jsonMessageConverter) {
+    RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+    rabbitTemplate.setMessageConverter(jsonMessageConverter);
     rabbitTemplate.setChannelTransacted(true);
     return rabbitTemplate;
   }
