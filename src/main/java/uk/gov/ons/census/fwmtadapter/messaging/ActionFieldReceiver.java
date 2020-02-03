@@ -32,6 +32,7 @@ public class ActionFieldReceiver {
     actionInstruction.setAddressLine2(followup.getAddressLine2());
     actionInstruction.setAddressLine3(followup.getAddressLine3());
     actionInstruction.setAddressType(followup.getAddressType());
+    actionInstruction.setCaseId(followup.getCaseId());
     actionInstruction.setCaseRef(followup.getCaseRef());
     actionInstruction.setCe1Complete(getCEComplete(followup));
     actionInstruction.setCeActualResponses(followup.getCeActualResponses());

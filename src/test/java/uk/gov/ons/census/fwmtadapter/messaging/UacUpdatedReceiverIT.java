@@ -4,14 +4,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import java.io.StringReader;
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,12 +22,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.ons.census.fwmtadapter.model.dto.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.Event;
+import uk.gov.ons.census.fwmtadapter.model.dto.FwmtCloseActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.Uac;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 
 @ContextConfiguration
@@ -65,13 +63,15 @@ public class UacUpdatedReceiverIT {
   }
 
   @Test
-  public void testGoodReceiptMessage()
-      throws InterruptedException, JAXBException, JsonProcessingException {
+  public void testGoodReceiptMessage() throws InterruptedException, JAXBException, IOException {
     // Given
     String url = "/cases/" + TEST_CASE_ID;
     CaseContainerDto caseContainerDto = new CaseContainerDto();
     caseContainerDto.setCaseId(TEST_CASE_ID);
     caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
+    caseContainerDto.setAddressLevel("U");
+    caseContainerDto.setAddressType("HH");
+    caseContainerDto.setCaseRef("123");
     String returnJson = objectMapper.writeValueAsString(caseContainerDto);
 
     stubFor(
@@ -102,13 +102,19 @@ public class UacUpdatedReceiverIT {
 
     // then
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
-    JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
-    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-    StringReader reader = new StringReader(actualMessage);
-    ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
+    ObjectMapper objectMapper = new ObjectMapper();
+    FwmtCloseActionInstruction actionInstruction =
+        objectMapper.readValue(actualMessage, FwmtCloseActionInstruction.class);
+    assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CLOSE);
 
-    assertThat(actionInstruction.getActionCancel().getCaseId()).isEqualTo(TEST_CASE_ID);
-
-    assertThat(actionInstruction.getActionCancel().getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
+    //    JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
+    //    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+    //    StringReader reader = new StringReader(actualMessage);
+    //    ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
+    //
+    //    assertThat(actionInstruction.getActionCancel().getCaseId()).isEqualTo(TEST_CASE_ID);
+    //
+    //
+    // assertThat(actionInstruction.getActionCancel().getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
   }
 }

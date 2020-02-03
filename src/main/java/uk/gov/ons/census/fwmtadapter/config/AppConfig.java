@@ -68,8 +68,7 @@ public class AppConfig {
   @Bean
   @Qualifier("specialMagicalRabbitTemplate")
   public RabbitTemplate specialMagicalRabbitTemplate(
-      ConnectionFactory connectionFactory,
-      Jackson2JsonMessageConverter jsonMessageConverter) {
+      ConnectionFactory connectionFactory, Jackson2JsonMessageConverter jsonMessageConverter) {
     RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
     rabbitTemplate.setMessageConverter(jsonMessageConverter);
     rabbitTemplate.setChannelTransacted(true);

@@ -8,6 +8,7 @@ public class FwmtCreateActionInstruction {
   private String surveyName;
   private String addressType;
   private String addressLevel;
+  private String caseId;
   private String caseRef;
   private String estabType;
   private String fieldOfficerId;

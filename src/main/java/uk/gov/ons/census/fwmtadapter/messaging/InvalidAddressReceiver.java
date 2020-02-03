@@ -1,15 +1,16 @@
 package uk.gov.ons.census.fwmtadapter.messaging;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.census.fwmtadapter.client.CaseClient;
+import uk.gov.ons.census.fwmtadapter.model.dto.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
+import uk.gov.ons.census.fwmtadapter.model.dto.FwmtCloseActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionCancel;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
 
 @MessageEndpoint
 public class InvalidAddressReceiver {
@@ -18,7 +19,7 @@ public class InvalidAddressReceiver {
   private final RabbitTemplate rabbitTemplate;
 
   public InvalidAddressReceiver(
-      RabbitTemplate rabbitTemplate,
+      @Qualifier("specialMagicalRabbitTemplate") RabbitTemplate rabbitTemplate,
       @Value("${queueconfig.outbound-exchange}") String outboundExchange,
       CaseClient caseClient) {
     this.rabbitTemplate = rabbitTemplate;
@@ -48,13 +49,14 @@ public class InvalidAddressReceiver {
 
     String caseId = event.getPayload().getInvalidAddress().getCollectionCase().getId();
 
-    CaseContainerDto caseContainerDto = caseClient.getCaseFromCaseId(caseId);
+    CaseContainerDto caseContainer = caseClient.getCaseFromCaseId(caseId);
 
-    ActionCancel actionCancel = new ActionCancel();
-    actionCancel.setCaseId(caseId);
-    actionCancel.setAddressType(caseContainerDto.getAddressType());
-    ActionInstruction actionInstruction = new ActionInstruction();
-    actionInstruction.setActionCancel(actionCancel);
+    FwmtCloseActionInstruction actionInstruction = new FwmtCloseActionInstruction();
+    actionInstruction.setActionInstruction(ActionInstructionType.CLOSE);
+    actionInstruction.setAddressLevel(caseContainer.getAddressLevel());
+    actionInstruction.setAddressType(caseContainer.getAddressType());
+    actionInstruction.setCaseId(caseContainer.getCaseId());
+    actionInstruction.setCaseRef(caseContainer.getCaseRef());
 
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }
