@@ -20,6 +20,7 @@ public class RefusalReceiver {
   private final RabbitTemplate rabbitTemplate;
 
   private static final String ESTAB_ADDRESS_LEVEL = "E";
+  private static final String FIELD_CHANNEL = "FIELD";
 
   public RefusalReceiver(
       RabbitTemplate rabbitTemplate,
@@ -39,7 +40,7 @@ public class RefusalReceiver {
     }
 
     // Do not send refusal back to Field if from Field
-    if ("FIELD".equalsIgnoreCase(event.getEvent().getChannel())) {
+    if (FIELD_CHANNEL.equalsIgnoreCase(event.getEvent().getChannel())) {
       return;
     }
 
