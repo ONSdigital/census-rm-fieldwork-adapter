@@ -52,6 +52,7 @@ public class ActionFieldReceiver {
     actionInstruction.setSurveyName(followup.getSurveyName());
     actionInstruction.setTownName(followup.getTownName());
     actionInstruction.setUprn(followup.getUprn());
+    actionInstruction.setUndeliveredAsAddress(followup.getUndeliveredAsAddress()); // TODO: Delete?
 
     // TODO: Why are we not sending these anymore?
     //    actionRequest.setUndeliveredAsAddress(followup.getUndeliveredAsAddress());
