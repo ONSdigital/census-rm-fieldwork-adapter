@@ -14,9 +14,12 @@ import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
 
 @MessageEndpoint
 public class RefusalReceiver {
+
   private final String outboundExchange;
   private final CaseClient caseClient;
   private final RabbitTemplate rabbitTemplate;
+
+  private static final String ESTAB_ADDRESS_LEVEL = "E";
 
   public RefusalReceiver(
       RabbitTemplate rabbitTemplate,
@@ -41,8 +44,12 @@ public class RefusalReceiver {
     }
 
     String caseId = event.getPayload().getRefusal().getCollectionCase().getId();
-
     CaseContainerDto caseContainerDto = caseClient.getCaseFromCaseId(caseId);
+
+    // Ignore refusal if estab level case - we shouldn't get these from any channel except Field
+    if (caseContainerDto.getAddressLevel().equals(ESTAB_ADDRESS_LEVEL)) {
+      return;
+    }
 
     ActionCancel actionCancel = new ActionCancel();
     actionCancel.setCaseId(caseId);

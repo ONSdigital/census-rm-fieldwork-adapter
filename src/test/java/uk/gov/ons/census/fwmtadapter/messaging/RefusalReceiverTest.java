@@ -17,6 +17,9 @@ import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
 public class RefusalReceiverTest {
   private static final String TEST_CASE_ID = "test_case_id";
   private static final String TEST_ADDRESS_TYPE = "test_address_type";
+  private static final String UNIT_ADDRESS_LEVEL = "U";
+  private static final String ESTAB_ADDRESS_LEVEL = "E";
+
   private EasyRandom easyRandom = new EasyRandom();
 
   @Test
@@ -34,6 +37,7 @@ public class RefusalReceiverTest {
     CaseContainerDto caseContainerDto = new CaseContainerDto();
     caseContainerDto.setCaseId(TEST_CASE_ID);
     caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
+    caseContainerDto.setAddressLevel(UNIT_ADDRESS_LEVEL);
     when(caseClient.getCaseFromCaseId(TEST_CASE_ID)).thenReturn(caseContainerDto);
 
     RefusalReceiver underTest = new RefusalReceiver(rabbitTemplate, "TEST EXCHANGE", caseClient);
@@ -60,6 +64,33 @@ public class RefusalReceiverTest {
     ResponseManagementEvent event = easyRandom.nextObject(ResponseManagementEvent.class);
     event.getEvent().setType(EventType.REFUSAL_RECEIVED);
     event.getEvent().setChannel("FIELD");
+    underTest.receiveMessage(event);
+
+    // Then
+    verifyZeroInteractions(rabbitTemplate);
+  }
+
+  @Test
+  public void testRefusalNotFromFieldForEstabAddressLevelIsIgnored() {
+    // Given
+    RabbitTemplate rabbitTemplate = mock(RabbitTemplate.class);
+
+    ResponseManagementEvent event = easyRandom.nextObject(ResponseManagementEvent.class);
+    event.getEvent().setType(EventType.REFUSAL_RECEIVED);
+    event.getEvent().setChannel("CC");
+    event.getPayload().getRefusal().getCollectionCase().setId(TEST_CASE_ID);
+
+    // When
+    CaseClient caseClient = mock(CaseClient.class);
+    CaseContainerDto caseContainerDto = new CaseContainerDto();
+    caseContainerDto.setCaseId(TEST_CASE_ID);
+    caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
+    caseContainerDto.setAddressLevel(ESTAB_ADDRESS_LEVEL);
+    when(caseClient.getCaseFromCaseId(TEST_CASE_ID)).thenReturn(caseContainerDto);
+
+    RefusalReceiver underTest = new RefusalReceiver(rabbitTemplate, "TEST EXCHANGE", caseClient);
+
+    // When
     underTest.receiveMessage(event);
 
     // Then

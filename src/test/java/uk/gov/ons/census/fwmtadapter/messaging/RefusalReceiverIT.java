@@ -47,6 +47,8 @@ public class RefusalReceiverIT {
   private static final String TEST_ADDRESS_TYPE = "test_address_type";
   private static final String REFUSAL_ROUTING_KEY = "event.respondent.refusal";
   private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
+  private static final String UNIT_ADDRESS_LEVEL = "U";
+  private static final String ESTAB_ADDRESS_LEVEL = "E";
 
   @Value("${queueconfig.case-event-exchange}")
   private String caseEventExchange;
@@ -90,6 +92,7 @@ public class RefusalReceiverIT {
     String url = "/cases/" + TEST_CASE_ID;
     CaseContainerDto caseContainerDto = new CaseContainerDto();
     caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
+    caseContainerDto.setAddressLevel(UNIT_ADDRESS_LEVEL);
     String returnJson = objectMapper.writeValueAsString(caseContainerDto);
 
     stubFor(
@@ -132,6 +135,46 @@ public class RefusalReceiverIT {
     event.setType(EventType.REFUSAL_RECEIVED);
     event.setChannel("FIELD");
     responseManagementEvent.setEvent(event);
+
+    // When
+    rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
+
+    // Then
+    assertThat(rabbitQueueHelper.getMessage(outboundQueue)).isNull();
+  }
+
+  @Test
+  public void testRefusalFromNonFieldChannelForEstabAddressLevelCaseDoesNotEmitToField()
+      throws InterruptedException, JsonProcessingException {
+    // Given
+    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
+
+    CollectionCase collectionCase = new CollectionCase();
+    collectionCase.setId(TEST_CASE_ID);
+    Refusal refusal = new Refusal();
+    refusal.setCollectionCase(collectionCase);
+    Payload payload = new Payload();
+    payload.setRefusal(refusal);
+    ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
+    responseManagementEvent.setPayload(payload);
+    Event event = new Event();
+    event.setType(EventType.REFUSAL_RECEIVED);
+    event.setChannel("CC");
+    responseManagementEvent.setEvent(event);
+
+    String url = "/cases/" + TEST_CASE_ID;
+    CaseContainerDto caseContainerDto = new CaseContainerDto();
+    caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
+    caseContainerDto.setAddressLevel(ESTAB_ADDRESS_LEVEL);
+    String returnJson = objectMapper.writeValueAsString(caseContainerDto);
+
+    stubFor(
+        get(urlEqualTo(url))
+            .willReturn(
+                aResponse()
+                    .withStatus(HttpStatus.OK.value())
+                    .withHeader("Content-Type", "application/json")
+                    .withBody(returnJson)));
 
     // When
     rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
