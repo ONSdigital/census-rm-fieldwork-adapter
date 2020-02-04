@@ -58,7 +58,6 @@ public class RefusalReceiverIT {
 
   @Autowired private RabbitQueueHelper rabbitQueueHelper;
 
-  private final EasyRandom easyRandom = new EasyRandom();
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Rule public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8089));
