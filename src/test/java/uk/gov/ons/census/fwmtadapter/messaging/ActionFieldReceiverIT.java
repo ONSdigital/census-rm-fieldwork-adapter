@@ -18,9 +18,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.ons.census.fwmtadapter.model.dto.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
-import uk.gov.ons.census.fwmtadapter.model.dto.FwmtCreateActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCreateActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 
 @ContextConfiguration
@@ -63,43 +63,28 @@ public class ActionFieldReceiverIT {
     FwmtCreateActionInstruction actionInstruction =
         objectMapper.readValue(actualMessage, FwmtCreateActionInstruction.class);
     assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CREATE);
-    //    JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
-    //    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-    //    StringReader reader = new StringReader(actualMessage);
-    //    ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
-    //
-    //    assertThat(actionInstruction.getActionRequest().getAddress())
-    //        .isEqualToComparingOnlyGivenFields(
-    //            fieldworkFollowup, "townName", "postcode", "organisationName", "oa", "arid",
-    // "uprn");
-    //    assertThat(actionInstruction.getActionRequest().getAddress().getLatitude())
-    //        .isEqualTo(new BigDecimal(fieldworkFollowup.getLatitude()));
-    //    assertThat(actionInstruction.getActionRequest().getAddress().getLongitude())
-    //        .isEqualTo(new BigDecimal(fieldworkFollowup.getLongitude()));
-    //    assertThat(actionInstruction.getActionRequest().getAddress().getLine1())
-    //        .isEqualTo(fieldworkFollowup.getAddressLine1());
-    //    assertThat(actionInstruction.getActionRequest().getAddress().getLine2())
-    //        .isEqualTo(fieldworkFollowup.getAddressLine2());
-    //    assertThat(actionInstruction.getActionRequest().getAddress().getLine3())
-    //        .isEqualTo(fieldworkFollowup.getAddressLine3());
-    //
-    //    assertThat(actionInstruction.getActionRequest())
-    //        .isEqualToComparingOnlyGivenFields(
-    //            fieldworkFollowup,
-    //            "actionPlan",
-    //            "actionType",
-    //            "caseId",
-    //            "caseRef",
-    //            "surveyName",
-    //            "addressType",
-    //            "addressLevel",
-    //            "fieldOfficerId",
-    //            "undeliveredAsAddress",
-    //            "blankQreReturned");
-    //    assertThat(actionInstruction.getActionRequest().getTreatmentId())
-    //        .isEqualTo(fieldworkFollowup.getTreatmentCode());
-    //    assertThat(actionInstruction.getActionRequest().getCeExpectedResponses())
-    //        .isEqualTo(fieldworkFollowup.getCeExpectedCapacity());
+    assertThat(actionInstruction)
+        .isEqualToComparingOnlyGivenFields(
+            fieldworkFollowup, "townName", "postcode", "organisationName", "oa", "uprn");
+    assertThat(actionInstruction.getLatitude())
+        .isEqualTo(Double.parseDouble(fieldworkFollowup.getLatitude()));
+    assertThat(actionInstruction.getLongitude())
+        .isEqualTo(Double.parseDouble((fieldworkFollowup.getLongitude())));
+    assertThat(actionInstruction.getAddressLine1()).isEqualTo(fieldworkFollowup.getAddressLine1());
+    assertThat(actionInstruction.getAddressLine2()).isEqualTo(fieldworkFollowup.getAddressLine2());
+    assertThat(actionInstruction.getAddressLine3()).isEqualTo(fieldworkFollowup.getAddressLine3());
+
+    assertThat(actionInstruction)
+        .isEqualToComparingOnlyGivenFields(
+            fieldworkFollowup,
+            "caseId",
+            "caseRef",
+            "surveyName",
+            "addressType",
+            "addressLevel",
+            "fieldOfficerId");
+    assertThat(actionInstruction.getCeExpectedCapacity())
+        .isEqualTo(fieldworkFollowup.getCeExpectedCapacity());
   }
 
   @Test
@@ -126,46 +111,27 @@ public class ActionFieldReceiverIT {
     FwmtCreateActionInstruction actionInstruction =
         objectMapper.readValue(actualMessage, FwmtCreateActionInstruction.class);
     assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CREATE);
+    assertThat(actionInstruction)
+        .isEqualToComparingOnlyGivenFields(
+            fieldworkFollowup, "townName", "postcode", "organisationName", "oa", "uprn");
+    assertThat(actionInstruction.getLatitude())
+        .isEqualTo(Double.parseDouble(fieldworkFollowup.getLatitude()));
+    assertThat(actionInstruction.getLongitude())
+        .isEqualTo(Double.parseDouble(fieldworkFollowup.getLongitude()));
+    assertThat(actionInstruction.getAddressLine1()).isEqualTo(fieldworkFollowup.getAddressLine1());
+    assertThat(actionInstruction.getAddressLine2()).isEqualTo(fieldworkFollowup.getAddressLine2());
+    assertThat(actionInstruction.getAddressLine3()).isEqualTo(fieldworkFollowup.getAddressLine3());
 
-    //    JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
-    //    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-    //    StringReader reader = new StringReader(actualMessage);
-    //    ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
-    //
-    //    assertThat(actionInstruction.getActionRequest().getAddress())
-    //        .isEqualToComparingOnlyGivenFields(
-    //            fieldworkFollowup, "townName", "postcode", "organisationName", "oa", "arid",
-    // "uprn");
-    //    assertThat(actionInstruction.getActionRequest().getAddress().getLatitude())
-    //        .isEqualTo(new BigDecimal(fieldworkFollowup.getLatitude()));
-    //    assertThat(actionInstruction.getActionRequest().getAddress().getLongitude())
-    //        .isEqualTo(new BigDecimal(fieldworkFollowup.getLongitude()));
-    //    assertThat(actionInstruction.getActionRequest().getAddress().getLine1())
-    //        .isEqualTo(fieldworkFollowup.getAddressLine1());
-    //    assertThat(actionInstruction.getActionRequest().getAddress().getLine2())
-    //        .isEqualTo(fieldworkFollowup.getAddressLine2());
-    //    assertThat(actionInstruction.getActionRequest().getAddress().getLine3())
-    //        .isEqualTo(fieldworkFollowup.getAddressLine3());
-    //
-    //    assertThat(actionInstruction.getActionRequest())
-    //        .isEqualToComparingOnlyGivenFields(
-    //            fieldworkFollowup,
-    //            "actionPlan",
-    //            "actionType",
-    //            "caseId",
-    //            "caseRef",
-    //            "surveyName",
-    //            "addressType",
-    //            "addressLevel",
-    //            "fieldOfficerId",
-    //            "undeliveredAsAddress",
-    //            "blankQreReturned");
-    //    assertThat(actionInstruction.getActionRequest().getTreatmentId())
-    //        .isEqualTo(fieldworkFollowup.getTreatmentCode());
-    //    assertThat(actionInstruction.getActionRequest().getCeExpectedResponses())
-    //        .isEqualTo(fieldworkFollowup.getCeExpectedCapacity());
-    //
-    //    assertThat(actionInstruction.getActionRequest().getCeCE1Complete())
-    //        .isEqualTo(fieldworkFollowup.getReceipted());
+    assertThat(actionInstruction)
+        .isEqualToComparingOnlyGivenFields(
+            fieldworkFollowup,
+            "caseId",
+            "caseRef",
+            "surveyName",
+            "addressType",
+            "addressLevel",
+            "fieldOfficerId");
+    assertThat(actionInstruction.getCeExpectedCapacity())
+        .isEqualTo(fieldworkFollowup.getCeExpectedCapacity());
   }
 }

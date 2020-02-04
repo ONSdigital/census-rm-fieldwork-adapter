@@ -24,15 +24,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.ons.census.fwmtadapter.model.dto.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.CollectionCase;
 import uk.gov.ons.census.fwmtadapter.model.dto.Event;
 import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
-import uk.gov.ons.census.fwmtadapter.model.dto.FwmtCloseActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
 import uk.gov.ons.census.fwmtadapter.model.dto.Refusal;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 
 @ContextConfiguration
@@ -88,6 +88,7 @@ public class RefusalReceiverIT {
     String url = "/cases/" + TEST_CASE_ID;
     CaseContainerDto caseContainerDto = new CaseContainerDto();
     caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
+    caseContainerDto.setCaseId(TEST_CASE_ID);
     String returnJson = objectMapper.writeValueAsString(caseContainerDto);
 
     stubFor(
@@ -108,14 +109,10 @@ public class RefusalReceiverIT {
     FwmtCloseActionInstruction actionInstruction =
         objectMapper.readValue(actualMessage, FwmtCloseActionInstruction.class);
     assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CLOSE);
-    //    JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
-    //    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-    //    StringReader reader = new StringReader(actualMessage);
-    //    ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
-    //    assertThat(responseManagementEvent.getPayload().getRefusal().getCollectionCase().getId())
-    //        .isEqualTo(actionInstruction.getActionCancel().getCaseId());
-    //
-    // assertThat(actionInstruction.getActionCancel().getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
+    assertThat(responseManagementEvent.getPayload().getRefusal().getCollectionCase().getId())
+        .isEqualTo(actionInstruction.getCaseId());
+
+    assertThat(actionInstruction.getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
   }
 
   @Test

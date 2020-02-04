@@ -19,10 +19,10 @@ import org.springframework.beans.factory.annotation.Value;
 import uk.gov.ons.census.fwmtadapter.client.CaseClient;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.Event;
-import uk.gov.ons.census.fwmtadapter.model.dto.FwmtCloseActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.Uac;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UacUpdatedReceiverTest {

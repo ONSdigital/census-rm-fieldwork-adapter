@@ -22,13 +22,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.ons.census.fwmtadapter.model.dto.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.Event;
-import uk.gov.ons.census.fwmtadapter.model.dto.FwmtCloseActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.Uac;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 
 @ContextConfiguration
@@ -70,7 +70,6 @@ public class UacUpdatedReceiverIT {
     caseContainerDto.setCaseId(TEST_CASE_ID);
     caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
     caseContainerDto.setAddressLevel("U");
-    caseContainerDto.setAddressType("HH");
     caseContainerDto.setCaseRef("123");
     String returnJson = objectMapper.writeValueAsString(caseContainerDto);
 
@@ -106,15 +105,8 @@ public class UacUpdatedReceiverIT {
     FwmtCloseActionInstruction actionInstruction =
         objectMapper.readValue(actualMessage, FwmtCloseActionInstruction.class);
     assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CLOSE);
+    assertThat(actionInstruction.getCaseId()).isEqualTo(TEST_CASE_ID);
 
-    //    JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
-    //    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-    //    StringReader reader = new StringReader(actualMessage);
-    //    ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
-    //
-    //    assertThat(actionInstruction.getActionCancel().getCaseId()).isEqualTo(TEST_CASE_ID);
-    //
-    //
-    // assertThat(actionInstruction.getActionCancel().getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
+    assertThat(actionInstruction.getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
   }
 }

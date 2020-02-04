@@ -1,4 +1,4 @@
-package uk.gov.ons.census.fwmtadapter.model.dto;
+package uk.gov.ons.census.fwmtadapter.model.dto.fwmt;
 
 public enum ActionInstructionType {
   CREATE,

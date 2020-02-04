@@ -5,18 +5,17 @@ import static uk.gov.ons.census.fwmtadapter.utility.QuestionnaireTypeHelper.isCo
 import com.godaddy.logging.Logger;
 import com.godaddy.logging.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import uk.gov.ons.census.fwmtadapter.client.CaseClient;
-import uk.gov.ons.census.fwmtadapter.model.dto.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
-import uk.gov.ons.census.fwmtadapter.model.dto.FwmtCloseActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.Uac;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
 
 @MessageEndpoint
 public class UacUpdatedReceiver {
@@ -28,7 +27,7 @@ public class UacUpdatedReceiver {
   private final CaseClient caseClient;
 
   public UacUpdatedReceiver(
-      @Qualifier("specialMagicalRabbitTemplate") RabbitTemplate rabbitTemplate,
+      RabbitTemplate rabbitTemplate,
       @Value("${queueconfig.outbound-exchange}") String outboundExchange,
       CaseClient caseClient) {
     this.rabbitTemplate = rabbitTemplate;

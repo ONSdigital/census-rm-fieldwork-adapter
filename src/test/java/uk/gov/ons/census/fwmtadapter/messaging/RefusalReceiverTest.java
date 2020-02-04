@@ -11,8 +11,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import uk.gov.ons.census.fwmtadapter.client.CaseClient;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
-import uk.gov.ons.census.fwmtadapter.model.dto.FwmtCloseActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
 
 public class RefusalReceiverTest {
   private static final String TEST_CASE_ID = "test_case_id";

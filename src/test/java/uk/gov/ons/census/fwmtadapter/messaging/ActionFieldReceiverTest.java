@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
-import uk.gov.ons.census.fwmtadapter.model.dto.FwmtCreateActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCreateActionInstruction;
 
 public class ActionFieldReceiverTest {
   private static final EasyRandom easyRandom = new EasyRandom();
