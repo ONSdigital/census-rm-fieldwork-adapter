@@ -48,6 +48,7 @@ public class RefusalReceiverIT {
   private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
   private static final String UNIT_ADDRESS_LEVEL = "U";
   private static final String ESTAB_ADDRESS_LEVEL = "E";
+  private static final String FIELD_CHANNEL = "FIELD";
 
   @Value("${queueconfig.case-event-exchange}")
   private String caseEventExchange;
@@ -131,14 +132,14 @@ public class RefusalReceiverIT {
     responseManagementEvent.setPayload(payload);
     Event event = new Event();
     event.setType(EventType.REFUSAL_RECEIVED);
-    event.setChannel("FIELD");
+    event.setChannel(FIELD_CHANNEL);
     responseManagementEvent.setEvent(event);
 
     // When
     rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
 
     // Then
-    assertThat(rabbitQueueHelper.getMessage(outboundQueue)).isNull();
+    rabbitQueueHelper.checkNoMessage(outboundQueue);
   }
 
   @Test

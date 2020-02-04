@@ -19,6 +19,7 @@ public class RefusalReceiverTest {
   private static final String TEST_ADDRESS_TYPE = "test_address_type";
   private static final String UNIT_ADDRESS_LEVEL = "U";
   private static final String ESTAB_ADDRESS_LEVEL = "E";
+  private static final String FIELD_CHANNEL = "FIELD";
 
   private EasyRandom easyRandom = new EasyRandom();
 
@@ -63,7 +64,7 @@ public class RefusalReceiverTest {
     RefusalReceiver underTest = new RefusalReceiver(rabbitTemplate, "TEST EXCHANGE", null);
     ResponseManagementEvent event = easyRandom.nextObject(ResponseManagementEvent.class);
     event.getEvent().setType(EventType.REFUSAL_RECEIVED);
-    event.getEvent().setChannel("FIELD");
+    event.getEvent().setChannel(FIELD_CHANNEL);
     underTest.receiveMessage(event);
 
     // Then
@@ -80,7 +81,6 @@ public class RefusalReceiverTest {
     event.getEvent().setChannel("CC");
     event.getPayload().getRefusal().getCollectionCase().setId(TEST_CASE_ID);
 
-    // When
     CaseClient caseClient = mock(CaseClient.class);
     CaseContainerDto caseContainerDto = new CaseContainerDto();
     caseContainerDto.setCaseId(TEST_CASE_ID);
