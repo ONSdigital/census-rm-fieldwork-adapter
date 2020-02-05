@@ -18,6 +18,9 @@ public class RefusalReceiver {
   private final CaseClient caseClient;
   private final RabbitTemplate rabbitTemplate;
 
+  private static final String ESTAB_ADDRESS_LEVEL = "E";
+  private static final String FIELD_CHANNEL = "FIELD";
+
   public RefusalReceiver(
       RabbitTemplate rabbitTemplate,
       @Value("${queueconfig.outbound-exchange}") String outboundExchange,
@@ -36,13 +39,18 @@ public class RefusalReceiver {
     }
 
     // Do not send refusal back to Field if from Field
-    if ("FIELD".equalsIgnoreCase(event.getEvent().getChannel())) {
+    if (FIELD_CHANNEL.equalsIgnoreCase(event.getEvent().getChannel())) {
       return;
     }
 
     String caseId = event.getPayload().getRefusal().getCollectionCase().getId();
 
     CaseContainerDto caseContainer = caseClient.getCaseFromCaseId(caseId);
+
+    // Ignore refusal if estab level case - we shouldn't get these from any channel except Field
+    if (caseContainer.getAddressLevel().equals(ESTAB_ADDRESS_LEVEL)) {
+      return;
+    }
 
     FwmtCloseActionInstruction actionInstruction = new FwmtCloseActionInstruction();
     actionInstruction.setActionInstruction(ActionInstructionType.CLOSE);

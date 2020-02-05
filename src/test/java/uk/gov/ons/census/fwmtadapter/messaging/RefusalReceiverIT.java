@@ -5,11 +5,11 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
-import javax.xml.bind.JAXBException;
 import org.jeasy.random.EasyRandom;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,6 +45,9 @@ public class RefusalReceiverIT {
   private static final String TEST_ADDRESS_TYPE = "test_address_type";
   private static final String REFUSAL_ROUTING_KEY = "event.respondent.refusal";
   private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
+  private static final String UNIT_ADDRESS_LEVEL = "U";
+  private static final String ESTAB_ADDRESS_LEVEL = "E";
+  private static final String FIELD_CHANNEL = "FIELD";
 
   @Value("${queueconfig.case-event-exchange}")
   private String caseEventExchange;
@@ -68,7 +71,7 @@ public class RefusalReceiverIT {
 
   @Test
   public void testRefusalMessageFromNonFieldChannelEmitsMessageToField()
-      throws InterruptedException, JAXBException, IOException {
+      throws InterruptedException, IOException {
     // Given
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
 
@@ -89,6 +92,7 @@ public class RefusalReceiverIT {
     CaseContainerDto caseContainerDto = new CaseContainerDto();
     caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
     caseContainerDto.setCaseId(TEST_CASE_ID);
+    caseContainerDto.setAddressLevel(UNIT_ADDRESS_LEVEL);
     String returnJson = objectMapper.writeValueAsString(caseContainerDto);
 
     stubFor(
@@ -117,7 +121,7 @@ public class RefusalReceiverIT {
 
   @Test
   public void testRefusalMessageFromFieldChannelDoesNotEmitMessageToField()
-      throws InterruptedException {
+      throws InterruptedException, JsonProcessingException {
     // Given
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
 
@@ -133,6 +137,20 @@ public class RefusalReceiverIT {
     event.setType(EventType.REFUSAL_RECEIVED);
     event.setChannel("FIELD");
     responseManagementEvent.setEvent(event);
+
+    String url = "/cases/" + TEST_CASE_ID;
+    CaseContainerDto caseContainerDto = new CaseContainerDto();
+    caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
+    caseContainerDto.setAddressLevel(ESTAB_ADDRESS_LEVEL);
+    String returnJson = objectMapper.writeValueAsString(caseContainerDto);
+
+    stubFor(
+        get(urlEqualTo(url))
+            .willReturn(
+                aResponse()
+                    .withStatus(HttpStatus.OK.value())
+                    .withHeader("Content-Type", "application/json")
+                    .withBody(returnJson)));
 
     // When
     rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
