@@ -54,9 +54,6 @@ public class ActionFieldReceiver {
     actionInstruction.setUprn(followup.getUprn());
     actionInstruction.setUndeliveredAsAddress(followup.getUndeliveredAsAddress()); // TODO: Delete?
 
-    // TODO: Why are we not sending this anymore?
-    //    actionRequest.setBlankQreReturned(followup.getBlankQreReturned());
-
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }
 
