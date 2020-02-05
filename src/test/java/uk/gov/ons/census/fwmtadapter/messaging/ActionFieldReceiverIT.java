@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
-import javax.xml.bind.JAXBException;
 import org.jeasy.random.EasyRandom;
 import org.junit.Before;
 import org.junit.Test;
@@ -88,7 +87,7 @@ public class ActionFieldReceiverIT {
   }
 
   @Test
-  public void testReceiveMessageCE() throws InterruptedException, JAXBException, IOException {
+  public void testReceiveMessageCE() throws InterruptedException, IOException {
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
 
     EasyRandom easyRandom = new EasyRandom();

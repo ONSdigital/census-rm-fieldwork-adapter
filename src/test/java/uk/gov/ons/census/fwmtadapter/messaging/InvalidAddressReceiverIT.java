@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
-import javax.xml.bind.JAXBException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -68,7 +67,7 @@ public class InvalidAddressReceiverIT {
 
   @Test
   public void testInvalidAddressMessageFromNonFieldChannelEmitsMessageToField()
-      throws InterruptedException, JAXBException, IOException {
+      throws InterruptedException, IOException {
     // Given
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
 
