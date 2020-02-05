@@ -10,4 +10,6 @@ public class CaseContainerDto {
 
   @JsonProperty("caseType")
   private String addressType;
+
+  private String addressLevel;
 }

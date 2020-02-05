@@ -13,7 +13,6 @@ import java.util.concurrent.BlockingQueue;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import org.jeasy.random.EasyRandom;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,6 +46,9 @@ public class RefusalReceiverIT {
   private static final String TEST_ADDRESS_TYPE = "test_address_type";
   private static final String REFUSAL_ROUTING_KEY = "event.respondent.refusal";
   private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
+  private static final String UNIT_ADDRESS_LEVEL = "U";
+  private static final String ESTAB_ADDRESS_LEVEL = "E";
+  private static final String FIELD_CHANNEL = "FIELD";
 
   @Value("${queueconfig.case-event-exchange}")
   private String caseEventExchange;
@@ -56,7 +58,6 @@ public class RefusalReceiverIT {
 
   @Autowired private RabbitQueueHelper rabbitQueueHelper;
 
-  private final EasyRandom easyRandom = new EasyRandom();
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Rule public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8089));
@@ -90,6 +91,7 @@ public class RefusalReceiverIT {
     String url = "/cases/" + TEST_CASE_ID;
     CaseContainerDto caseContainerDto = new CaseContainerDto();
     caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
+    caseContainerDto.setAddressLevel(UNIT_ADDRESS_LEVEL);
     String returnJson = objectMapper.writeValueAsString(caseContainerDto);
 
     stubFor(
@@ -100,6 +102,7 @@ public class RefusalReceiverIT {
                     .withHeader("Content-Type", "application/json")
                     .withBody(returnJson)));
 
+    // When
     rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
 
     // Then
@@ -130,13 +133,53 @@ public class RefusalReceiverIT {
     responseManagementEvent.setPayload(payload);
     Event event = new Event();
     event.setType(EventType.REFUSAL_RECEIVED);
-    event.setChannel("FIELD");
+    event.setChannel(FIELD_CHANNEL);
     responseManagementEvent.setEvent(event);
 
     // When
     rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
 
     // Then
-    assertThat(rabbitQueueHelper.getMessage(outboundQueue)).isNull();
+    rabbitQueueHelper.checkNoMessage(outboundQueue);
+  }
+
+  @Test
+  public void testRefusalFromNonFieldChannelForEstabAddressLevelCaseDoesNotEmitToField()
+      throws InterruptedException, JsonProcessingException {
+    // Given
+    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
+
+    CollectionCase collectionCase = new CollectionCase();
+    collectionCase.setId(TEST_CASE_ID);
+    Refusal refusal = new Refusal();
+    refusal.setCollectionCase(collectionCase);
+    Payload payload = new Payload();
+    payload.setRefusal(refusal);
+    ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
+    responseManagementEvent.setPayload(payload);
+    Event event = new Event();
+    event.setType(EventType.REFUSAL_RECEIVED);
+    event.setChannel("CC");
+    responseManagementEvent.setEvent(event);
+
+    String url = "/cases/" + TEST_CASE_ID;
+    CaseContainerDto caseContainerDto = new CaseContainerDto();
+    caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
+    caseContainerDto.setAddressLevel(ESTAB_ADDRESS_LEVEL);
+    String returnJson = objectMapper.writeValueAsString(caseContainerDto);
+
+    stubFor(
+        get(urlEqualTo(url))
+            .willReturn(
+                aResponse()
+                    .withStatus(HttpStatus.OK.value())
+                    .withHeader("Content-Type", "application/json")
+                    .withBody(returnJson)));
+
+    // When
+    rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
+
+    // Then
+    rabbitQueueHelper.checkNoMessage(outboundQueue);
   }
 }
