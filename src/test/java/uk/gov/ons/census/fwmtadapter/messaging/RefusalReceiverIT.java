@@ -102,6 +102,7 @@ public class RefusalReceiverIT {
                     .withHeader("Content-Type", "application/json")
                     .withBody(returnJson)));
 
+    // When
     rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
 
     // Then
@@ -179,6 +180,6 @@ public class RefusalReceiverIT {
     rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
 
     // Then
-    assertThat(rabbitQueueHelper.getMessage(outboundQueue)).isNull();
+    rabbitQueueHelper.checkNoMessage(outboundQueue);
   }
 }
