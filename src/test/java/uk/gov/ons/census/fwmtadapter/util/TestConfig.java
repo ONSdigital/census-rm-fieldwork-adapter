@@ -18,9 +18,4 @@ public class TestConfig {
     rabbitTemplate.setChannelTransacted(true);
     return rabbitTemplate;
   }
-
-  @Bean
-  public Jackson2JsonMessageConverter messageConverter() {
-    return new Jackson2JsonMessageConverter();
-  }
 }

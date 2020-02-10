@@ -14,8 +14,8 @@ import uk.gov.ons.census.fwmtadapter.client.CaseClient;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.Uac;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionCancel;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
 
 @MessageEndpoint
 public class UacUpdatedReceiver {
@@ -40,14 +40,15 @@ public class UacUpdatedReceiver {
   public void receiveMessage(ResponseManagementEvent event) {
     if (canIgnoreEvent(event)) return;
 
-    CaseContainerDto caseContainerDto =
+    CaseContainerDto caseContainer =
         caseClient.getCaseFromCaseId(event.getPayload().getUac().getCaseId());
 
-    ActionCancel actionCancel = new ActionCancel();
-    actionCancel.setCaseId(event.getPayload().getUac().getCaseId());
-    actionCancel.setAddressType(caseContainerDto.getAddressType());
-    ActionInstruction actionInstruction = new ActionInstruction();
-    actionInstruction.setActionCancel(actionCancel);
+    FwmtCloseActionInstruction actionInstruction = new FwmtCloseActionInstruction();
+    actionInstruction.setActionInstruction(ActionInstructionType.CLOSE);
+    actionInstruction.setAddressLevel(caseContainer.getAddressLevel());
+    actionInstruction.setAddressType(caseContainer.getAddressType());
+    actionInstruction.setCaseId(caseContainer.getCaseId());
+    actionInstruction.setCaseRef(caseContainer.getCaseRef());
 
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }

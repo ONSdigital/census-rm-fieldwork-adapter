@@ -22,7 +22,7 @@ import uk.gov.ons.census.fwmtadapter.model.dto.Event;
 import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.Uac;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
 
 @RunWith(MockitoJUnitRunner.class)
 public class UacUpdatedReceiverTest {
@@ -48,6 +48,7 @@ public class UacUpdatedReceiverTest {
     responseManagementEvent.setPayload(payload);
     CaseContainerDto caseContainerDto = new CaseContainerDto();
     caseContainerDto.setAddressType("test address type");
+    caseContainerDto.setCaseId("test case ID");
     when(caseClient.getCaseFromCaseId(any())).thenReturn(caseContainerDto);
 
     // When
@@ -56,15 +57,12 @@ public class UacUpdatedReceiverTest {
     // Then
     verify(caseClient).getCaseFromCaseId(eq("test case ID"));
 
-    ArgumentCaptor<ActionInstruction> aiArgumentCaptor =
-        ArgumentCaptor.forClass(ActionInstruction.class);
+    ArgumentCaptor<FwmtCloseActionInstruction> aiArgumentCaptor =
+        ArgumentCaptor.forClass(FwmtCloseActionInstruction.class);
     verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
-    ActionInstruction actualAi = aiArgumentCaptor.getValue();
-    assertThat(actualAi.getActionCancel()).isNotNull();
-    assertThat(actualAi.getActionCancel().getCaseId()).isEqualTo("test case ID");
-    assertThat(actualAi.getActionCancel().getAddressType()).isEqualTo("test address type");
-    assertThat(actualAi.getActionRequest()).isNull();
-    assertThat(actualAi.getActionUpdate()).isNull();
+    FwmtCloseActionInstruction actualAi = aiArgumentCaptor.getValue();
+    assertThat(actualAi.getCaseId()).isEqualTo("test case ID");
+    assertThat(actualAi.getAddressType()).isEqualTo("test address type");
   }
 
   @Test

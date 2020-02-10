@@ -5,6 +5,8 @@ import lombok.Data;
 
 @Data
 public class CaseContainerDto {
+  private String caseRef;
+
   @JsonProperty("id")
   private String caseId;
 

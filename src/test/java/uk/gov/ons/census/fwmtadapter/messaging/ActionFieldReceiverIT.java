@@ -2,12 +2,9 @@ package uk.gov.ons.census.fwmtadapter.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.StringReader;
-import java.math.BigDecimal;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import org.jeasy.random.EasyRandom;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +18,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCreateActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 
 @ContextConfiguration
@@ -45,7 +43,7 @@ public class ActionFieldReceiverIT {
   }
 
   @Test
-  public void testReceiveMessage() throws InterruptedException, JAXBException {
+  public void testReceiveMessage() throws InterruptedException, IOException {
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
 
     EasyRandom easyRandom = new EasyRandom();
@@ -60,46 +58,36 @@ public class ActionFieldReceiverIT {
 
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
     assertThat(actualMessage).isNotNull();
-    JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
-    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-    StringReader reader = new StringReader(actualMessage);
-    ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
-
-    assertThat(actionInstruction.getActionRequest().getAddress())
+    ObjectMapper objectMapper = new ObjectMapper();
+    FwmtCreateActionInstruction actionInstruction =
+        objectMapper.readValue(actualMessage, FwmtCreateActionInstruction.class);
+    assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CREATE);
+    assertThat(actionInstruction)
         .isEqualToComparingOnlyGivenFields(
-            fieldworkFollowup, "townName", "postcode", "organisationName", "oa", "arid", "uprn");
-    assertThat(actionInstruction.getActionRequest().getAddress().getLatitude())
-        .isEqualTo(new BigDecimal(fieldworkFollowup.getLatitude()));
-    assertThat(actionInstruction.getActionRequest().getAddress().getLongitude())
-        .isEqualTo(new BigDecimal(fieldworkFollowup.getLongitude()));
-    assertThat(actionInstruction.getActionRequest().getAddress().getLine1())
-        .isEqualTo(fieldworkFollowup.getAddressLine1());
-    assertThat(actionInstruction.getActionRequest().getAddress().getLine2())
-        .isEqualTo(fieldworkFollowup.getAddressLine2());
-    assertThat(actionInstruction.getActionRequest().getAddress().getLine3())
-        .isEqualTo(fieldworkFollowup.getAddressLine3());
+            fieldworkFollowup, "townName", "postcode", "organisationName", "oa", "uprn");
+    assertThat(actionInstruction.getLatitude())
+        .isEqualTo(Double.parseDouble(fieldworkFollowup.getLatitude()));
+    assertThat(actionInstruction.getLongitude())
+        .isEqualTo(Double.parseDouble((fieldworkFollowup.getLongitude())));
+    assertThat(actionInstruction.getAddressLine1()).isEqualTo(fieldworkFollowup.getAddressLine1());
+    assertThat(actionInstruction.getAddressLine2()).isEqualTo(fieldworkFollowup.getAddressLine2());
+    assertThat(actionInstruction.getAddressLine3()).isEqualTo(fieldworkFollowup.getAddressLine3());
 
-    assertThat(actionInstruction.getActionRequest())
+    assertThat(actionInstruction)
         .isEqualToComparingOnlyGivenFields(
             fieldworkFollowup,
-            "actionPlan",
-            "actionType",
             "caseId",
             "caseRef",
             "surveyName",
             "addressType",
             "addressLevel",
-            "fieldOfficerId",
-            "undeliveredAsAddress",
-            "blankQreReturned");
-    assertThat(actionInstruction.getActionRequest().getTreatmentId())
-        .isEqualTo(fieldworkFollowup.getTreatmentCode());
-    assertThat(actionInstruction.getActionRequest().getCeExpectedResponses())
+            "fieldOfficerId");
+    assertThat(actionInstruction.getCeExpectedCapacity())
         .isEqualTo(fieldworkFollowup.getCeExpectedCapacity());
   }
 
   @Test
-  public void testReceiveMessageCE() throws InterruptedException, JAXBException {
+  public void testReceiveMessageCE() throws InterruptedException, IOException {
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
 
     EasyRandom easyRandom = new EasyRandom();
@@ -118,44 +106,31 @@ public class ActionFieldReceiverIT {
 
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
     assertThat(actualMessage).isNotNull();
-    JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
-    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-    StringReader reader = new StringReader(actualMessage);
-    ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
-
-    assertThat(actionInstruction.getActionRequest().getAddress())
+    ObjectMapper objectMapper = new ObjectMapper();
+    FwmtCreateActionInstruction actionInstruction =
+        objectMapper.readValue(actualMessage, FwmtCreateActionInstruction.class);
+    assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CREATE);
+    assertThat(actionInstruction)
         .isEqualToComparingOnlyGivenFields(
-            fieldworkFollowup, "townName", "postcode", "organisationName", "oa", "arid", "uprn");
-    assertThat(actionInstruction.getActionRequest().getAddress().getLatitude())
-        .isEqualTo(new BigDecimal(fieldworkFollowup.getLatitude()));
-    assertThat(actionInstruction.getActionRequest().getAddress().getLongitude())
-        .isEqualTo(new BigDecimal(fieldworkFollowup.getLongitude()));
-    assertThat(actionInstruction.getActionRequest().getAddress().getLine1())
-        .isEqualTo(fieldworkFollowup.getAddressLine1());
-    assertThat(actionInstruction.getActionRequest().getAddress().getLine2())
-        .isEqualTo(fieldworkFollowup.getAddressLine2());
-    assertThat(actionInstruction.getActionRequest().getAddress().getLine3())
-        .isEqualTo(fieldworkFollowup.getAddressLine3());
+            fieldworkFollowup, "townName", "postcode", "organisationName", "oa", "uprn");
+    assertThat(actionInstruction.getLatitude())
+        .isEqualTo(Double.parseDouble(fieldworkFollowup.getLatitude()));
+    assertThat(actionInstruction.getLongitude())
+        .isEqualTo(Double.parseDouble(fieldworkFollowup.getLongitude()));
+    assertThat(actionInstruction.getAddressLine1()).isEqualTo(fieldworkFollowup.getAddressLine1());
+    assertThat(actionInstruction.getAddressLine2()).isEqualTo(fieldworkFollowup.getAddressLine2());
+    assertThat(actionInstruction.getAddressLine3()).isEqualTo(fieldworkFollowup.getAddressLine3());
 
-    assertThat(actionInstruction.getActionRequest())
+    assertThat(actionInstruction)
         .isEqualToComparingOnlyGivenFields(
             fieldworkFollowup,
-            "actionPlan",
-            "actionType",
             "caseId",
             "caseRef",
             "surveyName",
             "addressType",
             "addressLevel",
-            "fieldOfficerId",
-            "undeliveredAsAddress",
-            "blankQreReturned");
-    assertThat(actionInstruction.getActionRequest().getTreatmentId())
-        .isEqualTo(fieldworkFollowup.getTreatmentCode());
-    assertThat(actionInstruction.getActionRequest().getCeExpectedResponses())
+            "fieldOfficerId");
+    assertThat(actionInstruction.getCeExpectedCapacity())
         .isEqualTo(fieldworkFollowup.getCeExpectedCapacity());
-
-    assertThat(actionInstruction.getActionRequest().getCeCE1Complete())
-        .isEqualTo(fieldworkFollowup.getReceipted());
   }
 }

@@ -9,12 +9,11 @@ import uk.gov.ons.census.fwmtadapter.client.CaseClient;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionCancel;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
 
 @MessageEndpoint
 public class RefusalReceiver {
-
   private final String outboundExchange;
   private final CaseClient caseClient;
   private final RabbitTemplate rabbitTemplate;
@@ -45,18 +44,20 @@ public class RefusalReceiver {
     }
 
     String caseId = event.getPayload().getRefusal().getCollectionCase().getId();
-    CaseContainerDto caseContainerDto = caseClient.getCaseFromCaseId(caseId);
+
+    CaseContainerDto caseContainer = caseClient.getCaseFromCaseId(caseId);
 
     // Ignore refusal if estab level case - we shouldn't get these from any channel except Field
-    if (caseContainerDto.getAddressLevel().equals(ESTAB_ADDRESS_LEVEL)) {
+    if (caseContainer.getAddressLevel().equals(ESTAB_ADDRESS_LEVEL)) {
       return;
     }
 
-    ActionCancel actionCancel = new ActionCancel();
-    actionCancel.setCaseId(caseId);
-    actionCancel.setAddressType(caseContainerDto.getAddressType());
-    ActionInstruction actionInstruction = new ActionInstruction();
-    actionInstruction.setActionCancel(actionCancel);
+    FwmtCloseActionInstruction actionInstruction = new FwmtCloseActionInstruction();
+    actionInstruction.setActionInstruction(ActionInstructionType.CLOSE);
+    actionInstruction.setAddressLevel(caseContainer.getAddressLevel());
+    actionInstruction.setAddressType(caseContainer.getAddressType());
+    actionInstruction.setCaseId(caseContainer.getCaseId());
+    actionInstruction.setCaseRef(caseContainer.getCaseRef());
 
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }

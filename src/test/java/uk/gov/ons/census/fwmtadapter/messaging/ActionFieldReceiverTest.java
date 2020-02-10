@@ -5,14 +5,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import java.math.BigDecimal;
 import org.jeasy.random.EasyRandom;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionRequest;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCreateActionInstruction;
 
 public class ActionFieldReceiverTest {
   private static final EasyRandom easyRandom = new EasyRandom();
@@ -37,50 +35,40 @@ public class ActionFieldReceiverTest {
     underTest.receiveMessage(fieldworkFollowup);
 
     // Then
-    ArgumentCaptor<ActionInstruction> argCaptor = ArgumentCaptor.forClass(ActionInstruction.class);
+    ArgumentCaptor<FwmtCreateActionInstruction> argCaptor =
+        ArgumentCaptor.forClass(FwmtCreateActionInstruction.class);
     verify(rabbitTemplate).convertAndSend(eq("TEST EXCHANGE"), eq(""), argCaptor.capture());
 
-    ActionInstruction actionInstruction = argCaptor.getValue();
-    assertThat(actionInstruction.getActionRequest().getAddress())
+    FwmtCreateActionInstruction actionInstruction = argCaptor.getValue();
+    assertThat(actionInstruction)
         .isEqualToComparingOnlyGivenFields(
             fieldworkFollowup,
             "townName",
             "postcode",
             "organisationName",
             "oa",
-            "arid",
             "uprn",
             "estabType");
-    assertThat(actionInstruction.getActionRequest().getAddress().getLatitude())
-        .isEqualTo(new BigDecimal(fieldworkFollowup.getLatitude()));
-    assertThat(actionInstruction.getActionRequest().getAddress().getLongitude())
-        .isEqualTo(new BigDecimal(fieldworkFollowup.getLongitude()));
-    assertThat(actionInstruction.getActionRequest().getAddress().getLine1())
-        .isEqualTo(fieldworkFollowup.getAddressLine1());
-    assertThat(actionInstruction.getActionRequest().getAddress().getLine2())
-        .isEqualTo(fieldworkFollowup.getAddressLine2());
-    assertThat(actionInstruction.getActionRequest().getAddress().getLine3())
-        .isEqualTo(fieldworkFollowup.getAddressLine3());
+    assertThat(actionInstruction.getLatitude())
+        .isEqualTo(Double.parseDouble(fieldworkFollowup.getLatitude()));
+    assertThat(actionInstruction.getLongitude())
+        .isEqualTo(Double.parseDouble(fieldworkFollowup.getLongitude()));
+    assertThat(actionInstruction.getAddressLine1()).isEqualTo(fieldworkFollowup.getAddressLine1());
+    assertThat(actionInstruction.getAddressLine2()).isEqualTo(fieldworkFollowup.getAddressLine2());
+    assertThat(actionInstruction.getAddressLine3()).isEqualTo(fieldworkFollowup.getAddressLine3());
 
-    assertThat(actionInstruction.getActionRequest())
+    assertThat(actionInstruction)
         .isEqualToComparingOnlyGivenFields(
             fieldworkFollowup,
-            "actionPlan",
-            "actionType",
-            "caseId",
             "caseRef",
             "surveyName",
             "addressType",
             "addressLevel",
-            "fieldOfficerId",
-            "undeliveredAsAddress",
-            "blankQreReturned");
-    assertThat(actionInstruction.getActionRequest().getTreatmentId())
-        .isEqualTo(fieldworkFollowup.getTreatmentCode());
+            "fieldOfficerId");
 
-    assertThat(actionInstruction.getActionRequest().getCeCE1Complete()).isFalse();
-    assertThat(actionInstruction.getActionRequest().getCeExpectedResponses()).isEqualTo(0);
-    assertThat(actionInstruction.getActionRequest().getCeActualResponses()).isEqualTo(0);
+    assertThat(actionInstruction.isCe1Complete()).isFalse();
+    assertThat(actionInstruction.getCeExpectedCapacity()).isNull();
+    assertThat(actionInstruction.getCeActualResponses()).isNull();
   }
 
   @Test
@@ -100,14 +88,14 @@ public class ActionFieldReceiverTest {
     underTest.receiveMessage(fieldworkFollowup);
 
     // Then
-    ArgumentCaptor<ActionInstruction> actionInstructionArgumentCaptor =
-        ArgumentCaptor.forClass(ActionInstruction.class);
+    ArgumentCaptor<FwmtCreateActionInstruction> actionInstructionArgumentCaptor =
+        ArgumentCaptor.forClass(FwmtCreateActionInstruction.class);
     verify(rabbitTemplate)
         .convertAndSend(eq("TEST EXCHANGE"), eq(""), actionInstructionArgumentCaptor.capture());
-    ActionRequest actionRequest = actionInstructionArgumentCaptor.getValue().getActionRequest();
+    FwmtCreateActionInstruction actionRequest = actionInstructionArgumentCaptor.getValue();
 
-    assertThat(actionRequest.getCeCE1Complete()).isFalse();
-    assertThat(actionRequest.getCeExpectedResponses()).isEqualTo(5);
+    assertThat(actionRequest.isCe1Complete()).isFalse();
+    assertThat(actionRequest.getCeExpectedCapacity()).isEqualTo(5);
     assertThat(actionRequest.getCeActualResponses()).isEqualTo(0);
   }
 
@@ -127,14 +115,14 @@ public class ActionFieldReceiverTest {
     underTest.receiveMessage(fieldworkFollowup);
 
     // Then
-    ArgumentCaptor<ActionInstruction> actionInstructionArgumentCaptor =
-        ArgumentCaptor.forClass(ActionInstruction.class);
+    ArgumentCaptor<FwmtCreateActionInstruction> actionInstructionArgumentCaptor =
+        ArgumentCaptor.forClass(FwmtCreateActionInstruction.class);
     verify(rabbitTemplate)
         .convertAndSend(eq("TEST EXCHANGE"), eq(""), actionInstructionArgumentCaptor.capture());
-    ActionRequest actionRequest = actionInstructionArgumentCaptor.getValue().getActionRequest();
+    FwmtCreateActionInstruction actionRequest = actionInstructionArgumentCaptor.getValue();
 
-    assertThat(actionRequest.getCeCE1Complete()).isTrue();
-    assertThat(actionRequest.getCeExpectedResponses()).isEqualTo(5);
+    assertThat(actionRequest.isCe1Complete()).isTrue();
+    assertThat(actionRequest.getCeExpectedCapacity()).isEqualTo(5);
     assertThat(actionRequest.getCeActualResponses()).isEqualTo(5);
   }
 }

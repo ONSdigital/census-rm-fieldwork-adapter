@@ -12,7 +12,7 @@ import uk.gov.ons.census.fwmtadapter.client.CaseClient;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
 
 public class RefusalReceiverTest {
   private static final String TEST_CASE_ID = "test_case_id";
@@ -46,13 +46,14 @@ public class RefusalReceiverTest {
     underTest.receiveMessage(event);
 
     // Then
-    ArgumentCaptor<ActionInstruction> argCaptor = ArgumentCaptor.forClass(ActionInstruction.class);
+    ArgumentCaptor<FwmtCloseActionInstruction> argCaptor =
+        ArgumentCaptor.forClass(FwmtCloseActionInstruction.class);
     verify(rabbitTemplate).convertAndSend(eq("TEST EXCHANGE"), eq(""), argCaptor.capture());
 
-    ActionInstruction actionInstruction = argCaptor.getValue();
+    FwmtCloseActionInstruction actionInstruction = argCaptor.getValue();
     assertThat(event.getPayload().getRefusal().getCollectionCase().getId())
-        .isEqualTo(actionInstruction.getActionCancel().getCaseId());
-    assertThat(actionInstruction.getActionCancel().getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
+        .isEqualTo(actionInstruction.getCaseId());
+    assertThat(actionInstruction.getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
   }
 
   @Test

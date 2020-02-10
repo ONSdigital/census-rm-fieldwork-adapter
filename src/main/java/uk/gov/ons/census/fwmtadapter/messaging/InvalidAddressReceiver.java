@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.census.fwmtadapter.client.CaseClient;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseContainerDto;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionCancel;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
 
 @MessageEndpoint
 public class InvalidAddressReceiver {
@@ -48,13 +48,14 @@ public class InvalidAddressReceiver {
 
     String caseId = event.getPayload().getInvalidAddress().getCollectionCase().getId();
 
-    CaseContainerDto caseContainerDto = caseClient.getCaseFromCaseId(caseId);
+    CaseContainerDto caseContainer = caseClient.getCaseFromCaseId(caseId);
 
-    ActionCancel actionCancel = new ActionCancel();
-    actionCancel.setCaseId(caseId);
-    actionCancel.setAddressType(caseContainerDto.getAddressType());
-    ActionInstruction actionInstruction = new ActionInstruction();
-    actionInstruction.setActionCancel(actionCancel);
+    FwmtCloseActionInstruction actionInstruction = new FwmtCloseActionInstruction();
+    actionInstruction.setActionInstruction(ActionInstructionType.CLOSE);
+    actionInstruction.setAddressLevel(caseContainer.getAddressLevel());
+    actionInstruction.setAddressType(caseContainer.getAddressType());
+    actionInstruction.setCaseId(caseContainer.getCaseId());
+    actionInstruction.setCaseRef(caseContainer.getCaseRef());
 
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }

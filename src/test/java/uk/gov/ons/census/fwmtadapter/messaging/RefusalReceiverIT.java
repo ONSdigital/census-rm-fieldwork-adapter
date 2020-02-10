@@ -8,11 +8,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
-import java.io.StringReader;
+import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import org.jeasy.random.EasyRandom;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,7 +31,8 @@ import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
 import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
 import uk.gov.ons.census.fwmtadapter.model.dto.Refusal;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
-import uk.gov.ons.census.fwmtadapter.model.dto.field.ActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 
 @ContextConfiguration
@@ -58,6 +57,7 @@ public class RefusalReceiverIT {
 
   @Autowired private RabbitQueueHelper rabbitQueueHelper;
 
+  private final EasyRandom easyRandom = new EasyRandom();
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Rule public WireMockRule wireMockRule = new WireMockRule(wireMockConfig().port(8089));
@@ -71,7 +71,7 @@ public class RefusalReceiverIT {
 
   @Test
   public void testRefusalMessageFromNonFieldChannelEmitsMessageToField()
-      throws InterruptedException, JAXBException, JsonProcessingException {
+      throws InterruptedException, IOException {
     // Given
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
 
@@ -91,6 +91,7 @@ public class RefusalReceiverIT {
     String url = "/cases/" + TEST_CASE_ID;
     CaseContainerDto caseContainerDto = new CaseContainerDto();
     caseContainerDto.setAddressType(TEST_ADDRESS_TYPE);
+    caseContainerDto.setCaseId(TEST_CASE_ID);
     caseContainerDto.setAddressLevel(UNIT_ADDRESS_LEVEL);
     String returnJson = objectMapper.writeValueAsString(caseContainerDto);
 
@@ -102,49 +103,24 @@ public class RefusalReceiverIT {
                     .withHeader("Content-Type", "application/json")
                     .withBody(returnJson)));
 
-    // When
     rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
 
     // Then
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
     assertThat(actualMessage).isNotNull();
-    JAXBContext jaxbContext = JAXBContext.newInstance(ActionInstruction.class);
-    Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-    StringReader reader = new StringReader(actualMessage);
-    ActionInstruction actionInstruction = (ActionInstruction) unmarshaller.unmarshal(reader);
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    FwmtCloseActionInstruction actionInstruction =
+        objectMapper.readValue(actualMessage, FwmtCloseActionInstruction.class);
+    assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CLOSE);
     assertThat(responseManagementEvent.getPayload().getRefusal().getCollectionCase().getId())
-        .isEqualTo(actionInstruction.getActionCancel().getCaseId());
-    assertThat(actionInstruction.getActionCancel().getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
+        .isEqualTo(actionInstruction.getCaseId());
+
+    assertThat(actionInstruction.getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
   }
 
   @Test
   public void testRefusalMessageFromFieldChannelDoesNotEmitMessageToField()
-      throws InterruptedException {
-    // Given
-    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
-
-    CollectionCase collectionCase = new CollectionCase();
-    collectionCase.setId(TEST_CASE_ID);
-    Refusal refusal = new Refusal();
-    refusal.setCollectionCase(collectionCase);
-    Payload payload = new Payload();
-    payload.setRefusal(refusal);
-    ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
-    responseManagementEvent.setPayload(payload);
-    Event event = new Event();
-    event.setType(EventType.REFUSAL_RECEIVED);
-    event.setChannel(FIELD_CHANNEL);
-    responseManagementEvent.setEvent(event);
-
-    // When
-    rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
-
-    // Then
-    rabbitQueueHelper.checkNoMessage(outboundQueue);
-  }
-
-  @Test
-  public void testRefusalFromNonFieldChannelForEstabAddressLevelCaseDoesNotEmitToField()
       throws InterruptedException, JsonProcessingException {
     // Given
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
@@ -159,7 +135,7 @@ public class RefusalReceiverIT {
     responseManagementEvent.setPayload(payload);
     Event event = new Event();
     event.setType(EventType.REFUSAL_RECEIVED);
-    event.setChannel("CC");
+    event.setChannel("FIELD");
     responseManagementEvent.setEvent(event);
 
     String url = "/cases/" + TEST_CASE_ID;
@@ -180,6 +156,6 @@ public class RefusalReceiverIT {
     rabbitQueueHelper.sendMessage(caseEventExchange, REFUSAL_ROUTING_KEY, responseManagementEvent);
 
     // Then
-    rabbitQueueHelper.checkNoMessage(outboundQueue);
+    assertThat(rabbitQueueHelper.getMessage(outboundQueue)).isNull();
   }
 }
