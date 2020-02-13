@@ -6,11 +6,6 @@ import lombok.Data;
 
 @Data
 public class Payload {
-  @JsonInclude(Include.NON_NULL)
-  private Refusal refusal;
-
-  @JsonInclude(Include.NON_NULL)
-  private InvalidAddress invalidAddress;
-
-  private Uac uac;
+  private CollectionCase collectionCase;
+  private Metadata metadata;
 }

@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.amqp.inbound.AmqpInboundChannelAdapter;
 import org.springframework.integration.channel.DirectChannel;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
@@ -51,6 +52,9 @@ public class MessageConsumerConfig {
   @Value("${queueconfig.uac-updated-queue}")
   private String uacUpdatedQueue;
 
+  @Value("${queueconfig.case-updated-queue}")
+  private String caseUpdatedQueue;
+
   public MessageConsumerConfig(
       ExceptionManagerClient exceptionManagerClient,
       RabbitTemplate rabbitTemplate,
@@ -77,6 +81,11 @@ public class MessageConsumerConfig {
 
   @Bean
   public MessageChannel uacUpdatedInputChannel() {
+    return new DirectChannel();
+  }
+
+  @Bean
+  public MessageChannel caseUpdatedInputChannel() {
     return new DirectChannel();
   }
 
@@ -118,6 +127,15 @@ public class MessageConsumerConfig {
   }
 
   @Bean
+  public AmqpInboundChannelAdapter caseUpdatedInbound(
+      @Qualifier("caseUpdatedContainer") SimpleMessageListenerContainer listenerContainer,
+      @Qualifier("caseUpdatedInputChannel") MessageChannel channel) {
+    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
+    adapter.setOutputChannel(channel);
+    return adapter;
+  }
+
+  @Bean
   public SimpleMessageListenerContainer actionFieldContainer() {
     return setupListenerContainer(actionFieldQueue, FieldworkFollowup.class);
   }
@@ -135,6 +153,11 @@ public class MessageConsumerConfig {
   @Bean
   public SimpleMessageListenerContainer uacUpdatedContainer() {
     return setupListenerContainer(uacUpdatedQueue, ResponseManagementEvent.class);
+  }
+
+  @Bean
+  public SimpleMessageListenerContainer caseUpdatedContainer() {
+    return setupListenerContainer(caseUpdatedQueue, ResponseManagementEvent.class);
   }
 
   private SimpleMessageListenerContainer setupListenerContainer(
