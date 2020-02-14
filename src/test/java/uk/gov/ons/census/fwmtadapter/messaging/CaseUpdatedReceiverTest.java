@@ -1,5 +1,10 @@
 package uk.gov.ons.census.fwmtadapter.messaging;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -7,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import uk.gov.ons.census.fwmtadapter.model.dto.Address;
 import uk.gov.ons.census.fwmtadapter.model.dto.CollectionCase;
@@ -16,10 +20,6 @@ import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CaseUpdatedReceiverTest {
@@ -65,5 +65,40 @@ public class CaseUpdatedReceiverTest {
     assertThat(actualAi.getAddressType()).isEqualTo("test address type");
     assertThat(actualAi.getAddressLevel()).isEqualTo("U");
     assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.CLOSE);
+  }
+
+  @Test
+  public void testIgnoresEventWithNoMetadata() {
+    // Given
+    CollectionCase collectionCase = new CollectionCase();
+
+    Payload payload = new Payload();
+    payload.setCollectionCase(collectionCase);
+
+    ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
+    responseManagementEvent.setPayload(payload);
+
+    // When
+    underTest.receiveMessage(responseManagementEvent);
+
+    // Then
+    verifyZeroInteractions(rabbitTemplate);
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testErrorsOnUnimplementedFieldDecision() {
+    // Given
+    CollectionCase collectionCase = new CollectionCase();
+
+    Metadata metadata = new Metadata();
+    metadata.setFieldDecision(ActionInstructionType.PAUSE);
+    Payload payload = new Payload();
+    payload.setCollectionCase(collectionCase);
+    payload.setMetadata(metadata);
+    ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
+    responseManagementEvent.setPayload(payload);
+
+    // When, then throws
+    underTest.receiveMessage(responseManagementEvent);
   }
 }

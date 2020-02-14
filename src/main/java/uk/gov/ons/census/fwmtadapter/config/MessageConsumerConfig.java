@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.amqp.inbound.AmqpInboundChannelAdapter;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
@@ -43,15 +42,6 @@ public class MessageConsumerConfig {
   @Value("${queueconfig.action-field-queue}")
   private String actionFieldQueue;
 
-  @Value("${queueconfig.refusal-queue}")
-  private String refusalQueue;
-
-  @Value("${queueconfig.invalid-address-inbound-queue}")
-  private String invalidAddressInboundQueue;
-
-  @Value("${queueconfig.uac-updated-queue}")
-  private String uacUpdatedQueue;
-
   @Value("${queueconfig.case-updated-queue}")
   private String caseUpdatedQueue;
 
@@ -65,22 +55,7 @@ public class MessageConsumerConfig {
   }
 
   @Bean
-  public MessageChannel invalidAddressInputChannel() {
-    return new DirectChannel();
-  }
-
-  @Bean
   public MessageChannel actionFieldInputChannel() {
-    return new DirectChannel();
-  }
-
-  @Bean
-  public MessageChannel refusalInputChannel() {
-    return new DirectChannel();
-  }
-
-  @Bean
-  public MessageChannel uacUpdatedInputChannel() {
     return new DirectChannel();
   }
 
@@ -90,39 +65,12 @@ public class MessageConsumerConfig {
   }
 
   @Bean
-  AmqpInboundChannelAdapter invalidAddressInbound(
-      @Qualifier("invalidAddressContainer") SimpleMessageListenerContainer listenerContainer,
-      @Qualifier("invalidAddressInputChannel") MessageChannel channel) {
-    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
-    adapter.setOutputChannel(channel);
-    return adapter;
-  }
-
-  @Bean
   public AmqpInboundChannelAdapter actionFieldInbound(
       @Qualifier("actionFieldContainer") SimpleMessageListenerContainer listenerContainer,
       @Qualifier("actionFieldInputChannel") MessageChannel channel) {
     AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
     adapter.setOutputChannel(channel);
 
-    return adapter;
-  }
-
-  @Bean
-  public AmqpInboundChannelAdapter refusalInbound(
-      @Qualifier("refusalContainer") SimpleMessageListenerContainer listenerContainer,
-      @Qualifier("refusalInputChannel") MessageChannel channel) {
-    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
-    adapter.setOutputChannel(channel);
-    return adapter;
-  }
-
-  @Bean
-  public AmqpInboundChannelAdapter uacUpdatedInbound(
-      @Qualifier("uacUpdatedContainer") SimpleMessageListenerContainer listenerContainer,
-      @Qualifier("uacUpdatedInputChannel") MessageChannel channel) {
-    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
-    adapter.setOutputChannel(channel);
     return adapter;
   }
 
@@ -138,21 +86,6 @@ public class MessageConsumerConfig {
   @Bean
   public SimpleMessageListenerContainer actionFieldContainer() {
     return setupListenerContainer(actionFieldQueue, FieldworkFollowup.class);
-  }
-
-  @Bean
-  public SimpleMessageListenerContainer refusalContainer() {
-    return setupListenerContainer(refusalQueue, ResponseManagementEvent.class);
-  }
-
-  @Bean
-  public SimpleMessageListenerContainer invalidAddressContainer() {
-    return setupListenerContainer(invalidAddressInboundQueue, ResponseManagementEvent.class);
-  }
-
-  @Bean
-  public SimpleMessageListenerContainer uacUpdatedContainer() {
-    return setupListenerContainer(uacUpdatedQueue, ResponseManagementEvent.class);
   }
 
   @Bean

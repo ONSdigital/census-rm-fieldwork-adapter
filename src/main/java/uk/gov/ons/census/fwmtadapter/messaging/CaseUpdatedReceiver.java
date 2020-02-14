@@ -1,7 +1,5 @@
 package uk.gov.ons.census.fwmtadapter.messaging;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.integration.annotation.MessageEndpoint;
@@ -13,8 +11,6 @@ import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
 
 @MessageEndpoint
 public class CaseUpdatedReceiver {
-
-  private static final Logger log = LoggerFactory.getLogger(CaseUpdatedReceiver.class);
 
   private final RabbitTemplate rabbitTemplate;
   private final String outboundExchange;
@@ -33,8 +29,11 @@ public class CaseUpdatedReceiver {
 
     if (event.getPayload().getMetadata().getFieldDecision() == ActionInstructionType.CLOSE) {
       handleCloseDecision(event);
+      return;
     }
-    return;
+    throw new RuntimeException(
+        String.format(
+            "Unsupported field decision: %s", event.getPayload().getMetadata().getFieldDecision()));
   }
 
   private void handleCloseDecision(ResponseManagementEvent event) {
