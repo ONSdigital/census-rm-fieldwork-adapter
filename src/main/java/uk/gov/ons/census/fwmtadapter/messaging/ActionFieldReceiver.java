@@ -66,12 +66,4 @@ public class ActionFieldReceiver {
 
     return false;
   }
-
-  private int getIntegerValueOrZero(Integer value) {
-    if (value == null) {
-      return 0;
-    }
-
-    return value;
-  }
 }
