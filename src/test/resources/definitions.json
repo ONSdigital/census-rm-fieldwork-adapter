@@ -37,26 +37,6 @@
       }
     },
     {
-      "name": "FieldworkAdapter.Refusals",
-      "vhost": "/",
-      "durable": true,
-      "auto_delete": false,
-      "arguments": {
-        "x-dead-letter-exchange": "delayedRedeliveryExchange",
-        "x-dead-letter-routing-key": "FieldworkAdapter.Refusals"
-      }
-    },
-    {
-      "name": "FieldworkAdapter.uacUpdated",
-      "vhost": "/",
-      "durable": true,
-      "auto_delete": false,
-      "arguments": {
-        "x-dead-letter-exchange": "delayedRedeliveryExchange",
-        "x-dead-letter-routing-key": "FieldworkAdapter.uacUpdated"
-      }
-    },
-    {
       "name": "RM.Field",
       "vhost": "/",
       "durable": true,
@@ -67,13 +47,13 @@
       }
     },
     {
-      "name": "FieldworkAdapter.invalidAddress",
+      "name": "FieldworkAdapter.caseUpdated",
       "vhost": "/",
       "durable": true,
       "auto_delete": false,
       "arguments": {
         "x-dead-letter-exchange": "delayedRedeliveryExchange",
-        "x-dead-letter-routing-key": "FieldworkAdapter.invalidAddress"
+        "x-dead-letter-routing-key": "FieldworkAdapter.caseUpdated"
       }
     },
     {
@@ -126,35 +106,19 @@
       "arguments": {}
     },
     {
-      "source": "events",
-      "vhost": "/",
-      "destination": "FieldworkAdapter.invalidAddress",
-      "destination_type": "queue",
-      "routing_key": "event.case.address.update",
-      "arguments": {}
-    },
-    {
-      "source": "events",
-      "vhost": "/",
-      "destination": "FieldworkAdapter.Refusals",
-      "destination_type": "queue",
-      "routing_key": "event.respondent.refusal",
-      "arguments": {}
-    },
-    {
-      "source": "events",
-      "vhost": "/",
-      "destination": "FieldworkAdapter.uacUpdated",
-      "destination_type": "queue",
-      "routing_key": "event.uac.update",
-      "arguments": {}
-    },
-    {
       "source": "delayedRedeliveryExchange",
       "vhost": "/",
       "destination": "delayedRedeliveryQueue",
       "destination_type": "queue",
       "routing_key": "",
+      "arguments": {}
+    },
+    {
+      "source": "events",
+      "vhost": "/",
+      "destination": "FieldworkAdapter.caseUpdated",
+      "destination_type": "queue",
+      "routing_key": "event.case.update",
       "arguments": {}
     }
   ]

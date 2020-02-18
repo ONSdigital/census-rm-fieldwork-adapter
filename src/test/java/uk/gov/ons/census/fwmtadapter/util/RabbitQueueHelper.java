@@ -1,7 +1,5 @@
 package uk.gov.ons.census.fwmtadapter.util;
 
-import static org.junit.Assert.assertNull;
-
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -62,10 +60,5 @@ public class RabbitQueueHelper {
 
   public String getMessage(BlockingQueue<String> queue) throws InterruptedException {
     return queue.poll(20, TimeUnit.SECONDS);
-  }
-
-  public void checkNoMessage(BlockingQueue<String> queue) throws InterruptedException {
-    String actualMessage = queue.poll(5, TimeUnit.SECONDS);
-    assertNull("Received Message", actualMessage);
   }
 }

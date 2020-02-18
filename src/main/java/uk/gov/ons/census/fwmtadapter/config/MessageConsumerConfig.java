@@ -42,14 +42,8 @@ public class MessageConsumerConfig {
   @Value("${queueconfig.action-field-queue}")
   private String actionFieldQueue;
 
-  @Value("${queueconfig.refusal-queue}")
-  private String refusalQueue;
-
-  @Value("${queueconfig.invalid-address-inbound-queue}")
-  private String invalidAddressInboundQueue;
-
-  @Value("${queueconfig.uac-updated-queue}")
-  private String uacUpdatedQueue;
+  @Value("${queueconfig.case-updated-queue}")
+  private String caseUpdatedQueue;
 
   public MessageConsumerConfig(
       ExceptionManagerClient exceptionManagerClient,
@@ -61,32 +55,13 @@ public class MessageConsumerConfig {
   }
 
   @Bean
-  public MessageChannel invalidAddressInputChannel() {
-    return new DirectChannel();
-  }
-
-  @Bean
   public MessageChannel actionFieldInputChannel() {
     return new DirectChannel();
   }
 
   @Bean
-  public MessageChannel refusalInputChannel() {
+  public MessageChannel caseUpdatedInputChannel() {
     return new DirectChannel();
-  }
-
-  @Bean
-  public MessageChannel uacUpdatedInputChannel() {
-    return new DirectChannel();
-  }
-
-  @Bean
-  AmqpInboundChannelAdapter invalidAddressInbound(
-      @Qualifier("invalidAddressContainer") SimpleMessageListenerContainer listenerContainer,
-      @Qualifier("invalidAddressInputChannel") MessageChannel channel) {
-    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
-    adapter.setOutputChannel(channel);
-    return adapter;
   }
 
   @Bean
@@ -100,18 +75,9 @@ public class MessageConsumerConfig {
   }
 
   @Bean
-  public AmqpInboundChannelAdapter refusalInbound(
-      @Qualifier("refusalContainer") SimpleMessageListenerContainer listenerContainer,
-      @Qualifier("refusalInputChannel") MessageChannel channel) {
-    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
-    adapter.setOutputChannel(channel);
-    return adapter;
-  }
-
-  @Bean
-  public AmqpInboundChannelAdapter uacUpdatedInbound(
-      @Qualifier("uacUpdatedContainer") SimpleMessageListenerContainer listenerContainer,
-      @Qualifier("uacUpdatedInputChannel") MessageChannel channel) {
+  public AmqpInboundChannelAdapter caseUpdatedInbound(
+      @Qualifier("caseUpdatedContainer") SimpleMessageListenerContainer listenerContainer,
+      @Qualifier("caseUpdatedInputChannel") MessageChannel channel) {
     AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
     adapter.setOutputChannel(channel);
     return adapter;
@@ -123,18 +89,8 @@ public class MessageConsumerConfig {
   }
 
   @Bean
-  public SimpleMessageListenerContainer refusalContainer() {
-    return setupListenerContainer(refusalQueue, ResponseManagementEvent.class);
-  }
-
-  @Bean
-  public SimpleMessageListenerContainer invalidAddressContainer() {
-    return setupListenerContainer(invalidAddressInboundQueue, ResponseManagementEvent.class);
-  }
-
-  @Bean
-  public SimpleMessageListenerContainer uacUpdatedContainer() {
-    return setupListenerContainer(uacUpdatedQueue, ResponseManagementEvent.class);
+  public SimpleMessageListenerContainer caseUpdatedContainer() {
+    return setupListenerContainer(caseUpdatedQueue, ResponseManagementEvent.class);
   }
 
   private SimpleMessageListenerContainer setupListenerContainer(
