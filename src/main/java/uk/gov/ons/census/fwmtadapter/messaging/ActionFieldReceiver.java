@@ -39,7 +39,7 @@ public class ActionFieldReceiver {
     actionInstruction.setEstabType(followup.getEstabType());
     actionInstruction.setFieldCoordinatorId(followup.getFieldCoordinatorId());
     actionInstruction.setFieldOfficerId(followup.getFieldOfficerId());
-    actionInstruction.setHandDeliver(false); // TODO: This needs to be based on treatment code
+    actionInstruction.setHandDeliver(followup.isHandDelivery());
     if (followup.getLatitude() != null && !followup.getLatitude().isBlank()) {
       actionInstruction.setLatitude(Double.parseDouble(followup.getLatitude()));
     }

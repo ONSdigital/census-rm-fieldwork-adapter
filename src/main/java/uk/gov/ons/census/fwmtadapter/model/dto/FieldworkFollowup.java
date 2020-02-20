@@ -31,4 +31,5 @@ public class FieldworkFollowup {
   private Boolean undeliveredAsAddress;
   private Boolean blankQreReturned;
   private Boolean receipted;
+  private boolean handDelivery;
 }
