@@ -71,7 +71,7 @@ public class CaseUpdatedReceiver {
     actionInstruction.setOa(caze.getOa());
     actionInstruction.setOrganisationName(caze.getAddress().getOrganisationName());
     actionInstruction.setPostcode(caze.getAddress().getPostcode());
-    // actionInstruction.setSurveyName(caze.getSurveyName()); TODO: We might need to add this
+    actionInstruction.setSurveyName(caze.getSurvey());
     actionInstruction.setTownName(caze.getAddress().getTownName());
     actionInstruction.setUprn(caze.getAddress().getUprn());
     actionInstruction.setUndeliveredAsAddress(caze.getUndeliveredAsAddressed());
