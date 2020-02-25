@@ -39,7 +39,7 @@ public class ActionFieldReceiver {
     actionInstruction.setEstabType(followup.getEstabType());
     actionInstruction.setFieldCoordinatorId(followup.getFieldCoordinatorId());
     actionInstruction.setFieldOfficerId(followup.getFieldOfficerId());
-    actionInstruction.setHandDeliver(followup.isHandDelivery());
+    actionInstruction.setHandDeliver(followup.getHandDelivery());
     if (followup.getLatitude() != null && !followup.getLatitude().isBlank()) {
       actionInstruction.setLatitude(Double.parseDouble(followup.getLatitude()));
     }
