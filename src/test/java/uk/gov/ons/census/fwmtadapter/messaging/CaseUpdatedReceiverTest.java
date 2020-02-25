@@ -20,6 +20,7 @@ import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCreateActionInstruction;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CaseUpdatedReceiverTest {
@@ -65,6 +66,43 @@ public class CaseUpdatedReceiverTest {
     assertThat(actualAi.getAddressType()).isEqualTo("test address type");
     assertThat(actualAi.getAddressLevel()).isEqualTo("U");
     assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.CLOSE);
+  }
+
+  @Test
+  public void testReceiveCreateDecision() {
+    // Given
+    CollectionCase collectionCase = new CollectionCase();
+    collectionCase.setId("testId");
+    collectionCase.setCaseRef("testRef");
+    collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
+    Address address = new Address();
+    address.setAddressLevel("U");
+    address.setAddressType("test address type");
+    collectionCase.setAddress(address);
+
+    Metadata metadata = new Metadata();
+    metadata.setFieldDecision(ActionInstructionType.CREATE);
+
+    Payload payload = new Payload();
+    payload.setCollectionCase(collectionCase);
+    payload.setMetadata(metadata);
+
+    ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
+    responseManagementEvent.setPayload(payload);
+
+    // When
+    underTest.receiveMessage(responseManagementEvent);
+
+    // Then
+    ArgumentCaptor<FwmtCreateActionInstruction> aiArgumentCaptor =
+        ArgumentCaptor.forClass(FwmtCreateActionInstruction.class);
+    verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
+    FwmtCreateActionInstruction actualAi = aiArgumentCaptor.getValue();
+    assertThat(actualAi.getCaseId()).isEqualTo("testId");
+    assertThat(actualAi.getCaseRef()).isEqualTo("testRef");
+    assertThat(actualAi.getAddressType()).isEqualTo("test address type");
+    assertThat(actualAi.getAddressLevel()).isEqualTo("U");
+    assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.CREATE);
   }
 
   @Test
