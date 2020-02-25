@@ -53,6 +53,7 @@ public class ActionFieldReceiverIT {
     fieldworkFollowup.setSurveyName("CENSUS");
     fieldworkFollowup.setUndeliveredAsAddress(false);
     fieldworkFollowup.setBlankQreReturned(false);
+    fieldworkFollowup.setHandDelivery(true);
 
     rabbitQueueHelper.sendMessage(actionFieldQueue, fieldworkFollowup);
 
@@ -84,6 +85,7 @@ public class ActionFieldReceiverIT {
             "fieldOfficerId");
     assertThat(actionInstruction.getCeExpectedCapacity())
         .isEqualTo(fieldworkFollowup.getCeExpectedCapacity());
+    assertThat(actionInstruction.isHandDeliver()).isTrue();
   }
 
   @Test

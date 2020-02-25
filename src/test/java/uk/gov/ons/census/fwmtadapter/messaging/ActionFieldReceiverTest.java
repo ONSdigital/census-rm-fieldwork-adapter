@@ -30,6 +30,7 @@ public class ActionFieldReceiverTest {
     fieldworkFollowup.setAddressType("HH");
     fieldworkFollowup.setCeActualResponses(null);
     fieldworkFollowup.setCeExpectedCapacity(null);
+    fieldworkFollowup.setHandDelivery(true);
 
     // When
     underTest.receiveMessage(fieldworkFollowup);
@@ -69,6 +70,7 @@ public class ActionFieldReceiverTest {
     assertThat(actionInstruction.isCe1Complete()).isFalse();
     assertThat(actionInstruction.getCeExpectedCapacity()).isNull();
     assertThat(actionInstruction.getCeActualResponses()).isNull();
+    assertThat(actionInstruction.isHandDeliver()).isTrue();
   }
 
   @Test
