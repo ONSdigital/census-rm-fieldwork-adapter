@@ -99,10 +99,9 @@ public class CaseUpdatedReceiver {
 
   private Boolean getCEComplete(CollectionCase caze) {
     if (caze.getAddress().getAddressType().equals("CE")
-        && caze.getAddress().getAddressLevel().equals("E")) {
-      if (caze.getReceiptReceived() != null) {
-        return caze.getReceiptReceived();
-      }
+        && caze.getAddress().getAddressLevel().equals("E")
+        && caze.getReceiptReceived() != null) {
+      return caze.getReceiptReceived();
     }
 
     return false;
