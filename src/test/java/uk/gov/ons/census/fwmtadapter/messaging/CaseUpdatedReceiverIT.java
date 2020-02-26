@@ -35,7 +35,7 @@ public class CaseUpdatedReceiverIT {
   private static final String CASE_UPDATE_ROUTING_KEY = "event.case.update";
   private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
   private static final String TEST_CASE_ID = "test_case_id";
-  private static final String TEST_CASE_REF = "test_case_ref";
+  private static final String TEST_CASE_REF = "test_case_ref"; // This exists
   private static final String TEST_ADDRESS_TYPE = "test_address_type";
   private static final String TEST_ADDRESS_LEVEL = "test_address_level";
   private static final String TEST_ADDRESS_LINE1 = "test_address_line_1";
