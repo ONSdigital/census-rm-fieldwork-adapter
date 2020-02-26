@@ -23,6 +23,7 @@ import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCreateActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 
 @ContextConfiguration
@@ -34,9 +35,13 @@ public class CaseUpdatedReceiverIT {
   private static final String CASE_UPDATE_ROUTING_KEY = "event.case.update";
   private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
   private static final String TEST_CASE_ID = "test_case_id";
+  private static final String TEST_CASE_REF = "test_case_ref";
   private static final String TEST_SURVEY = "test_survey";
   private static final String TEST_ADDRESS_TYPE = "test_address_type";
   private static final String TEST_ADDRESS_LEVEL = "test_address_level";
+  private static final String TEST_ADDRESS_LINE1 = "test_address_line_1";
+  private static final String TEST_ADDRESS_POST_TOWN = "test_address_post_town";
+  private static final String TEST_ADDRESS_POSTCODE = "test_address_postcode";
 
   @Value("${queueconfig.case-event-exchange}")
   private String caseEventExchange;
@@ -89,5 +94,50 @@ public class CaseUpdatedReceiverIT {
     assertThat(actionInstruction.getSurveyName()).isEqualTo(TEST_SURVEY);
     assertThat(actionInstruction.getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
     assertThat(actionInstruction.getAddressLevel()).isEqualTo(TEST_ADDRESS_LEVEL);
+  }
+
+  @Test
+  public void testGoodNewCCSCaseMessage() throws InterruptedException, IOException {
+    // Given
+    BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
+    CollectionCase collectionCase = new CollectionCase();
+    collectionCase.setId(TEST_CASE_ID);
+    collectionCase.setCaseRef(TEST_CASE_REF);
+    collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
+    Address address = new Address();
+    address.setAddressLevel(TEST_ADDRESS_LEVEL);
+    address.setAddressType(TEST_ADDRESS_TYPE);
+    address.setAddressLine1(TEST_ADDRESS_LINE1);
+    address.setTownName(TEST_ADDRESS_POST_TOWN);
+    address.setPostcode(TEST_ADDRESS_POSTCODE);
+    collectionCase.setAddress(address);
+
+    Metadata metadata = new Metadata();
+    metadata.setFieldDecision(ActionInstructionType.CREATE);
+
+    Payload payload = new Payload();
+    payload.setCollectionCase(collectionCase);
+    payload.setMetadata(metadata);
+
+    ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
+    responseManagementEvent.setPayload(payload);
+
+    // when
+    rabbitQueueHelper.sendMessage(
+        caseEventExchange, CASE_UPDATE_ROUTING_KEY, responseManagementEvent);
+
+    // then
+    String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
+    ObjectMapper objectMapper = new ObjectMapper();
+    FwmtCreateActionInstruction actionInstruction =
+        objectMapper.readValue(actualMessage, FwmtCreateActionInstruction.class);
+    assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CREATE);
+    assertThat(actionInstruction.getCaseId()).isEqualTo(TEST_CASE_ID);
+    assertThat(actionInstruction.getCaseRef()).isEqualTo(TEST_CASE_REF);
+    assertThat(actionInstruction.getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
+    assertThat(actionInstruction.getAddressLevel()).isEqualTo(TEST_ADDRESS_LEVEL);
+    assertThat(actionInstruction.getAddressLine1()).isEqualTo(TEST_ADDRESS_LINE1);
+    assertThat(actionInstruction.getTownName()).isEqualTo(TEST_ADDRESS_POST_TOWN);
+    assertThat(actionInstruction.getPostcode()).isEqualTo(TEST_ADDRESS_POSTCODE);
   }
 }
