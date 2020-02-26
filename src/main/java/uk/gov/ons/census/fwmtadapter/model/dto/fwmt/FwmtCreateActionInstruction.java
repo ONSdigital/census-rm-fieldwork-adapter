@@ -27,5 +27,5 @@ public class FwmtCreateActionInstruction {
   private boolean handDeliver;
   private Integer ceExpectedCapacity;
   private Integer ceActualResponses;
-  private boolean undeliveredAsAddress; // TODO: This will probably be removed
+  private Boolean undeliveredAsAddress; // TODO: This will probably be removed
 }
