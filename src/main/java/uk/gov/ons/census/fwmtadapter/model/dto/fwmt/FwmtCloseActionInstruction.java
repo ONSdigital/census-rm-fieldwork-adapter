@@ -9,5 +9,4 @@ public class FwmtCloseActionInstruction {
   private String addressType;
   private String addressLevel;
   private String caseId;
-  private String caseRef;
 }

@@ -34,7 +34,7 @@ public class CaseUpdatedReceiverIT {
   private static final String CASE_UPDATE_ROUTING_KEY = "event.case.update";
   private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
   private static final String TEST_CASE_ID = "test_case_id";
-  private static final String TEST_CASE_REF = "test_case_ref";
+  private static final String TEST_SURVEY = "test_survey";
   private static final String TEST_ADDRESS_TYPE = "test_address_type";
   private static final String TEST_ADDRESS_LEVEL = "test_address_level";
 
@@ -59,7 +59,7 @@ public class CaseUpdatedReceiverIT {
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId(TEST_CASE_ID);
-    collectionCase.setCaseRef(TEST_CASE_REF);
+    collectionCase.setSurvey(TEST_SURVEY);
     Address address = new Address();
     address.setAddressLevel(TEST_ADDRESS_LEVEL);
     address.setAddressType(TEST_ADDRESS_TYPE);
@@ -86,7 +86,7 @@ public class CaseUpdatedReceiverIT {
         objectMapper.readValue(actualMessage, FwmtCloseActionInstruction.class);
     assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CLOSE);
     assertThat(actionInstruction.getCaseId()).isEqualTo(TEST_CASE_ID);
-    assertThat(actionInstruction.getCaseRef()).isEqualTo(TEST_CASE_REF);
+    assertThat(actionInstruction.getSurveyName()).isEqualTo(TEST_SURVEY);
     assertThat(actionInstruction.getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
     assertThat(actionInstruction.getAddressLevel()).isEqualTo(TEST_ADDRESS_LEVEL);
   }

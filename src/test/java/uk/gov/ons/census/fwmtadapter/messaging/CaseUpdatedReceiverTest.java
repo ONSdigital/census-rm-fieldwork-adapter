@@ -36,7 +36,7 @@ public class CaseUpdatedReceiverTest {
     // Given
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId("testId");
-    collectionCase.setCaseRef("testRef");
+    collectionCase.setSurvey("CENSUS");
     Address address = new Address();
     address.setAddressLevel("U");
     address.setAddressType("test address type");
@@ -61,7 +61,7 @@ public class CaseUpdatedReceiverTest {
     verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
     FwmtCloseActionInstruction actualAi = aiArgumentCaptor.getValue();
     assertThat(actualAi.getCaseId()).isEqualTo("testId");
-    assertThat(actualAi.getCaseRef()).isEqualTo("testRef");
+    assertThat(actualAi.getSurveyName()).isEqualTo("CENSUS");
     assertThat(actualAi.getAddressType()).isEqualTo("test address type");
     assertThat(actualAi.getAddressLevel()).isEqualTo("U");
     assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.CLOSE);

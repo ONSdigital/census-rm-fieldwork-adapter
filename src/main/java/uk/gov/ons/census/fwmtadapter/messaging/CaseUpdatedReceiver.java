@@ -44,7 +44,7 @@ public class CaseUpdatedReceiver {
     actionInstruction.setAddressType(
         event.getPayload().getCollectionCase().getAddress().getAddressType());
     actionInstruction.setCaseId(event.getPayload().getCollectionCase().getId());
-    actionInstruction.setCaseRef(event.getPayload().getCollectionCase().getCaseRef());
+    actionInstruction.setSurveyName(event.getPayload().getCollectionCase().getSurvey());
 
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }
