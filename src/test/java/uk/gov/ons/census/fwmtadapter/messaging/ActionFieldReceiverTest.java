@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
-import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCreateActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
 
 public class ActionFieldReceiverTest {
   private static final EasyRandom easyRandom = new EasyRandom();
@@ -36,11 +36,11 @@ public class ActionFieldReceiverTest {
     underTest.receiveMessage(fieldworkFollowup);
 
     // Then
-    ArgumentCaptor<FwmtCreateActionInstruction> argCaptor =
-        ArgumentCaptor.forClass(FwmtCreateActionInstruction.class);
+    ArgumentCaptor<FwmtActionInstruction> argCaptor =
+        ArgumentCaptor.forClass(FwmtActionInstruction.class);
     verify(rabbitTemplate).convertAndSend(eq("TEST EXCHANGE"), eq(""), argCaptor.capture());
 
-    FwmtCreateActionInstruction actionInstruction = argCaptor.getValue();
+    FwmtActionInstruction actionInstruction = argCaptor.getValue();
     assertThat(actionInstruction)
         .isEqualToComparingOnlyGivenFields(
             fieldworkFollowup,
@@ -90,11 +90,11 @@ public class ActionFieldReceiverTest {
     underTest.receiveMessage(fieldworkFollowup);
 
     // Then
-    ArgumentCaptor<FwmtCreateActionInstruction> actionInstructionArgumentCaptor =
-        ArgumentCaptor.forClass(FwmtCreateActionInstruction.class);
+    ArgumentCaptor<FwmtActionInstruction> actionInstructionArgumentCaptor =
+        ArgumentCaptor.forClass(FwmtActionInstruction.class);
     verify(rabbitTemplate)
         .convertAndSend(eq("TEST EXCHANGE"), eq(""), actionInstructionArgumentCaptor.capture());
-    FwmtCreateActionInstruction actionRequest = actionInstructionArgumentCaptor.getValue();
+    FwmtActionInstruction actionRequest = actionInstructionArgumentCaptor.getValue();
 
     assertThat(actionRequest.isCe1Complete()).isFalse();
     assertThat(actionRequest.getCeExpectedCapacity()).isEqualTo(5);
@@ -117,11 +117,11 @@ public class ActionFieldReceiverTest {
     underTest.receiveMessage(fieldworkFollowup);
 
     // Then
-    ArgumentCaptor<FwmtCreateActionInstruction> actionInstructionArgumentCaptor =
-        ArgumentCaptor.forClass(FwmtCreateActionInstruction.class);
+    ArgumentCaptor<FwmtActionInstruction> actionInstructionArgumentCaptor =
+        ArgumentCaptor.forClass(FwmtActionInstruction.class);
     verify(rabbitTemplate)
         .convertAndSend(eq("TEST EXCHANGE"), eq(""), actionInstructionArgumentCaptor.capture());
-    FwmtCreateActionInstruction actionRequest = actionInstructionArgumentCaptor.getValue();
+    FwmtActionInstruction actionRequest = actionInstructionArgumentCaptor.getValue();
 
     assertThat(actionRequest.isCe1Complete()).isTrue();
     assertThat(actionRequest.getCeExpectedCapacity()).isEqualTo(5);

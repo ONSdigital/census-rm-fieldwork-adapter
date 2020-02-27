@@ -19,7 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
-import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCreateActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 
 @ContextConfiguration
@@ -60,8 +60,8 @@ public class ActionFieldReceiverIT {
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
     assertThat(actualMessage).isNotNull();
     ObjectMapper objectMapper = new ObjectMapper();
-    FwmtCreateActionInstruction actionInstruction =
-        objectMapper.readValue(actualMessage, FwmtCreateActionInstruction.class);
+    FwmtActionInstruction actionInstruction =
+        objectMapper.readValue(actualMessage, FwmtActionInstruction.class);
     assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CREATE);
     assertThat(actionInstruction)
         .isEqualToComparingOnlyGivenFields(
@@ -109,8 +109,8 @@ public class ActionFieldReceiverIT {
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
     assertThat(actualMessage).isNotNull();
     ObjectMapper objectMapper = new ObjectMapper();
-    FwmtCreateActionInstruction actionInstruction =
-        objectMapper.readValue(actualMessage, FwmtCreateActionInstruction.class);
+    FwmtActionInstruction actionInstruction =
+        objectMapper.readValue(actualMessage, FwmtActionInstruction.class);
     assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CREATE);
     assertThat(actionInstruction)
         .isEqualToComparingOnlyGivenFields(

@@ -3,7 +3,7 @@ package uk.gov.ons.census.fwmtadapter.model.dto.fwmt;
 import lombok.Data;
 
 @Data
-public class FwmtCreateActionInstruction {
+public class FwmtActionInstruction {
   private ActionInstructionType actionInstruction;
   private String surveyName;
   private String addressType;
