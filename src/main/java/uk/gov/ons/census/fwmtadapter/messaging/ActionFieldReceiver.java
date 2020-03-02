@@ -7,7 +7,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
-import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCreateActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
 
 @MessageEndpoint
 public class ActionFieldReceiver {
@@ -24,7 +24,7 @@ public class ActionFieldReceiver {
   @Transactional
   @ServiceActivator(inputChannel = "actionFieldInputChannel")
   public void receiveMessage(FieldworkFollowup followup) {
-    FwmtCreateActionInstruction actionInstruction = new FwmtCreateActionInstruction();
+    FwmtActionInstruction actionInstruction = new FwmtActionInstruction();
     actionInstruction.setActionInstruction(ActionInstructionType.CREATE);
     actionInstruction.setAddressLevel(followup.getAddressLevel());
     actionInstruction.setAddressLine1(followup.getAddressLine1());

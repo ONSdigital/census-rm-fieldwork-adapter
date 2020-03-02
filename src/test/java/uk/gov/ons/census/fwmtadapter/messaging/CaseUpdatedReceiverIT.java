@@ -22,8 +22,8 @@ import uk.gov.ons.census.fwmtadapter.model.dto.Metadata;
 import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
-import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCreateActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 
 @ContextConfiguration
@@ -59,7 +59,7 @@ public class CaseUpdatedReceiverIT {
   }
 
   @Test
-  public void testGoodReceiptMessage() throws InterruptedException, IOException {
+  public void testGoodCloseReceiptMessage() throws InterruptedException, IOException {
     // Given
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
     CollectionCase collectionCase = new CollectionCase();
@@ -129,8 +129,8 @@ public class CaseUpdatedReceiverIT {
     // then
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
     ObjectMapper objectMapper = new ObjectMapper();
-    FwmtCreateActionInstruction actionInstruction =
-        objectMapper.readValue(actualMessage, FwmtCreateActionInstruction.class);
+    FwmtActionInstruction actionInstruction =
+        objectMapper.readValue(actualMessage, FwmtActionInstruction.class);
     assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CREATE);
     assertThat(actionInstruction.getCaseId()).isEqualTo(TEST_CASE_ID);
     assertThat(actionInstruction.getCaseRef()).isEqualTo(TEST_CASE_REF);

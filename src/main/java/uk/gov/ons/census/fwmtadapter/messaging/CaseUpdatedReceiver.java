@@ -8,8 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.census.fwmtadapter.model.dto.CollectionCase;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
-import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCreateActionInstruction;
 
 @MessageEndpoint
 public class CaseUpdatedReceiver {
@@ -34,20 +34,25 @@ public class CaseUpdatedReceiver {
     if (fieldDecision == ActionInstructionType.CLOSE) {
       handleCloseDecision(event);
       return;
-    } else if (fieldDecision == ActionInstructionType.CREATE) {
-      handleCreateDecision(event);
+    }
+
+    if (fieldDecision == ActionInstructionType.CREATE
+        || fieldDecision == ActionInstructionType.UPDATE) {
+      buildAndSendActionInstruction(event, fieldDecision);
       return;
     }
+
     throw new RuntimeException(
         String.format(
             "Unsupported field decision: %s", event.getPayload().getMetadata().getFieldDecision()));
   }
 
-  private void handleCreateDecision(ResponseManagementEvent event) {
+  private void buildAndSendActionInstruction(
+      ResponseManagementEvent event, ActionInstructionType actionInstructionType) {
     CollectionCase caze = event.getPayload().getCollectionCase();
 
-    FwmtCreateActionInstruction actionInstruction = new FwmtCreateActionInstruction();
-    actionInstruction.setActionInstruction(ActionInstructionType.CREATE);
+    FwmtActionInstruction actionInstruction = new FwmtActionInstruction();
+    actionInstruction.setActionInstruction(actionInstructionType);
     actionInstruction.setAddressLevel(caze.getAddress().getAddressLevel());
     actionInstruction.setAddressLine1(caze.getAddress().getAddressLine1());
     actionInstruction.setAddressLine2(caze.getAddress().getAddressLine2());
