@@ -1,5 +1,6 @@
 package uk.gov.ons.census.fwmtadapter.model.dto;
 
+import java.util.Map;
 import lombok.Data;
 
 @Data
@@ -32,4 +33,5 @@ public class FieldworkFollowup {
   private Boolean blankQreReturned;
   private Boolean receipted;
   private Boolean handDelivery;
+  private Map<String, String> metadata;
 }

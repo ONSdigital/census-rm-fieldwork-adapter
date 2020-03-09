@@ -28,4 +28,5 @@ public class FwmtActionInstruction {
   private Integer ceExpectedCapacity;
   private Integer ceActualResponses;
   private Boolean undeliveredAsAddress;
+  private Boolean secureEstablishment;
 }
