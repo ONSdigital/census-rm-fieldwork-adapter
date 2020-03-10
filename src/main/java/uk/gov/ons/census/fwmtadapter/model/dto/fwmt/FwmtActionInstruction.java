@@ -1,5 +1,6 @@
 package uk.gov.ons.census.fwmtadapter.model.dto.fwmt;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 @Data
@@ -28,5 +29,7 @@ public class FwmtActionInstruction {
   private Integer ceExpectedCapacity;
   private Integer ceActualResponses;
   private Boolean undeliveredAsAddress;
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean secureEstablishment;
 }

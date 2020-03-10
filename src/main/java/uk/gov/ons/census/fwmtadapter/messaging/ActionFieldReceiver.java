@@ -54,6 +54,11 @@ public class ActionFieldReceiver {
     actionInstruction.setUprn(followup.getUprn());
     actionInstruction.setUndeliveredAsAddress(followup.getUndeliveredAsAddress()); // TODO: Delete?
 
+    if (followup.getAddressType().equals("CE")) {
+      actionInstruction.setSecureEstablishment(
+          Boolean.valueOf(followup.getMetadata().get("secureEstablishment")));
+    }
+
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }
 
