@@ -5,8 +5,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -15,11 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
-import uk.gov.ons.census.fwmtadapter.model.dto.Address;
-import uk.gov.ons.census.fwmtadapter.model.dto.CollectionCase;
-import uk.gov.ons.census.fwmtadapter.model.dto.Metadata;
-import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
-import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
+import uk.gov.ons.census.fwmtadapter.model.dto.*;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
@@ -117,8 +111,9 @@ public class CaseUpdatedReceiverTest {
     collectionCase.setCaseRef("testRef");
     collectionCase.setCaseType("CE");
     collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
-    Map<String, String> ceMetadata = new HashMap<>();
-    ceMetadata.put("secureEstablishment", "TRUE");
+
+    CaseMetadata ceMetadata = new CaseMetadata();
+    ceMetadata.setSecureEstablishment(true);
     collectionCase.setMetadata(ceMetadata);
     Address address = new Address();
     address.setAddressLevel("E");
@@ -197,8 +192,9 @@ public class CaseUpdatedReceiverTest {
     collectionCase.setCaseRef("testRef");
     collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
     collectionCase.setCaseType("CE");
-    Map<String, String> ceMetadata = new HashMap<>();
-    ceMetadata.put("secureEstablishment", "FALSE");
+
+    CaseMetadata ceMetadata = new CaseMetadata();
+    ceMetadata.setSecureEstablishment(false);
     collectionCase.setMetadata(ceMetadata);
     Address address = new Address();
     address.setAddressLevel("E");

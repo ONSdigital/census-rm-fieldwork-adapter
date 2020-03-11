@@ -82,8 +82,7 @@ public class CaseUpdatedReceiver {
     actionInstruction.setUndeliveredAsAddress(caze.getUndeliveredAsAddressed());
 
     if (caze.getCaseType().equals("CE")) {
-      actionInstruction.setSecureEstablishment(
-          Boolean.valueOf(caze.getMetadata().get("secureEstablishment")));
+      actionInstruction.setSecureEstablishment(caze.getMetadata().getSecureEstablishment());
     }
 
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
