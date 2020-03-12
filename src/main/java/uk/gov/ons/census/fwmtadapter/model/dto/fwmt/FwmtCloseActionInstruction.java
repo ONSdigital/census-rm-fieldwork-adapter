@@ -9,4 +9,6 @@ public class FwmtCloseActionInstruction {
   private String addressType;
   private String addressLevel;
   private String caseId;
+  private Integer ceExpectedCapacity;
+  private Integer ceActualResponses;
 }
