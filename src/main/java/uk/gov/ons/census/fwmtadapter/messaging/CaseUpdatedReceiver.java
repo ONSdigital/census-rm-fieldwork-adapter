@@ -94,6 +94,13 @@ public class CaseUpdatedReceiver {
     actionInstruction.setCaseId(event.getPayload().getCollectionCase().getId());
     actionInstruction.setSurveyName(event.getPayload().getCollectionCase().getSurvey());
 
+    // These have been added in because we can't guarantee the order that we would publish separate
+    // UPDATE and CLOSE messages, which would be published simultaneously
+    actionInstruction.setCeActualResponses(
+        event.getPayload().getCollectionCase().getCeActualResponses());
+    actionInstruction.setCeExpectedCapacity(
+        event.getPayload().getCollectionCase().getCeExpectedCapacity());
+
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }
 
