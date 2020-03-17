@@ -32,4 +32,5 @@ public class FieldworkFollowup {
   private Boolean blankQreReturned;
   private Boolean receipted;
   private Boolean handDelivery;
+  private CaseMetadata metadata;
 }

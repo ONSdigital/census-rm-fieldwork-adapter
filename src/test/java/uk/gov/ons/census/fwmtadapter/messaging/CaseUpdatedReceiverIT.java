@@ -42,6 +42,7 @@ public class CaseUpdatedReceiverIT {
   private static final String TEST_ADDRESS_LINE1 = "test_address_line_1";
   private static final String TEST_ADDRESS_POST_TOWN = "test_address_post_town";
   private static final String TEST_ADDRESS_POSTCODE = "test_address_postcode";
+  public static final String TEST_CASE_TYPE = "HH";
 
   @Value("${queueconfig.case-event-exchange}")
   private String caseEventExchange;
@@ -103,6 +104,7 @@ public class CaseUpdatedReceiverIT {
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId(TEST_CASE_ID);
     collectionCase.setCaseRef(TEST_CASE_REF);
+    collectionCase.setCaseType(TEST_CASE_TYPE);
     collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
     Address address = new Address();
     address.setAddressLevel(TEST_ADDRESS_LEVEL);
