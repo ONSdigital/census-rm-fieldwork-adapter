@@ -228,6 +228,49 @@ public class CaseUpdatedReceiverTest {
   }
 
   @Test
+  public void testReceiveUpdateDecisionSPG() {
+    // Given
+    CollectionCase collectionCase = new CollectionCase();
+    collectionCase.setId("testId");
+    collectionCase.setCaseRef("testRef");
+    collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
+    collectionCase.setCaseType("SPG");
+
+    CaseMetadata ceMetadata = new CaseMetadata();
+    ceMetadata.setSecureEstablishment(true);
+    collectionCase.setMetadata(ceMetadata);
+    Address address = new Address();
+    address.setAddressLevel("U");
+    address.setAddressType("test address type");
+    collectionCase.setAddress(address);
+
+    Metadata metadata = new Metadata();
+    metadata.setFieldDecision(ActionInstructionType.UPDATE);
+
+    Payload payload = new Payload();
+    payload.setCollectionCase(collectionCase);
+    payload.setMetadata(metadata);
+
+    ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
+    responseManagementEvent.setPayload(payload);
+
+    // When
+    underTest.receiveMessage(responseManagementEvent);
+
+    // Then
+    ArgumentCaptor<FwmtActionInstruction> aiArgumentCaptor =
+        ArgumentCaptor.forClass(FwmtActionInstruction.class);
+    verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
+    FwmtActionInstruction actualAi = aiArgumentCaptor.getValue();
+    assertThat(actualAi.getCaseId()).isEqualTo("testId");
+    assertThat(actualAi.getCaseRef()).isEqualTo("testRef");
+    assertThat(actualAi.getAddressType()).isEqualTo("test address type");
+    assertThat(actualAi.getAddressLevel()).isEqualTo("U");
+    assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.UPDATE);
+    assertThat(actualAi.getSecureEstablishment()).isTrue();
+  }
+
+  @Test
   public void testIgnoresEventWithNoMetadata() {
     // Given
     CollectionCase collectionCase = new CollectionCase();
