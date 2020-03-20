@@ -81,7 +81,7 @@ public class CaseUpdatedReceiver {
     actionInstruction.setUprn(caze.getAddress().getUprn());
     actionInstruction.setUndeliveredAsAddress(caze.getUndeliveredAsAddressed());
 
-    if (caze.getCaseType().equals("CE")) {
+    if (caze.getMetadata() != null) {
       actionInstruction.setSecureEstablishment(caze.getMetadata().getSecureEstablishment());
     }
 
