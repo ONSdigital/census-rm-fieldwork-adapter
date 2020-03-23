@@ -30,22 +30,22 @@ public class CaseUpdatedReceiver {
     if (canIgnoreEvent(event)) return;
 
     ActionInstructionType fieldDecision = event.getPayload().getMetadata().getFieldDecision();
+    switch (fieldDecision) {
+      case CLOSE:
+        handleCloseDecision(event);
+        return;
 
-    // TODO switch?
-    if (fieldDecision == ActionInstructionType.CLOSE) {
-      handleCloseDecision(event);
-      return;
+      case UPDATE:
+      case CREATE:
+        buildAndSendActionInstruction(event, fieldDecision);
+        return;
+
+      default:
+        throw new RuntimeException(
+            String.format(
+                "Unsupported field decision: %s",
+                event.getPayload().getMetadata().getFieldDecision()));
     }
-
-    if (fieldDecision == ActionInstructionType.CREATE
-        || fieldDecision == ActionInstructionType.UPDATE) {
-      buildAndSendActionInstruction(event, fieldDecision);
-      return;
-    }
-
-    throw new RuntimeException(
-        String.format(
-            "Unsupported field decision: %s", event.getPayload().getMetadata().getFieldDecision()));
   }
 
   private void buildAndSendActionInstruction(
@@ -86,7 +86,8 @@ public class CaseUpdatedReceiver {
       actionInstruction.setSecureEstablishment(caze.getMetadata().getSecureEstablishment());
     }
 
-    actionInstruction.setBlankFormReturned(event.getPayload().getMetadata().getBlankQuestionnaireReceived());
+    actionInstruction.setBlankFormReturned(
+        event.getPayload().getMetadata().getBlankQuestionnaireReceived());
 
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }
