@@ -31,6 +31,7 @@ public class CaseUpdatedReceiver {
 
     ActionInstructionType fieldDecision = event.getPayload().getMetadata().getFieldDecision();
 
+    // TODO switch?
     if (fieldDecision == ActionInstructionType.CLOSE) {
       handleCloseDecision(event);
       return;
@@ -84,6 +85,8 @@ public class CaseUpdatedReceiver {
     if (caze.getMetadata() != null) {
       actionInstruction.setSecureEstablishment(caze.getMetadata().getSecureEstablishment());
     }
+
+    actionInstruction.setBlankFormReturned(event.getPayload().getMetadata().getBlankQuestionnaireReceived());
 
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }

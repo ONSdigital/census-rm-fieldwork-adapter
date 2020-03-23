@@ -7,4 +7,5 @@ import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
 public class Metadata {
   private ActionInstructionType fieldDecision;
   private EventType causeEventType;
+  private Boolean blankQuestionnaireReceived;
 }

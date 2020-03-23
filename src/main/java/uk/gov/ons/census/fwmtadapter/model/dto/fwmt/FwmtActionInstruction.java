@@ -29,7 +29,9 @@ public class FwmtActionInstruction {
   private Integer ceExpectedCapacity;
   private Integer ceActualResponses;
   private Boolean undeliveredAsAddress;
+  private Boolean blankFormReturned;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean secureEstablishment;
+
 }

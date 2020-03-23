@@ -101,6 +101,7 @@ public class CaseUpdatedReceiverTest {
     assertThat(actualAi.getAddressLevel()).isEqualTo("U");
     assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.CREATE);
     assertThat(actualAi.getSecureEstablishment()).isNull();
+    assertThat(actualAi.getBlankFormReturned()).isNull();
   }
 
   @Test
@@ -144,6 +145,7 @@ public class CaseUpdatedReceiverTest {
     assertThat(actualAi.getAddressLevel()).isEqualTo("E");
     assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.CREATE);
     assertThat(actualAi.getSecureEstablishment()).isTrue();
+    assertThat(actualAi.getBlankFormReturned()).isNull();
   }
 
   @Test
@@ -182,6 +184,7 @@ public class CaseUpdatedReceiverTest {
     assertThat(actualAi.getAddressType()).isEqualTo("test address type");
     assertThat(actualAi.getAddressLevel()).isEqualTo("U");
     assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.UPDATE);
+    assertThat(actualAi.getBlankFormReturned()).isNull();
   }
 
   @Test
@@ -225,6 +228,7 @@ public class CaseUpdatedReceiverTest {
     assertThat(actualAi.getAddressLevel()).isEqualTo("E");
     assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.UPDATE);
     assertThat(actualAi.getSecureEstablishment()).isFalse();
+    assertThat(actualAi.getBlankFormReturned()).isNull();
   }
 
   @Test
@@ -268,6 +272,46 @@ public class CaseUpdatedReceiverTest {
     assertThat(actualAi.getAddressLevel()).isEqualTo("U");
     assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.UPDATE);
     assertThat(actualAi.getSecureEstablishment()).isTrue();
+    assertThat(actualAi.getBlankFormReturned()).isNull();
+  }
+
+  @Test
+  public void testReceiveUpdateDecisionWithBlankQuestionnaireReturned() {
+    // Given
+    CollectionCase collectionCase = new CollectionCase();
+    collectionCase.setId("testId");
+    collectionCase.setCaseRef("testRef");
+    collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
+    collectionCase.setCaseType("HH");
+    Address address = new Address();
+    address.setAddressLevel("U");
+    address.setAddressType("test address type");
+    collectionCase.setAddress(address);
+
+    Metadata metadata = new Metadata();
+    metadata.setFieldDecision(ActionInstructionType.UPDATE);
+
+    // Note blank questionnaire set to true in the metadata
+    metadata.setBlankQuestionnaireReceived(true);
+
+    Payload payload = new Payload();
+    payload.setCollectionCase(collectionCase);
+    payload.setMetadata(metadata);
+
+    ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
+    responseManagementEvent.setPayload(payload);
+
+    // When
+    underTest.receiveMessage(responseManagementEvent);
+
+    // Then
+    ArgumentCaptor<FwmtActionInstruction> aiArgumentCaptor =
+        ArgumentCaptor.forClass(FwmtActionInstruction.class);
+    verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
+    FwmtActionInstruction actualAi = aiArgumentCaptor.getValue();
+
+    assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.UPDATE);
+    assertThat(actualAi.getBlankFormReturned()).isTrue();
   }
 
   @Test
