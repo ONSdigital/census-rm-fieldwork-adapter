@@ -9,7 +9,9 @@ import org.jeasy.random.EasyRandom;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import uk.gov.ons.census.fwmtadapter.model.dto.CaseMetadata;
 import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
+import uk.gov.ons.census.fwmtadapter.model.dto.Metadata;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
 
 public class ActionFieldReceiverTest {
@@ -126,5 +128,31 @@ public class ActionFieldReceiverTest {
     assertThat(actionRequest.isCe1Complete()).isTrue();
     assertThat(actionRequest.getCeExpectedCapacity()).isEqualTo(5);
     assertThat(actionRequest.getCeActualResponses()).isEqualTo(5);
+  }
+
+  @Test
+  public void testSpgSecureEstabTrue() {
+    ActionFieldReceiver underTest = new ActionFieldReceiver(rabbitTemplate, "TEST EXCHANGE");
+    FieldworkFollowup fieldworkFollowup = easyRandom.nextObject(FieldworkFollowup.class);
+    fieldworkFollowup.setLatitude("-179.99999");
+    fieldworkFollowup.setLongitude("179.99999");
+    fieldworkFollowup.setAddressType("SPG");
+    fieldworkFollowup.setAddressLevel("U");
+
+    CaseMetadata caseMetadata = new CaseMetadata();
+    caseMetadata.setSecureEstablishment(true);
+    fieldworkFollowup.setMetadata(caseMetadata);
+
+    // When
+    underTest.receiveMessage(fieldworkFollowup);
+
+    // Then
+    ArgumentCaptor<FwmtActionInstruction> actionInstructionArgumentCaptor =
+        ArgumentCaptor.forClass(FwmtActionInstruction.class);
+    verify(rabbitTemplate)
+        .convertAndSend(eq("TEST EXCHANGE"), eq(""), actionInstructionArgumentCaptor.capture());
+    FwmtActionInstruction actionRequest = actionInstructionArgumentCaptor.getValue();
+
+    assertThat(actionRequest.getSecureEstablishment()).isTrue();
   }
 }
