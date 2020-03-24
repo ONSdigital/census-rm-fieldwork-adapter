@@ -11,7 +11,6 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import uk.gov.ons.census.fwmtadapter.model.dto.CaseMetadata;
 import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
-import uk.gov.ons.census.fwmtadapter.model.dto.Metadata;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
 
 public class ActionFieldReceiverTest {
