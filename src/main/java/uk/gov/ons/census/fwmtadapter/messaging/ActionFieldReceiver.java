@@ -54,7 +54,7 @@ public class ActionFieldReceiver {
     actionInstruction.setUprn(followup.getUprn());
     actionInstruction.setUndeliveredAsAddress(followup.getUndeliveredAsAddress()); // TODO: Delete?
 
-    if (followup.getAddressType().equals("CE")) {
+    if (followup.getMetadata() != null) {
       actionInstruction.setSecureEstablishment(followup.getMetadata().getSecureEstablishment());
     }
 
