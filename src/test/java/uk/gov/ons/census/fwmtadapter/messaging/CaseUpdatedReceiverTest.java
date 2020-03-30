@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import uk.gov.ons.census.fwmtadapter.model.dto.*;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
-import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCancelActionInstruction;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CaseUpdatedReceiverTest {
@@ -29,7 +29,7 @@ public class CaseUpdatedReceiverTest {
   @InjectMocks private CaseUpdatedReceiver underTest;
 
   @Test
-  public void testReceiveCloseDecision() {
+  public void testReceiveCancelDecision() {
     // Given
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId("testId");
@@ -40,7 +40,7 @@ public class CaseUpdatedReceiverTest {
     collectionCase.setAddress(address);
 
     Metadata metadata = new Metadata();
-    metadata.setFieldDecision(ActionInstructionType.CLOSE);
+    metadata.setFieldDecision(ActionInstructionType.CANCEL);
 
     Payload payload = new Payload();
     payload.setCollectionCase(collectionCase);
@@ -53,15 +53,15 @@ public class CaseUpdatedReceiverTest {
     underTest.receiveMessage(responseManagementEvent);
 
     // Then
-    ArgumentCaptor<FwmtCloseActionInstruction> aiArgumentCaptor =
-        ArgumentCaptor.forClass(FwmtCloseActionInstruction.class);
+    ArgumentCaptor<FwmtCancelActionInstruction> aiArgumentCaptor =
+        ArgumentCaptor.forClass(FwmtCancelActionInstruction.class);
     verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
-    FwmtCloseActionInstruction actualAi = aiArgumentCaptor.getValue();
+    FwmtCancelActionInstruction actualAi = aiArgumentCaptor.getValue();
     assertThat(actualAi.getCaseId()).isEqualTo("testId");
     assertThat(actualAi.getSurveyName()).isEqualTo("CENSUS");
     assertThat(actualAi.getAddressType()).isEqualTo("test address type");
     assertThat(actualAi.getAddressLevel()).isEqualTo("U");
-    assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.CLOSE);
+    assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.CANCEL);
   }
 
   @Test
