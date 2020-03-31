@@ -23,7 +23,7 @@ import uk.gov.ons.census.fwmtadapter.model.dto.Payload;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
-import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCancelActionInstruction;
 import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 
 @ContextConfiguration
@@ -60,7 +60,7 @@ public class CaseUpdatedReceiverIT {
   }
 
   @Test
-  public void testGoodCloseReceiptMessage() throws InterruptedException, IOException {
+  public void testGoodCancelReceiptMessage() throws InterruptedException, IOException {
     // Given
     BlockingQueue<String> outboundQueue = rabbitQueueHelper.listen(ADAPTER_OUTBOUND_QUEUE);
     CollectionCase collectionCase = new CollectionCase();
@@ -72,7 +72,7 @@ public class CaseUpdatedReceiverIT {
     collectionCase.setAddress(address);
 
     Metadata metadata = new Metadata();
-    metadata.setFieldDecision(ActionInstructionType.CLOSE);
+    metadata.setFieldDecision(ActionInstructionType.CANCEL);
 
     Payload payload = new Payload();
     payload.setCollectionCase(collectionCase);
@@ -88,9 +88,9 @@ public class CaseUpdatedReceiverIT {
     // then
     String actualMessage = rabbitQueueHelper.getMessage(outboundQueue);
     ObjectMapper objectMapper = new ObjectMapper();
-    FwmtCloseActionInstruction actionInstruction =
-        objectMapper.readValue(actualMessage, FwmtCloseActionInstruction.class);
-    assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CLOSE);
+    FwmtCancelActionInstruction actionInstruction =
+        objectMapper.readValue(actualMessage, FwmtCancelActionInstruction.class);
+    assertThat(actionInstruction.getActionInstruction()).isEqualTo(ActionInstructionType.CANCEL);
     assertThat(actionInstruction.getCaseId()).isEqualTo(TEST_CASE_ID);
     assertThat(actionInstruction.getSurveyName()).isEqualTo(TEST_SURVEY);
     assertThat(actionInstruction.getAddressType()).isEqualTo(TEST_ADDRESS_TYPE);
