@@ -10,7 +10,7 @@ import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
-import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCloseActionInstruction;
+import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCancelActionInstruction;
 
 @MessageEndpoint
 public class CaseUpdatedReceiver {
@@ -32,8 +32,8 @@ public class CaseUpdatedReceiver {
 
     ActionInstructionType fieldDecision = event.getPayload().getMetadata().getFieldDecision();
 
-    if (fieldDecision == ActionInstructionType.CLOSE) {
-      handleCloseDecision(event);
+    if (fieldDecision == ActionInstructionType.CANCEL) {
+      handleCancelDecision(event);
       return;
     }
 
@@ -93,9 +93,9 @@ public class CaseUpdatedReceiver {
     rabbitTemplate.convertAndSend(outboundExchange, "", actionInstruction);
   }
 
-  private void handleCloseDecision(ResponseManagementEvent event) {
-    FwmtCloseActionInstruction actionInstruction = new FwmtCloseActionInstruction();
-    actionInstruction.setActionInstruction(ActionInstructionType.CLOSE);
+  private void handleCancelDecision(ResponseManagementEvent event) {
+    FwmtCancelActionInstruction actionInstruction = new FwmtCancelActionInstruction();
+    actionInstruction.setActionInstruction(ActionInstructionType.CANCEL);
     actionInstruction.setAddressLevel(
         event.getPayload().getCollectionCase().getAddress().getAddressLevel());
     actionInstruction.setAddressType(
@@ -104,7 +104,7 @@ public class CaseUpdatedReceiver {
     actionInstruction.setSurveyName(event.getPayload().getCollectionCase().getSurvey());
 
     // These have been added in because we can't guarantee the order that we would publish separate
-    // UPDATE and CLOSE messages, which would be published simultaneously
+    // UPDATE and CANCEL messages, which would be published simultaneously
     actionInstruction.setCeActualResponses(
         event.getPayload().getCollectionCase().getCeActualResponses());
     actionInstruction.setCeExpectedCapacity(
