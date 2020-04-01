@@ -28,7 +28,6 @@ public class FieldworkFollowup {
   private Integer ceExpectedCapacity;
   private Integer ceActualResponses;
   private String surveyName;
-  private Boolean undeliveredAsAddress;
   private Boolean blankQreReturned;
   private Boolean receipted;
   private Boolean handDelivery;

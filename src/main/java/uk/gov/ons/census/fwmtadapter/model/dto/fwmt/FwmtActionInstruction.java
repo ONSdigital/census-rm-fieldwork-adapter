@@ -28,7 +28,7 @@ public class FwmtActionInstruction {
   private boolean handDeliver;
   private Integer ceExpectedCapacity;
   private Integer ceActualResponses;
-  private Boolean undeliveredAsAddress;
+  private Boolean undeliveredAsAddressed;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Boolean secureEstablishment;

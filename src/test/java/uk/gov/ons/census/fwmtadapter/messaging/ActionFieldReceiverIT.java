@@ -51,7 +51,6 @@ public class ActionFieldReceiverIT {
     fieldworkFollowup.setLatitude("-179.99999");
     fieldworkFollowup.setLongitude("179.99999");
     fieldworkFollowup.setSurveyName("CENSUS");
-    fieldworkFollowup.setUndeliveredAsAddress(false);
     fieldworkFollowup.setBlankQreReturned(false);
     fieldworkFollowup.setHandDelivery(true);
 
@@ -97,7 +96,6 @@ public class ActionFieldReceiverIT {
     fieldworkFollowup.setLatitude("-179.99999");
     fieldworkFollowup.setLongitude("179.99999");
     fieldworkFollowup.setSurveyName("CENSUS");
-    fieldworkFollowup.setUndeliveredAsAddress(false);
     fieldworkFollowup.setBlankQreReturned(false);
     fieldworkFollowup.setAddressType("CE");
     fieldworkFollowup.setAddressLevel("E");

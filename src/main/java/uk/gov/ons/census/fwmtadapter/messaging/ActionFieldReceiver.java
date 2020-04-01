@@ -52,7 +52,6 @@ public class ActionFieldReceiver {
     actionInstruction.setSurveyName(followup.getSurveyName());
     actionInstruction.setTownName(followup.getTownName());
     actionInstruction.setUprn(followup.getUprn());
-    actionInstruction.setUndeliveredAsAddress(followup.getUndeliveredAsAddress()); // TODO: Delete?
 
     if (followup.getMetadata() != null) {
       actionInstruction.setSecureEstablishment(followup.getMetadata().getSecureEstablishment());

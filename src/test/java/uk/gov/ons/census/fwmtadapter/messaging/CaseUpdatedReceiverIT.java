@@ -105,7 +105,6 @@ public class CaseUpdatedReceiverIT {
     collectionCase.setId(TEST_CASE_ID);
     collectionCase.setCaseRef(TEST_CASE_REF);
     collectionCase.setCaseType(TEST_CASE_TYPE);
-    collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
     Address address = new Address();
     address.setAddressLevel(TEST_ADDRESS_LEVEL);
     address.setAddressType(TEST_ADDRESS_TYPE);
