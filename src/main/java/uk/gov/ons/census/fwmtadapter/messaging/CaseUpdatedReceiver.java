@@ -83,7 +83,7 @@ public class CaseUpdatedReceiver {
 
     if (event.getPayload().getMetadata().getCauseEventType()
         == EventType.UNDELIVERED_MAIL_REPORTED) {
-      actionInstruction.setUndeliveredAsAddressed(true);
+      actionInstruction.setUndeliveredAsAddress(true);
     }
 
     if (caze.getMetadata() != null) {
