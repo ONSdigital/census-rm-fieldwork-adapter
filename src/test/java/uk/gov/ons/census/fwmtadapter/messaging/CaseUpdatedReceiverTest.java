@@ -71,7 +71,6 @@ public class CaseUpdatedReceiverTest {
     collectionCase.setId("testId");
     collectionCase.setCaseRef("testRef");
     collectionCase.setCaseType("HH");
-    collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
     Address address = new Address();
     address.setAddressLevel("U");
     address.setAddressType("test address type");
@@ -111,7 +110,6 @@ public class CaseUpdatedReceiverTest {
     collectionCase.setId("testId");
     collectionCase.setCaseRef("testRef");
     collectionCase.setCaseType("CE");
-    collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
 
     CaseMetadata ceMetadata = new CaseMetadata();
     ceMetadata.setSecureEstablishment(true);
@@ -154,7 +152,6 @@ public class CaseUpdatedReceiverTest {
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId("testId");
     collectionCase.setCaseRef("testRef");
-    collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
     collectionCase.setCaseType("HH");
     Address address = new Address();
     address.setAddressLevel("U");
@@ -193,7 +190,6 @@ public class CaseUpdatedReceiverTest {
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId("testId");
     collectionCase.setCaseRef("testRef");
-    collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
     collectionCase.setCaseType("CE");
 
     CaseMetadata ceMetadata = new CaseMetadata();
@@ -237,7 +233,6 @@ public class CaseUpdatedReceiverTest {
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId("testId");
     collectionCase.setCaseRef("testRef");
-    collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
     collectionCase.setCaseType("SPG");
 
     CaseMetadata ceMetadata = new CaseMetadata();

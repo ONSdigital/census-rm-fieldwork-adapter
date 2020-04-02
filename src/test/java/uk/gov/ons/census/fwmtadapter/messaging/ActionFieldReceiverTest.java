@@ -26,7 +26,6 @@ public class ActionFieldReceiverTest {
     fieldworkFollowup.setLatitude("-179.99999");
     fieldworkFollowup.setLongitude("179.99999");
     fieldworkFollowup.setSurveyName("CENSUS");
-    fieldworkFollowup.setUndeliveredAsAddress(false);
     fieldworkFollowup.setBlankQreReturned(false);
     fieldworkFollowup.setAddressType("HH");
     fieldworkFollowup.setCeActualResponses(null);

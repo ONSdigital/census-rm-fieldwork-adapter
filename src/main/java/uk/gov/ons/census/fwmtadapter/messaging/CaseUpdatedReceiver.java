@@ -6,6 +6,7 @@ import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.ons.census.fwmtadapter.model.dto.CollectionCase;
+import uk.gov.ons.census.fwmtadapter.model.dto.EventType;
 import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.ActionInstructionType;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
@@ -80,7 +81,11 @@ public class CaseUpdatedReceiver {
     actionInstruction.setSurveyName(caze.getSurvey());
     actionInstruction.setTownName(caze.getAddress().getTownName());
     actionInstruction.setUprn(caze.getAddress().getUprn());
-    actionInstruction.setUndeliveredAsAddress(caze.getUndeliveredAsAddressed());
+
+    if (event.getPayload().getMetadata().getCauseEventType()
+        == EventType.UNDELIVERED_MAIL_REPORTED) {
+      actionInstruction.setUndeliveredAsAddress(true);
+    }
 
     if (caze.getMetadata() != null) {
       actionInstruction.setSecureEstablishment(caze.getMetadata().getSecureEstablishment());
