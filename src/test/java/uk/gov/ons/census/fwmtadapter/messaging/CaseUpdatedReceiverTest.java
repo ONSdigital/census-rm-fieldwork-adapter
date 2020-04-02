@@ -276,7 +276,6 @@ public class CaseUpdatedReceiverTest {
     CollectionCase collectionCase = new CollectionCase();
     collectionCase.setId("testId");
     collectionCase.setCaseRef("testRef");
-    collectionCase.setUndeliveredAsAddressed(Boolean.FALSE);
     collectionCase.setCaseType("HH");
     Address address = new Address();
     address.setAddressLevel("U");
