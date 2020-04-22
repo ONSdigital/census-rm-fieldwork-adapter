@@ -13,12 +13,12 @@ import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCancelActionInstruction;
 
 @MessageEndpoint
-public class CaseUpdatedReceiver {
+public class CaseReceiver {
 
   private final RabbitTemplate rabbitTemplate;
   private final String outboundExchange;
 
-  public CaseUpdatedReceiver(
+  public CaseReceiver(
       RabbitTemplate rabbitTemplate,
       @Value("${queueconfig.outbound-exchange}") String outboundExchange) {
     this.rabbitTemplate = rabbitTemplate;
@@ -26,7 +26,7 @@ public class CaseUpdatedReceiver {
   }
 
   @Transactional
-  @ServiceActivator(inputChannel = "caseUpdatedInputChannel")
+  @ServiceActivator(inputChannel = "caseReceiverChannel")
   public void receiveMessage(ResponseManagementEvent event) {
     if (canIgnoreEvent(event)) return;
 
