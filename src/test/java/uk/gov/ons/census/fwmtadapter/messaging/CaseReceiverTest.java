@@ -19,14 +19,14 @@ import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtActionInstruction;
 import uk.gov.ons.census.fwmtadapter.model.dto.fwmt.FwmtCancelActionInstruction;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CaseUpdatedReceiverTest {
+public class CaseReceiverTest {
 
   @Mock private RabbitTemplate rabbitTemplate;
 
   @Value("${queueconfig.outbound-exchange}")
   private String outboundExchange;
 
-  @InjectMocks private CaseUpdatedReceiver underTest;
+  @InjectMocks private CaseReceiver underTest;
 
   @Test
   public void testReceiveCancelDecision() {

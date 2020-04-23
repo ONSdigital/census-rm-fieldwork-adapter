@@ -31,7 +31,7 @@ import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @RunWith(SpringJUnit4ClassRunner.class)
-public class CaseUpdatedReceiverIT {
+public class CaseReceiverIT {
   private static final String CASE_UPDATE_ROUTING_KEY = "event.case.update";
   private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
   private static final String TEST_CASE_ID = "test_case_id";

@@ -60,7 +60,7 @@ public class MessageConsumerConfig {
   }
 
   @Bean
-  public MessageChannel caseUpdatedInputChannel() {
+  public MessageChannel caseReceiverChannel() {
     return new DirectChannel();
   }
 
@@ -75,9 +75,9 @@ public class MessageConsumerConfig {
   }
 
   @Bean
-  public AmqpInboundChannelAdapter caseUpdatedInbound(
-      @Qualifier("caseUpdatedContainer") SimpleMessageListenerContainer listenerContainer,
-      @Qualifier("caseUpdatedInputChannel") MessageChannel channel) {
+  public AmqpInboundChannelAdapter caseReceivedInbound(
+      @Qualifier("caseReceivedContainer") SimpleMessageListenerContainer listenerContainer,
+      @Qualifier("caseReceiverChannel") MessageChannel channel) {
     AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
     adapter.setOutputChannel(channel);
     return adapter;
@@ -89,7 +89,7 @@ public class MessageConsumerConfig {
   }
 
   @Bean
-  public SimpleMessageListenerContainer caseUpdatedContainer() {
+  public SimpleMessageListenerContainer caseReceivedContainer() {
     return setupListenerContainer(caseUpdatedQueue, ResponseManagementEvent.class);
   }
 
