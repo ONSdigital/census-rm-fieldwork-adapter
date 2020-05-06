@@ -40,6 +40,7 @@ public class ActionFieldReceiver {
     actionInstruction.setFieldCoordinatorId(followup.getFieldCoordinatorId());
     actionInstruction.setFieldOfficerId(followup.getFieldOfficerId());
     actionInstruction.setHandDeliver(followup.getHandDelivery());
+
     if (followup.getLatitude() != null && !followup.getLatitude().isBlank()) {
       actionInstruction.setLatitude(Double.parseDouble(followup.getLatitude()));
     }
@@ -52,6 +53,7 @@ public class ActionFieldReceiver {
     actionInstruction.setSurveyName(followup.getSurveyName());
     actionInstruction.setTownName(followup.getTownName());
     actionInstruction.setUprn(followup.getUprn());
+    actionInstruction.setEstabUprn(followup.getEstabUprn());
 
     if (followup.getMetadata() != null) {
       actionInstruction.setSecureEstablishment(followup.getMetadata().getSecureEstablishment());
