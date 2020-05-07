@@ -74,6 +74,8 @@ public class CaseReceiverTest {
     Address address = new Address();
     address.setAddressLevel("U");
     address.setAddressType("test address type");
+    address.setUprn("U1");
+    address.setEstabUprn("EstabU2");
     collectionCase.setAddress(address);
 
     Metadata metadata = new Metadata();
@@ -93,14 +95,17 @@ public class CaseReceiverTest {
     ArgumentCaptor<FwmtActionInstruction> aiArgumentCaptor =
         ArgumentCaptor.forClass(FwmtActionInstruction.class);
     verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
-    FwmtActionInstruction actualAi = aiArgumentCaptor.getValue();
-    assertThat(actualAi.getCaseId()).isEqualTo("testId");
-    assertThat(actualAi.getCaseRef()).isEqualTo("testRef");
-    assertThat(actualAi.getAddressType()).isEqualTo("test address type");
-    assertThat(actualAi.getAddressLevel()).isEqualTo("U");
-    assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.CREATE);
-    assertThat(actualAi.getSecureEstablishment()).isNull();
-    assertThat(actualAi.getBlankFormReturned()).isNull();
+    FwmtActionInstruction actualActionInstruction = aiArgumentCaptor.getValue();
+    assertThat(actualActionInstruction.getCaseId()).isEqualTo("testId");
+    assertThat(actualActionInstruction.getCaseRef()).isEqualTo("testRef");
+    assertThat(actualActionInstruction.getAddressType()).isEqualTo("test address type");
+    assertThat(actualActionInstruction.getAddressLevel()).isEqualTo("U");
+    assertThat(actualActionInstruction.getActionInstruction())
+        .isEqualTo(ActionInstructionType.CREATE);
+    assertThat(actualActionInstruction.getSecureEstablishment()).isNull();
+    assertThat(actualActionInstruction.getBlankFormReturned()).isNull();
+    assertThat(actualActionInstruction.getUprn()).isEqualTo("U1");
+    assertThat(actualActionInstruction.getEstabUprn()).isEqualTo("EstabU2");
   }
 
   @Test

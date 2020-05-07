@@ -81,6 +81,7 @@ public class CaseReceiver {
     actionInstruction.setSurveyName(caze.getSurvey());
     actionInstruction.setTownName(caze.getAddress().getTownName());
     actionInstruction.setUprn(caze.getAddress().getUprn());
+    actionInstruction.setEstabUprn(caze.getAddress().getEstabUprn());
 
     if (event.getPayload().getMetadata().getCauseEventType()
         == EventType.UNDELIVERED_MAIL_REPORTED) {
