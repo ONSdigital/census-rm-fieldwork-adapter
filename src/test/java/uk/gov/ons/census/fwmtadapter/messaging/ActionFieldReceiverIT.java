@@ -125,6 +125,8 @@ public class ActionFieldReceiverIT {
         .isEqualToComparingOnlyGivenFields(
             fieldworkFollowup,
             "caseId",
+            "uprn",
+            "estabUprn",
             "caseRef",
             "surveyName",
             "addressType",

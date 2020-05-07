@@ -49,6 +49,7 @@ public class ActionFieldReceiverTest {
             "organisationName",
             "oa",
             "uprn",
+            "estabUprn",
             "estabType");
     assertThat(actionInstruction.getLatitude())
         .isEqualTo(Double.parseDouble(fieldworkFollowup.getLatitude()));
