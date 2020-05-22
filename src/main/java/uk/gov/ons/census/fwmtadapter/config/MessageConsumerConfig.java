@@ -1,14 +1,19 @@
 package uk.gov.ons.census.fwmtadapter.config;
 
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.amqp.inbound.AmqpInboundChannelAdapter;
+import org.springframework.integration.amqp.support.DefaultAmqpHeaderMapper;
 import org.springframework.integration.channel.DirectChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
@@ -68,19 +73,14 @@ public class MessageConsumerConfig {
   public AmqpInboundChannelAdapter actionFieldInbound(
       @Qualifier("actionFieldContainer") SimpleMessageListenerContainer listenerContainer,
       @Qualifier("actionFieldInputChannel") MessageChannel channel) {
-    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
-    adapter.setOutputChannel(channel);
-
-    return adapter;
+    return makeAdapter(listenerContainer, channel);
   }
 
   @Bean
   public AmqpInboundChannelAdapter caseReceivedInbound(
       @Qualifier("caseReceivedContainer") SimpleMessageListenerContainer listenerContainer,
       @Qualifier("caseReceiverChannel") MessageChannel channel) {
-    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
-    adapter.setOutputChannel(channel);
-    return adapter;
+    return makeAdapter(listenerContainer, channel);
   }
 
   @Bean
@@ -123,5 +123,21 @@ public class MessageConsumerConfig {
 
     container.setAdviceChain(retryOperationsInterceptor);
     return container;
+  }
+
+  private AmqpInboundChannelAdapter makeAdapter(
+      AbstractMessageListenerContainer listenerContainer, MessageChannel channel) {
+    AmqpInboundChannelAdapter adapter = new AmqpInboundChannelAdapter(listenerContainer);
+    adapter.setOutputChannel(channel);
+    adapter.setHeaderMapper(
+        new DefaultAmqpHeaderMapper(null, null) {
+          @Override
+          public Map<String, Object> toHeadersFromRequest(MessageProperties source) {
+            Map<String, Object> headers = new HashMap<>();
+            headers.put("contentType", "application/json");
+            return headers;
+          }
+        });
+    return adapter;
   }
 }
