@@ -2,7 +2,6 @@ package uk.gov.ons.census.fwmtadapter.config;
 
 import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +20,6 @@ import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 @Configuration
 public class MessageConsumerConfig {
   private final ExceptionManagerClient exceptionManagerClient;
-  private final RabbitTemplate rabbitTemplate;
   private final ConnectionFactory connectionFactory;
 
   @Value("${messagelogging.logstacktraces}")
@@ -36,9 +34,6 @@ public class MessageConsumerConfig {
   @Value("${queueconfig.retry-delay}")
   private int retryDelay;
 
-  @Value("${queueconfig.quarantine-exchange}")
-  private String quarantineExchange;
-
   @Value("${queueconfig.action-field-queue}")
   private String actionFieldQueue;
 
@@ -46,11 +41,8 @@ public class MessageConsumerConfig {
   private String caseUpdatedQueue;
 
   public MessageConsumerConfig(
-      ExceptionManagerClient exceptionManagerClient,
-      RabbitTemplate rabbitTemplate,
-      ConnectionFactory connectionFactory) {
+      ExceptionManagerClient exceptionManagerClient, ConnectionFactory connectionFactory) {
     this.exceptionManagerClient = exceptionManagerClient;
-    this.rabbitTemplate = rabbitTemplate;
     this.connectionFactory = connectionFactory;
   }
 
@@ -104,9 +96,7 @@ public class MessageConsumerConfig {
             expectedMessageType,
             logStackTraces,
             "Fieldwork Adapter",
-            queueName,
-            quarantineExchange,
-            rabbitTemplate);
+            queueName);
 
     RetryOperationsInterceptor retryOperationsInterceptor =
         RetryInterceptorBuilder.stateless()
