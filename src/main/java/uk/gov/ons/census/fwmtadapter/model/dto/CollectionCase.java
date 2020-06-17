@@ -17,6 +17,8 @@ public class CollectionCase {
   private OffsetDateTime actionableFrom;
   private Boolean receiptReceived;
   private String refusalReceived;
+  private OffsetDateTime createdDateTime;
+  private OffsetDateTime lastUpdated;
 
   // Below this line is extra data potentially needed by Action Scheduler - can be ignored by RH
   private String actionPlanId;
