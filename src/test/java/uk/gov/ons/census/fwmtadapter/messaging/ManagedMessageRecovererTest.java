@@ -2,6 +2,7 @@ package uk.gov.ons.census.fwmtadapter.messaging;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -41,17 +42,22 @@ public class ManagedMessageRecovererTest {
     exceptionReportResponse.setLogIt(true);
     exceptionReportResponse.setPeek(false);
     exceptionReportResponse.setSkipIt(false);
-    when(exceptionManagerClient.reportException(any(), any(), any(), any()))
+    when(exceptionManagerClient.reportException(any(), any(), any(), any(), any()))
         .thenReturn(exceptionReportResponse);
 
+    // When
     try {
-      // When
       underTest.recover(message, failedException);
     } catch (AmqpRejectAndDontRequeueException expectedException) {
+
       // Then
       verify(exceptionManagerClient)
           .reportException(
-              eq(MESSAGE_HASH), eq("test service"), eq("test queue"), eq(cause.getCause()));
+              eq(MESSAGE_HASH),
+              eq("test service"),
+              eq("test queue"),
+              eq(cause.getCause()),
+              contains("at uk.gov.ons.census.fwmtadapter.messaging.ManagedMessageRecovererTest"));
 
       verifyNoMoreInteractions(exceptionManagerClient);
 
@@ -61,7 +67,6 @@ public class ManagedMessageRecovererTest {
 
   @Test(expected = AmqpRejectAndDontRequeueException.class)
   public void testRecoverExceptionManagerUnavailable() {
-    // Given
     ExceptionManagerClient exceptionManagerClient = mock(ExceptionManagerClient.class);
     ManagedMessageRecoverer underTest =
         new ManagedMessageRecoverer(
@@ -72,20 +77,22 @@ public class ManagedMessageRecovererTest {
     ListenerExecutionFailedException failedException =
         new ListenerExecutionFailedException("test error message", cause, message);
 
-    when(exceptionManagerClient.reportException(any(), any(), any(), any()))
+    when(exceptionManagerClient.reportException(any(), any(), any(), any(), any()))
         .thenThrow(new RuntimeException());
 
     try {
-      // When
       underTest.recover(message, failedException);
     } catch (AmqpRejectAndDontRequeueException expectedException) {
-      // Then
+
       verify(exceptionManagerClient)
           .reportException(
-              eq(MESSAGE_HASH), eq("test service"), eq("test queue"), eq(cause.getCause()));
+              eq(MESSAGE_HASH),
+              eq("test service"),
+              eq("test queue"),
+              eq(cause.getCause()),
+              contains("at uk.gov.ons.census.fwmtadapter.messaging.ManagedMessageRecovererTest"));
 
       verifyNoMoreInteractions(exceptionManagerClient);
-
       throw expectedException;
     }
   }
@@ -110,14 +117,18 @@ public class ManagedMessageRecovererTest {
     exceptionReportResponse.setLogIt(true);
     exceptionReportResponse.setPeek(false);
     exceptionReportResponse.setSkipIt(true);
-    when(exceptionManagerClient.reportException(any(), any(), any(), any()))
+    when(exceptionManagerClient.reportException(any(), any(), any(), any(), any()))
         .thenReturn(exceptionReportResponse);
 
     underTest.recover(message, failedException);
 
     verify(exceptionManagerClient)
         .reportException(
-            eq(MESSAGE_HASH), eq("test service"), eq("test queue"), eq(cause.getCause()));
+            eq(MESSAGE_HASH),
+            eq("test service"),
+            eq("test queue"),
+            eq(cause.getCause()),
+            contains("at uk.gov.ons.census.fwmtadapter.messaging.ManagedMessageRecovererTest"));
 
     ArgumentCaptor<SkippedMessage> skippedMessageArgumentCaptor =
         ArgumentCaptor.forClass(SkippedMessage.class);
@@ -138,7 +149,6 @@ public class ManagedMessageRecovererTest {
 
   @Test(expected = AmqpRejectAndDontRequeueException.class)
   public void testRecoverPeek() {
-    // Given
     ExceptionManagerClient exceptionManagerClient = mock(ExceptionManagerClient.class);
     ManagedMessageRecoverer underTest =
         new ManagedMessageRecoverer(
@@ -157,17 +167,20 @@ public class ManagedMessageRecovererTest {
     exceptionReportResponse.setLogIt(false);
     exceptionReportResponse.setPeek(true);
     exceptionReportResponse.setSkipIt(false);
-    when(exceptionManagerClient.reportException(any(), any(), any(), any()))
+    when(exceptionManagerClient.reportException(any(), any(), any(), any(), any()))
         .thenReturn(exceptionReportResponse);
 
     try {
-      // When
       underTest.recover(message, failedException);
     } catch (AmqpRejectAndDontRequeueException expectedException) {
-      // Then
+
       verify(exceptionManagerClient)
           .reportException(
-              eq(MESSAGE_HASH), eq("test service"), eq("test queue"), eq(cause.getCause()));
+              eq(MESSAGE_HASH),
+              eq("test service"),
+              eq("test queue"),
+              eq(cause.getCause()),
+              contains("at uk.gov.ons.census.fwmtadapter.messaging.ManagedMessageRecovererTest"));
 
       verify(exceptionManagerClient)
           .respondToPeek(eq(MESSAGE_HASH), eq("test message body".getBytes()));
