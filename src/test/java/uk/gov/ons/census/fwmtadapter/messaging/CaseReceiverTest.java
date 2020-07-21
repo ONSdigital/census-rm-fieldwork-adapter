@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import java.util.UUID;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -28,11 +29,13 @@ public class CaseReceiverTest {
 
   @InjectMocks private CaseReceiver underTest;
 
+  private UUID TEST_CASE_ID = UUID.randomUUID();
+
   @Test
   public void testReceiveCancelDecision() {
     // Given
     CollectionCase collectionCase = new CollectionCase();
-    collectionCase.setId("testId");
+    collectionCase.setId(TEST_CASE_ID);
     collectionCase.setSurvey("CENSUS");
     Address address = new Address();
     address.setAddressLevel("U");
@@ -57,7 +60,7 @@ public class CaseReceiverTest {
         ArgumentCaptor.forClass(FwmtCancelActionInstruction.class);
     verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
     FwmtCancelActionInstruction actualAi = aiArgumentCaptor.getValue();
-    assertThat(actualAi.getCaseId()).isEqualTo("testId");
+    assertThat(actualAi.getCaseId()).isEqualTo(TEST_CASE_ID);
     assertThat(actualAi.getSurveyName()).isEqualTo("CENSUS");
     assertThat(actualAi.getAddressType()).isEqualTo("test address type");
     assertThat(actualAi.getAddressLevel()).isEqualTo("U");
@@ -68,7 +71,7 @@ public class CaseReceiverTest {
   public void testReceiveCreateDecision() {
     // Given
     CollectionCase collectionCase = new CollectionCase();
-    collectionCase.setId("testId");
+    collectionCase.setId(TEST_CASE_ID);
     collectionCase.setCaseRef("testRef");
     collectionCase.setCaseType("HH");
     Address address = new Address();
@@ -96,7 +99,7 @@ public class CaseReceiverTest {
         ArgumentCaptor.forClass(FwmtActionInstruction.class);
     verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
     FwmtActionInstruction actualActionInstruction = aiArgumentCaptor.getValue();
-    assertThat(actualActionInstruction.getCaseId()).isEqualTo("testId");
+    assertThat(actualActionInstruction.getCaseId()).isEqualTo(TEST_CASE_ID);
     assertThat(actualActionInstruction.getCaseRef()).isEqualTo("testRef");
     assertThat(actualActionInstruction.getAddressType()).isEqualTo("test address type");
     assertThat(actualActionInstruction.getAddressLevel()).isEqualTo("U");
@@ -112,7 +115,7 @@ public class CaseReceiverTest {
   public void testReceiveCreateDecisionCE() {
     // Given
     CollectionCase collectionCase = new CollectionCase();
-    collectionCase.setId("testId");
+    collectionCase.setId(TEST_CASE_ID);
     collectionCase.setCaseRef("testRef");
     collectionCase.setCaseType("CE");
 
@@ -142,7 +145,7 @@ public class CaseReceiverTest {
         ArgumentCaptor.forClass(FwmtActionInstruction.class);
     verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
     FwmtActionInstruction actualAi = aiArgumentCaptor.getValue();
-    assertThat(actualAi.getCaseId()).isEqualTo("testId");
+    assertThat(actualAi.getCaseId()).isEqualTo(TEST_CASE_ID);
     assertThat(actualAi.getCaseRef()).isEqualTo("testRef");
     assertThat(actualAi.getAddressType()).isEqualTo("test address type");
     assertThat(actualAi.getAddressLevel()).isEqualTo("E");
@@ -155,7 +158,7 @@ public class CaseReceiverTest {
   public void testReceiveUpdateDecision() {
     // Given
     CollectionCase collectionCase = new CollectionCase();
-    collectionCase.setId("testId");
+    collectionCase.setId(TEST_CASE_ID);
     collectionCase.setCaseRef("testRef");
     collectionCase.setCaseType("HH");
     Address address = new Address();
@@ -181,7 +184,7 @@ public class CaseReceiverTest {
         ArgumentCaptor.forClass(FwmtActionInstruction.class);
     verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
     FwmtActionInstruction actualAi = aiArgumentCaptor.getValue();
-    assertThat(actualAi.getCaseId()).isEqualTo("testId");
+    assertThat(actualAi.getCaseId()).isEqualTo(TEST_CASE_ID);
     assertThat(actualAi.getCaseRef()).isEqualTo("testRef");
     assertThat(actualAi.getAddressType()).isEqualTo("test address type");
     assertThat(actualAi.getAddressLevel()).isEqualTo("U");
@@ -193,7 +196,7 @@ public class CaseReceiverTest {
   public void testReceiveUpdateDecisionCE() {
     // Given
     CollectionCase collectionCase = new CollectionCase();
-    collectionCase.setId("testId");
+    collectionCase.setId(TEST_CASE_ID);
     collectionCase.setCaseRef("testRef");
     collectionCase.setCaseType("CE");
 
@@ -223,7 +226,7 @@ public class CaseReceiverTest {
         ArgumentCaptor.forClass(FwmtActionInstruction.class);
     verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
     FwmtActionInstruction actualAi = aiArgumentCaptor.getValue();
-    assertThat(actualAi.getCaseId()).isEqualTo("testId");
+    assertThat(actualAi.getCaseId()).isEqualTo(TEST_CASE_ID);
     assertThat(actualAi.getCaseRef()).isEqualTo("testRef");
     assertThat(actualAi.getAddressType()).isEqualTo("test address type");
     assertThat(actualAi.getAddressLevel()).isEqualTo("E");
@@ -236,7 +239,7 @@ public class CaseReceiverTest {
   public void testReceiveUpdateDecisionSPG() {
     // Given
     CollectionCase collectionCase = new CollectionCase();
-    collectionCase.setId("testId");
+    collectionCase.setId(TEST_CASE_ID);
     collectionCase.setCaseRef("testRef");
     collectionCase.setCaseType("SPG");
 
@@ -266,7 +269,7 @@ public class CaseReceiverTest {
         ArgumentCaptor.forClass(FwmtActionInstruction.class);
     verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
     FwmtActionInstruction actualAi = aiArgumentCaptor.getValue();
-    assertThat(actualAi.getCaseId()).isEqualTo("testId");
+    assertThat(actualAi.getCaseId()).isEqualTo(TEST_CASE_ID);
     assertThat(actualAi.getCaseRef()).isEqualTo("testRef");
     assertThat(actualAi.getAddressType()).isEqualTo("test address type");
     assertThat(actualAi.getAddressLevel()).isEqualTo("U");
@@ -279,7 +282,7 @@ public class CaseReceiverTest {
   public void testReceiveUpdateDecisionWithBlankQuestionnaireReturned() {
     // Given
     CollectionCase collectionCase = new CollectionCase();
-    collectionCase.setId("testId");
+    collectionCase.setId(TEST_CASE_ID);
     collectionCase.setCaseRef("testRef");
     collectionCase.setCaseType("HH");
     Address address = new Address();

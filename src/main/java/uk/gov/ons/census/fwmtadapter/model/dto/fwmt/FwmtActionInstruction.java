@@ -1,6 +1,7 @@
 package uk.gov.ons.census.fwmtadapter.model.dto.fwmt;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.UUID;
 import lombok.Data;
 
 @Data
@@ -9,7 +10,7 @@ public class FwmtActionInstruction {
   private String surveyName;
   private String addressType;
   private String addressLevel;
-  private String caseId;
+  private UUID caseId;
   private String caseRef;
   private String estabType;
   private String fieldOfficerId;
