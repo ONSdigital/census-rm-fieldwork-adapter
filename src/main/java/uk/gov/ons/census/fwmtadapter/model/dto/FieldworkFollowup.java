@@ -1,5 +1,6 @@
 package uk.gov.ons.census.fwmtadapter.model.dto;
 
+import java.util.UUID;
 import lombok.Data;
 
 @Data
@@ -18,7 +19,7 @@ public class FieldworkFollowup {
   private String longitude;
   private String actionPlan;
   private String actionType;
-  private String caseId;
+  private UUID caseId;
   private String caseRef;
   private String addressType;
   private String addressLevel;

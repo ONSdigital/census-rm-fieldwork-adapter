@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +35,7 @@ import uk.gov.ons.census.fwmtadapter.util.RabbitQueueHelper;
 public class CaseReceiverIT {
   private static final String CASE_UPDATE_ROUTING_KEY = "event.case.update";
   private static final String ADAPTER_OUTBOUND_QUEUE = "RM.Field";
-  private static final String TEST_CASE_ID = "test_case_id";
+  private static final UUID TEST_CASE_ID = UUID.randomUUID();
   private static final String TEST_CASE_REF = "test_case_ref";
   private static final String TEST_SURVEY = "test_survey";
   private static final String TEST_ADDRESS_TYPE = "test_address_type";

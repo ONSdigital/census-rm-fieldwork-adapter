@@ -1,5 +1,6 @@
 package uk.gov.ons.census.fwmtadapter.model.dto.fwmt;
 
+import java.util.UUID;
 import lombok.Data;
 
 @Data
@@ -8,7 +9,7 @@ public class FwmtCancelActionInstruction {
   private String surveyName;
   private String addressType;
   private String addressLevel;
-  private String caseId;
+  private UUID caseId;
   private Integer ceExpectedCapacity;
   private Integer ceActualResponses;
 }
