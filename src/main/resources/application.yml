@@ -11,7 +11,6 @@ queueconfig:
   outbound-exchange: adapter-outbound-exchange
   case-updated-queue: FieldworkAdapter.caseUpdated
   consumers: 50
-  retry-attempts: 3
   retry-delay: 1000 #milliseconds
 
 healthcheck:
