@@ -17,7 +17,6 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.retry.backoff.FixedBackOffPolicy;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
-import org.springframework.transaction.PlatformTransactionManager;
 import uk.gov.ons.census.fwmtadapter.client.ExceptionManagerClient;
 import uk.gov.ons.census.fwmtadapter.messaging.ManagedMessageRecoverer;
 import uk.gov.ons.census.fwmtadapter.model.dto.FieldworkFollowup;
@@ -27,7 +26,6 @@ import uk.gov.ons.census.fwmtadapter.model.dto.ResponseManagementEvent;
 public class MessageConsumerConfig {
   private final ExceptionManagerClient exceptionManagerClient;
   private final ConnectionFactory connectionFactory;
-  private final PlatformTransactionManager transactionManager;
 
   @Value("${messagelogging.logstacktraces}")
   private boolean logStackTraces;
@@ -48,12 +46,9 @@ public class MessageConsumerConfig {
   private String caseUpdatedQueue;
 
   public MessageConsumerConfig(
-      ExceptionManagerClient exceptionManagerClient,
-      ConnectionFactory connectionFactory,
-      PlatformTransactionManager transactionManager) {
+      ExceptionManagerClient exceptionManagerClient, ConnectionFactory connectionFactory) {
     this.exceptionManagerClient = exceptionManagerClient;
     this.connectionFactory = connectionFactory;
-    this.transactionManager = transactionManager;
   }
 
   @Bean
@@ -114,8 +109,6 @@ public class MessageConsumerConfig {
         new SimpleMessageListenerContainer(connectionFactory);
     container.setQueueNames(queueName);
     container.setConcurrentConsumers(consumers);
-    container.setChannelTransacted(true);
-    container.setTransactionManager(transactionManager);
     container.setAdviceChain(retryOperationsInterceptor);
     return container;
   }
