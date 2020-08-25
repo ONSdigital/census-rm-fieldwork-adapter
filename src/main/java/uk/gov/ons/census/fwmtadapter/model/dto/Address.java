@@ -13,7 +13,7 @@ public class Address {
   private String latitude;
   private String longitude;
   private String uprn;
-  private String apbCode;
+  private String abpCode;
   private String estabUprn;
   private String addressType;
   private String addressLevel;
