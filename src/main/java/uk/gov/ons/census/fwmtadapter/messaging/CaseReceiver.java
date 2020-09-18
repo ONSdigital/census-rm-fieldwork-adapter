@@ -83,8 +83,15 @@ public class CaseReceiver {
     actionInstruction.setUprn(caze.getAddress().getUprn());
     actionInstruction.setEstabUprn(caze.getAddress().getEstabUprn());
 
-    if (event.getPayload().getMetadata().getCauseEventType()
-        == EventType.UNDELIVERED_MAIL_REPORTED) {
+    /*
+     HERE BE DRAGONS
+     UNDELIVERED_MAIL_REPORTED Events are set to field as UndeliveredAsAddress = true.  This makes sense.
+     CLERICAL_ADDRESS_RESOLUTION Events now hijack this field, it's a lazy hack so that Gateway and TM don't
+     have to alter their systems to handle a new flag.
+    */
+    if (event.getPayload().getMetadata().getCauseEventType() == EventType.UNDELIVERED_MAIL_REPORTED
+        || event.getPayload().getMetadata().getCauseEventType()
+            == EventType.CLERICAL_ADDRESS_RESOLUTION) {
       actionInstruction.setUndeliveredAsAddress(true);
     }
 

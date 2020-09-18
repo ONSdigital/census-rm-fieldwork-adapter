@@ -109,6 +109,7 @@ public class CaseReceiverTest {
     assertThat(actualActionInstruction.getBlankFormReturned()).isNull();
     assertThat(actualActionInstruction.getUprn()).isEqualTo("U1");
     assertThat(actualActionInstruction.getEstabUprn()).isEqualTo("EstabU2");
+    assertThat(actualActionInstruction.getUndeliveredAsAddress()).isNull();
   }
 
   @Test
@@ -276,6 +277,52 @@ public class CaseReceiverTest {
     assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.UPDATE);
     assertThat(actualAi.getSecureEstablishment()).isTrue();
     assertThat(actualAi.getBlankFormReturned()).isNull();
+  }
+
+  @Test
+  public void testReceiveCreateDecisionWtihClericalAddressResolution() {
+    // Given
+    CollectionCase collectionCase = new CollectionCase();
+    collectionCase.setId(TEST_CASE_ID);
+    collectionCase.setCaseRef("testRef");
+    collectionCase.setCaseType("HH");
+    Address address = new Address();
+    address.setAddressLevel("U");
+    address.setAddressType("test address type");
+    address.setUprn("U1");
+    address.setEstabUprn("EstabU2");
+    collectionCase.setAddress(address);
+
+    Metadata metadata = new Metadata();
+    metadata.setFieldDecision(ActionInstructionType.CREATE);
+    metadata.setCauseEventType(EventType.CLERICAL_ADDRESS_RESOLUTION);
+
+    Payload payload = new Payload();
+    payload.setCollectionCase(collectionCase);
+    payload.setMetadata(metadata);
+
+    ResponseManagementEvent responseManagementEvent = new ResponseManagementEvent();
+    responseManagementEvent.setPayload(payload);
+
+    // When
+    underTest.receiveMessage(responseManagementEvent);
+
+    // Then
+    ArgumentCaptor<FwmtActionInstruction> aiArgumentCaptor =
+        ArgumentCaptor.forClass(FwmtActionInstruction.class);
+    verify(rabbitTemplate).convertAndSend(eq(outboundExchange), eq(""), aiArgumentCaptor.capture());
+    FwmtActionInstruction actualActionInstruction = aiArgumentCaptor.getValue();
+    assertThat(actualActionInstruction.getCaseId()).isEqualTo(TEST_CASE_ID);
+    assertThat(actualActionInstruction.getCaseRef()).isEqualTo("testRef");
+    assertThat(actualActionInstruction.getAddressType()).isEqualTo("test address type");
+    assertThat(actualActionInstruction.getAddressLevel()).isEqualTo("U");
+    assertThat(actualActionInstruction.getActionInstruction())
+        .isEqualTo(ActionInstructionType.CREATE);
+    assertThat(actualActionInstruction.getSecureEstablishment()).isNull();
+    assertThat(actualActionInstruction.getBlankFormReturned()).isNull();
+    assertThat(actualActionInstruction.getUprn()).isEqualTo("U1");
+    assertThat(actualActionInstruction.getEstabUprn()).isEqualTo("EstabU2");
+    assertThat(actualActionInstruction.getUndeliveredAsAddress()).isTrue();
   }
 
   @Test
