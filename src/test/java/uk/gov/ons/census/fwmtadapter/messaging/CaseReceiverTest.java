@@ -105,7 +105,7 @@ public class CaseReceiverTest {
     assertThat(actualActionInstruction.getAddressLevel()).isEqualTo("U");
     assertThat(actualActionInstruction.getActionInstruction())
         .isEqualTo(ActionInstructionType.CREATE);
-    assertThat(actualActionInstruction.getSecureEstablishment()).isNull();
+    assertThat(actualActionInstruction.isSecureEstablishment()).isFalse();
     assertThat(actualActionInstruction.getBlankFormReturned()).isNull();
     assertThat(actualActionInstruction.getUprn()).isEqualTo("U1");
     assertThat(actualActionInstruction.getEstabUprn()).isEqualTo("EstabU2");
@@ -151,7 +151,7 @@ public class CaseReceiverTest {
     assertThat(actualAi.getAddressType()).isEqualTo("test address type");
     assertThat(actualAi.getAddressLevel()).isEqualTo("E");
     assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.CREATE);
-    assertThat(actualAi.getSecureEstablishment()).isTrue();
+    assertThat(actualAi.isSecureEstablishment()).isTrue();
     assertThat(actualAi.getBlankFormReturned()).isNull();
   }
 
@@ -232,7 +232,7 @@ public class CaseReceiverTest {
     assertThat(actualAi.getAddressType()).isEqualTo("test address type");
     assertThat(actualAi.getAddressLevel()).isEqualTo("E");
     assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.UPDATE);
-    assertThat(actualAi.getSecureEstablishment()).isFalse();
+    assertThat(actualAi.isSecureEstablishment()).isFalse();
     assertThat(actualAi.getBlankFormReturned()).isNull();
   }
 
@@ -275,7 +275,7 @@ public class CaseReceiverTest {
     assertThat(actualAi.getAddressType()).isEqualTo("test address type");
     assertThat(actualAi.getAddressLevel()).isEqualTo("U");
     assertThat(actualAi.getActionInstruction()).isEqualTo(ActionInstructionType.UPDATE);
-    assertThat(actualAi.getSecureEstablishment()).isTrue();
+    assertThat(actualAi.isSecureEstablishment()).isTrue();
     assertThat(actualAi.getBlankFormReturned()).isNull();
   }
 
@@ -318,7 +318,7 @@ public class CaseReceiverTest {
     assertThat(actualActionInstruction.getAddressLevel()).isEqualTo("U");
     assertThat(actualActionInstruction.getActionInstruction())
         .isEqualTo(ActionInstructionType.CREATE);
-    assertThat(actualActionInstruction.getSecureEstablishment()).isNull();
+    assertThat(actualActionInstruction.isSecureEstablishment()).isFalse();
     assertThat(actualActionInstruction.getBlankFormReturned()).isNull();
     assertThat(actualActionInstruction.getUprn()).isEqualTo("U1");
     assertThat(actualActionInstruction.getEstabUprn()).isEqualTo("EstabU2");
