@@ -1,30 +1,12 @@
 {
-  "rabbit_version": "3.6.10",
   "users": [
     {
-      "name": "guest",
-      "password_hash": "AldElI2NwJNg9A1YZbcOU2IH3EAbc1QMTLugjUXXcs/zikqh",
+      "name": "rmquser",
+      "password_hash": "aQpkvJ2NmkPkbXuur7p+IiuN5C0kQXV6QfZdHXO8o8hHUuAT",
       "hashing_algorithm": "rabbit_password_hashing_sha256",
       "tags": "administrator"
     }
   ],
-  "vhosts": [
-    {
-      "name": "/"
-    }
-  ],
-  "permissions": [
-    {
-      "user": "guest",
-      "vhost": "/",
-      "configure": ".*",
-      "write": ".*",
-      "read": ".*"
-    }
-  ],
-  "parameters": [],
-  "global_parameters": [],
-  "policies": [],
   "queues": [
     {
       "name": "Action.Field",
