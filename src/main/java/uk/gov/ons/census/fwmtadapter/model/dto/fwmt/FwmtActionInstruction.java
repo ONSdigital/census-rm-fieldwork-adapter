@@ -31,6 +31,5 @@ public class FwmtActionInstruction {
   private Integer ceActualResponses;
   private Boolean undeliveredAsAddress;
   private Boolean blankFormReturned;
-
   private boolean secureEstablishment;
 }

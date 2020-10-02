@@ -95,7 +95,7 @@ public class CaseReceiver {
       actionInstruction.setUndeliveredAsAddress(true);
     }
 
-    if (caze.getMetadata() != null) {
+    if (caze.getMetadata() != null && caze.getMetadata().getSecureEstablishment() != null) {
       actionInstruction.setSecureEstablishment(caze.getMetadata().getSecureEstablishment());
     }
 
