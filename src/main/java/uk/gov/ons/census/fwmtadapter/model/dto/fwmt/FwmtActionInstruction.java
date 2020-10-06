@@ -1,6 +1,5 @@
 package uk.gov.ons.census.fwmtadapter.model.dto.fwmt;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.UUID;
 import lombok.Data;
 
@@ -32,7 +31,5 @@ public class FwmtActionInstruction {
   private Integer ceActualResponses;
   private Boolean undeliveredAsAddress;
   private Boolean blankFormReturned;
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private Boolean secureEstablishment;
+  private boolean secureEstablishment;
 }
