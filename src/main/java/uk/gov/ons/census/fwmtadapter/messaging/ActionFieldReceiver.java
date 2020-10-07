@@ -55,7 +55,7 @@ public class ActionFieldReceiver {
     actionInstruction.setUprn(followup.getUprn());
     actionInstruction.setEstabUprn(followup.getEstabUprn());
 
-    if (followup.getMetadata() != null) {
+    if (followup.getMetadata() != null && followup.getMetadata().getSecureEstablishment() != null) {
       actionInstruction.setSecureEstablishment(followup.getMetadata().getSecureEstablishment());
     }
 

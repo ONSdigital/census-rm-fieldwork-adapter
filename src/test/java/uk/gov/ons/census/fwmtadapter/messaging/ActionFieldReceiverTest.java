@@ -152,6 +152,6 @@ public class ActionFieldReceiverTest {
         .convertAndSend(eq("TEST EXCHANGE"), eq(""), actionInstructionArgumentCaptor.capture());
     FwmtActionInstruction actionRequest = actionInstructionArgumentCaptor.getValue();
 
-    assertThat(actionRequest.getSecureEstablishment()).isTrue();
+    assertThat(actionRequest.isSecureEstablishment()).isTrue();
   }
 }
