@@ -11,5 +11,5 @@ public class FwmtCancelActionInstruction {
   private String addressLevel;
   private UUID caseId;
   private Integer ceExpectedCapacity;
-  private Integer ceActualResponses;
+  private int ceActualResponses;
 }

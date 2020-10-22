@@ -28,7 +28,7 @@ public class ActionFieldReceiverTest {
     fieldworkFollowup.setSurveyName("CENSUS");
     fieldworkFollowup.setBlankQreReturned(false);
     fieldworkFollowup.setAddressType("HH");
-    fieldworkFollowup.setCeActualResponses(null);
+    fieldworkFollowup.setCeActualResponses(0);
     fieldworkFollowup.setCeExpectedCapacity(null);
     fieldworkFollowup.setHandDelivery(true);
 
@@ -70,7 +70,7 @@ public class ActionFieldReceiverTest {
 
     assertThat(actionInstruction.isCe1Complete()).isFalse();
     assertThat(actionInstruction.getCeExpectedCapacity()).isNull();
-    assertThat(actionInstruction.getCeActualResponses()).isNull();
+    assertThat(actionInstruction.getCeActualResponses()).isEqualTo(0);
     assertThat(actionInstruction.isHandDeliver()).isTrue();
   }
 
