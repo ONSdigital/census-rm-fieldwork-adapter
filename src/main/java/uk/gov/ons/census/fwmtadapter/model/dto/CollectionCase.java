@@ -33,7 +33,7 @@ public class CollectionCase {
   private String fieldCoordinatorId;
   private String fieldOfficerId;
   private Integer ceExpectedCapacity;
-  private Integer ceActualResponses;
+  private int ceActualResponses;
   private Boolean addressInvalid;
   private boolean handDelivery;
   private CaseMetadata metadata;

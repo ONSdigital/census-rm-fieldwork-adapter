@@ -28,7 +28,7 @@ public class FwmtActionInstruction {
   private boolean ce1Complete;
   private boolean handDeliver;
   private Integer ceExpectedCapacity;
-  private Integer ceActualResponses;
+  private int ceActualResponses;
   private Boolean undeliveredAsAddress;
   private Boolean blankFormReturned;
   private boolean secureEstablishment;
