@@ -50,3 +50,5 @@ Run in debug mode.
 # How to test
 
 Use the [census-rm-acceptance-tests](https://github.com/ONSdigital/census-rm-acceptance-tests)
+
+TESTING
